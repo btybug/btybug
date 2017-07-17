@@ -7,6 +7,14 @@
         }
     ],
     "require": {
+        "sahak.avatar/avatar":"dev-master",
+        "sahak.avatar/console":"dev-master",
+        "sahak.avatar/framework":"dev-master",
+        "sahak.avatar/manage":"dev-master",
+        "sahak.avatar/resources":"dev-master",
+        "sahak.avatar/settings ":"dev-master",
+        "sahak.avatar/uploads":"dev-master",
+        "sahak.avatar/user":"dev-master"
     },
 	"autoload": {
         "psr-4": {
