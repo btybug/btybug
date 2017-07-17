@@ -1,0 +1,16 @@
+{
+    "name": "sahak.avatar/cms",
+    "authors": [
+        {
+            "name": "Sahak",
+            "email": "hakobyan.sahak88@gmail.com"
+        }
+    ],
+    "require": {
+    },
+	"autoload": {
+        "psr-4": {
+            "sahakavatar\\cms\\": "src/"
+        }
+    }
+}
