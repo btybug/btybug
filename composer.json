@@ -7,9 +7,6 @@
         }
     ],
     "require": {
-
-    },
-    "require-dev": {
         "tormjens/eventy":"dev-master",
         "sahak.avatar/avatar":"dev-master",
         "sahak.avatar/console":"dev-master",
@@ -21,6 +18,9 @@
         "sahak.avatar/modules":"dev-master",
         "sahak.avatar/media":"dev-master",
         "sahak.avatar/user":"dev-master"
+    },
+    "require-dev": {
+
     },
 	"autoload": {
         "psr-4": {
