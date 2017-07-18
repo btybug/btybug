@@ -1,6 +1,6 @@
 <?php
 
-namespace Sahakavatar\cms\Providers;
+namespace Sahakavatar\Cms\Providers;
 
 //use TorMorten\Eventy;
 
@@ -37,7 +37,8 @@ class CmsServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        include __DIR__.'/../standards/constants.php';
+        $this->app->register(RouteServiceProvider::class);
     }
 
 }

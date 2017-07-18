@@ -1,6 +1,6 @@
 <?php
 
-namespace Avatar\Avatar\Providers;
+namespace Sahakavatar\Cms\Providers;
 
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Route;
@@ -14,7 +14,7 @@ class RouteServiceProvider extends ServiceProvider
      *
      * @var string
      */
-    protected $namespace = 'Avatar\Avatar\Http\Controllers';
+    protected $namespace = 'Sahakavatar\Cms\Http\Controllers';
 
     /**
      * Define your route model bindings, pattern filters, etc.
@@ -56,12 +56,10 @@ class RouteServiceProvider extends ServiceProvider
             'middleware' => 'web',
         ], function ($router) {
             Route::group([
-                'middleware' => ['admin:Users'],
-                'prefix' => 'admin/avatar',
+//                'middleware' => ['admin:Users'],
                 'namespace' => $this->namespace,
             ], function ($router) {
-                //TODO fix path when done
-                require base_path('avatar/src/Routes/web.php');
+                require __DIR__.'/../Routes/web.php';
             });
         });
     }

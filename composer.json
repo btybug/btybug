@@ -25,6 +25,8 @@
 	"autoload": {
         "psr-4": {
             "Sahakavatar\\Cms\\": "src/"
-        }
+        },"files": [
+            "src/Helpers/api.php"
+        ]
     }
 }
