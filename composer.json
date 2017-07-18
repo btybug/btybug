@@ -14,6 +14,7 @@
         "sahak.avatar/resources":"dev-master",
         "sahak.avatar/settings":"dev-master",
         "sahak.avatar/uploads":"dev-master",
+        "sahak.avatar/modules":"dev-master",
         "sahak.avatar/user":"dev-master"
     },
 	"autoload": {
