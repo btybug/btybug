@@ -8,8 +8,8 @@
 
 namespace Sahakavatar\Cms\Models\Templates\Eloquent\Abstractions;
 
-use App\Models\Templates\Eloquent\Interfaces\TplInterface;
-use App\Modules\Packeges\Models\Validation;
+use Sahakavatar\Cms\Models\Templates\Eloquent\Interfaces\TplInterface;
+use Sahakavatar\Modules\Models\Validation;
 use Illuminate\Contracts\Support\Arrayable;
 use File, View, HTML;
 

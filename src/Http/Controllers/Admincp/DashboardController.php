@@ -1,4 +1,4 @@
-<?php namespace App\Http\Controllers\Admincp;
+<?php namespace Sahakavatar\Cms\Http\Controllers\Admincp;
 
 use App\Events\OrderShipped;
 use App\Events\PodcastWasPurchased;
@@ -36,7 +36,7 @@ class DashboardController extends Controller
      */
     public function __construct()
     {
-        $this->helpers = new helpers;
+//        $this->helpers = new helpers;
 
     }
 
@@ -47,12 +47,7 @@ class DashboardController extends Controller
      */
     public function getIndex()
     {
-        $order = User::findOrFail(1);
-
-        // Order shipment logic...
-
-        event(new OrderShipped($order));
-        return view('admin.dashboard');
+        return view('cms::admin.dashboard');
     }
 
     /**

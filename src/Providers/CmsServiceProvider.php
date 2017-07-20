@@ -18,6 +18,9 @@ class CmsServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        $this->loadTranslationsFrom(__DIR__ . '/../resources/Lang', 'cms');
+        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'cms');
+
         $this->app->register("Sahakavatar\User\Providers\ModuleServiceProvider");
         $this->app->register('Sahakavatar\Console\Providers\ModuleServiceProvider');
         $this->app->register('Sahakavatar\Framework\Providers\ModuleServiceProvider');

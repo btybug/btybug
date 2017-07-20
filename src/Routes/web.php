@@ -50,7 +50,7 @@ Route::group(
         Route::post('save-form', function (){
 
         });
-        Route::get('/', 'HomeController@pages');
+//        Route::get('/', 'HomeController@pages');
         //deletable
         Route::get('login', '\Sahakavatar\User\Http\Controllers\Auth\AuthController@getLogin')->middleware('guest');
         Route::post('login', '\Sahakavatar\User\Http\Controllers\Auth\AuthController@postLogin')->middleware('guest');

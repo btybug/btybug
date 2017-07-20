@@ -135,6 +135,26 @@ abstract class GeneralRepository implements RepositoryInterface
         return $model->delete() ? true : false;
     }
 
+    /**
+     * @param array $ids
+     * @return bool
+     */
+    public function destroy(array $ids)
+    {
+        return $this->model->destroy($ids) ? true : false;
+    }
+
+    /**
+     * @param string $attribute
+     * @param string $value
+     * @return bool
+     */
+    public function deleteByCondition(string $attribute, string $value)
+    {
+        return $this->where($attribute, $value)->delete() ? true : false;
+
+    }
+
 
 
 }

@@ -2,9 +2,9 @@
 namespace Sahakavatar\Cms\Models\Templates;
 
 use App\Core\CmsItemReader;
-use App\Models\Templates\Eloquent\Abstractions\TplModel;
-use App\Models\Templates\TplVariations;
-use App\Modules\Settings\Models\TemplateVariations;
+use Sahakavatar\Cms\Models\Templates\Eloquent\Abstractions\TplModel;
+use Sahakavatar\Cms\Models\Templates\TplVariations;
+use Sahakavatar\Settings\Models\TemplateVariations;
 
 class BackendTpl extends TplModel
 {

@@ -42,14 +42,13 @@ class Home
             if (!isset($settings['pl_live_settings'])) {
                 if ($page->status == 'draft')
                     abort(404);
-
                 if (BBCheckMemberAccessEnabled() && $page->url != "/") {
 
                     return view('frontend.login', compact('page', 'settings'));
                 } else {
                     if (Auth::check()) {
                         $user = Auth::user();
-                        if (!$user->membership or FrontendPage::checkAccess($page->id, Auth::user()->membership->slug)) {
+                        if (!$user->membership || FrontendPage::checkAccess($page, $user->membership->slug)) {
                             abort(403, 'Unauthorized action.');
                         }
                     }
@@ -64,7 +63,7 @@ class Home
                 $settings=array_merge($settings,$page_settings);
             }
             $settings['main_content'] = $page->main_content;
-            return view('front_pages', compact('page', 'settings'));
+            return view('cms::front_pages', compact('page', 'settings'));
         }
 
         return abort(404);

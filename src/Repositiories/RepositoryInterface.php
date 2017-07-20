@@ -88,4 +88,19 @@ interface RepositoryInterface
      */
     public function delete(int $id);
 
+    /**
+     * @param array $ids
+     * @return mixed
+     */
+    public function destroy(array $ids);
+
+    /**
+     * @param string $attribute
+     * @param string $value
+     * @return mixed
+     */
+    public function deleteByCondition(string $attribute, string $value);
+
+
+
 }
