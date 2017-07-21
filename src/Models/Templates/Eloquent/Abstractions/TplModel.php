@@ -434,7 +434,7 @@ abstract class TplModel implements TplInterface, Arrayable
 
     public function checkGearInFileStructureWithPath($path) {
         if($path) {
-            return File::isDirectory($path);
+            return File::isDirectory(base_path($path));
         }
     }
     /**

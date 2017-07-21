@@ -31,7 +31,7 @@ class BackendTpl extends TplModel
      */
     public function section()
     {
-        return $this->belongsTo('App\Modules\Sections\Sections', 'section_id');
+        return $this->belongsTo(Sections::class, 'section_id');
     }
 
     /**
@@ -39,7 +39,7 @@ class BackendTpl extends TplModel
      */
     public function variations()
     {
-        return $this->allVars('App\Models\Templates\TplVariations');
+        return $this->allVars(TplVariations::class);
     }
 
     public function makeVariation($array)

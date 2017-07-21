@@ -336,3 +336,174 @@ function BBFrameworkJs()
 {
     return \Sahakavatar\Framework\Models\Framework::activeJs();
 }
+
+//TODO transer in user package
+if (!function_exists('BBGetUserAvatar')) {
+    /**
+     * @param null $id
+     * @return mixed|null|string
+     */
+    function BBGetUserAvatar($id = null)
+    {
+        if ($id) {
+            if ($user = \App\User::find($id)) {
+                return ($user->profile->avatar) ? url($user->profile->avatar) : '/resources/assets/images/avatar.png';
+            }
+        } else {
+            if (Auth::check()) {
+                return (Auth::user()->profile->avatar) ? url(Auth::user()->profile->avatar) : '/resources/assets/images/avatar.png';
+            }
+        }
+
+        return null;
+    }
+}
+
+if (!function_exists('BBGetUserName')) {
+    /**
+     * @param null $id
+     * @return mixed|null|string
+     */
+    function BBGetUserName($id = null)
+    {
+        if ($id) {
+            if ($user = \App\User::find($id)) {
+                if (!isset($user->profile)) {
+                    return $user->username;
+                }
+
+                return ($user->profile->first_name || $user->profile->last_name) ?
+                    $user->profile->first_name . ' ' . $user->profile->last_name : $user->username;
+            }
+        } else {
+            if (Auth::check()) {
+                if (!isset(Auth::user()->profile)) {
+                    return Auth::user()->username;
+                }
+
+                return (Auth::user()->profile->first_name || Auth::user()->profile->last_name) ? Auth::user(
+                    )->profile->first_name . ' ' . Auth::user()->profile->last_name : Auth::user()->username;
+            }
+        }
+
+        return null;
+    }
+}
+
+function BBAdminMenu()
+{
+
+    // Get json file
+    $menu_array = \Config::get('admin_menus');
+    if (!$menu_array) {
+        $menu_json_file = file_get_contents(base_path('resources/menus/admin/1.json'));
+        $menu_array = json_decode($menu_json_file, true);
+    }
+    $menu = BBAdminMenuWalker($menu_array);
+
+//    // Optional Menu 1
+//    if (BBGetAdminSetting('active-menu-1')) {
+//        $file = 'resources/menus/admin/' . BBGetAdminSetting('active-menu-1') . '.json';
+//        if (is_file($file)) {
+//            $menu .= BBAdminMenuWalker(json_decode(file_get_contents($file), true));
+//        }
+//    }
+
+    return $menu;
+}
+function BBAdminMenuWalker($menu_array)
+{
+
+    $menu = '';
+    if (is_array($menu_array)) {
+        $menu = '<ul id="menu-content" class="menu-content collapse out">';
+
+        foreach ($menu_array as $key => $item) {
+            $link = 'javascript:void(0)';
+            $icon = (isset($item['icon'])) ? $item['icon'] : 'fa fa-share-square-o';
+            if (isset($item['custom-link'])) {
+                $link = $item['custom-link'];
+            }
+
+            $menu .=
+                '<li  data-toggle="collapse" data-target="#id' . $key . '" class="collapsed">' .
+                '<a href="javascript:void(0)"><i class="' . $icon . '"></i>' . $item['title'];
+            if (isset($item['children']) and is_array($item['children'])) {
+                $menu .= '<span class="pull-right arrow fa fa-arrow-left"></span>';
+            }
+            $menu .= '</a>';
+
+            $menu .= '</li>';
+            $menu .= '</ul>';
+            if (isset($item['children']) and is_array($item['children'])) {
+                $menu .= '   <ul class="sub-menu collapse" id="id' . $key . '">';
+                foreach ($item['children'] as $child) {
+                    $menu .=
+                        ' <li class="clearfix">' .
+                        ' <a href="' . $child['custom-link'] . '">' . $child['title'] .
+                        ' </a>' .
+                        ' </li>';
+                }
+                $menu .= '   </ul>';
+            }
+
+        }
+
+    }
+
+
+    return $menu;
+}
+
+function BBgetSiteLogo()
+{
+    $logo = \Sahakavatar\Settings\Models\Settings::where('section', 'setting_system')->where('settingkey', 'site_logo')->first();
+    if (!$logo) return '';
+
+    return url('/resources/assets/images/logo/', $logo->val);
+}
+
+function BBgetSiteName()
+{
+    $name = \Sahakavatar\Settings\Models\Settings::where('section', 'setting_system')->where('settingkey', 'site_name')->first();
+
+    return $name->val;
+}
+
+function BBRenderUnits($variation_id, $source = [], $data = NULL)
+{
+    $field = null;
+    $cheked = null;
+    $slug = explode('.', $variation_id);
+    if (isset($slug[0]) && isset($slug[1])) {
+        $widget_id = $slug[0];
+        $variationID = $slug[1];
+        $unit = \Sahakavatar\Cms\Models\Templates\Units::find($widget_id);
+        if (!is_null($unit)) {
+            $variation = $unit->findVariation($variation_id);
+            if (!is_null($variation)) {
+                $settings = $variation->settings;
+                if ($unit->have_settings && !$settings) {
+                    $settings = [];
+                }
+
+                if (isset($source['field'])) {
+                    if (is_string($source['field'])) {
+                        $field = $source;
+                    } else {
+                        $field = $source['field'];
+                    }
+                }
+
+                return $unit->render(compact(['variation', 'settings', 'source', 'field', 'cheked', 'data']));
+            }
+        }
+
+        return 'Wrong Unit';
+    }
+}
+//TODO transver in Avatar
+function plugins_path($path = null)
+{
+    return rtrim(base_path(config('avatar.plugins.path').DS. $path), '/');
+}

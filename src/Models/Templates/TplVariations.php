@@ -8,7 +8,7 @@
 
 namespace Sahakavatar\Cms\Models\Templates;
 
-use App\Models\Templates\Eloquent\Abstractions\TplVariations as variations;
+use Sahakavatar\Cms\Models\Templates\Eloquent\Abstractions\TplVariations as variations;
 use File;
 
 class TplVariations extends variations
@@ -33,7 +33,7 @@ class TplVariations extends variations
 
     public function findVarition($tpl, $id)
     {
-        $path = $tpl->path . '/' . $tpl->variationPath .'/'.$id . '.json';
+        $path =base_path($tpl->path . '/' . $tpl->variationPath .'/'.$id . '.json');
         if (File::exists($path)) {
             $all = new $this;
             $all->id = File::name($path);

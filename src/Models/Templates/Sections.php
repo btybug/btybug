@@ -1,8 +1,8 @@
 <?php
 namespace Sahakavatar\Cms\Models\Templates;
 
-use App\Models\Templates\Eloquent\Abstractions\TplModel;
-use App\Models\Templates\SectionVariations;
+use Sahakavatar\Cms\Models\Templates\Eloquent\Abstractions\TplModel;
+use Sahakavatar\Cms\Models\Templates\SectionVariations;
 use File;
 
 class Sections extends TplModel

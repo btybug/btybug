@@ -1,11 +1,11 @@
 <?php namespace Sahakavatar\Cms\Models\Templates;
 
-use App\Core\CmsItemReader;
-use App\Models\ContentLayouts\autoinclude;
-use App\Models\Templates\Eloquent\Abstractions\TplModel;
-use App\Models\Templates\UnitsVariations;
-use App\Models\Templates\Templates;
-use App\Modules\Resources\Models\Files\traits\FilesPreview;
+//use App\Core\CmsItemReader;
+use Sahakavatar\Cms\Models\ContentLayouts\autoinclude;
+use Sahakavatar\Cms\Models\Templates\Eloquent\Abstractions\TplModel;
+use Sahakavatar\Cms\Models\Templates\UnitsVariations;
+use Sahakavatar\Cms\Models\Templates\Templates;
+use Sahakavatar\Resources\Models\Files\traits\FilesPreview;
 
 class Units extends TplModel
 {

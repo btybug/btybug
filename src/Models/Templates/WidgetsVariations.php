@@ -8,7 +8,7 @@
 
 namespace Sahakavatar\Cms\Models\Templates;
 
-use App\Models\Templates\Eloquent\Abstractions\TplVariations as variations;
+use Sahakavatar\Cms\Models\Templates\TplVariations as variations;
 use File;
 
 class WidgetsVariations extends variations
