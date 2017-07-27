@@ -30,7 +30,7 @@
 {{--{!! BBlinkFonts() !!}--}}
 {{--{!! BBFrameworkCss() !!}--}}
 {{--{!! BBCustomCss() !!}--}}
-{{--{!! HTML::style("resources/assets/css/builder-tool.css") !!}--}}
+{{--{!! HTML::style("css/builder-tool.css") !!}--}}
 {!! HTML::script("/js/jquery-2.1.4.min.js") !!}
 {!! HTML::script("/js/jquery-ui/jquery-ui.min.js") !!}
 @yield('CSS')
@@ -44,7 +44,7 @@
 <body data-background="[BB:Background]">
 <div id="wrapper">
     @php
-        $page = \Sahakavatar\Modules\Models\AdminPages::getPageByURL();
+        $page = \Sahakavatar\Cms\Services\RenderService::getPageByURL();
     @endphp
     @if($page)
         @if($page->left_bar)
@@ -120,9 +120,9 @@
 {!! HTML::script("/css/bootstrap/js/bootstrap.min.js") !!}
 {!! HTML::script("/js/admin.js?v=6.0") !!}
 
-{{--{!! HTML::script("resources/assets/js/bootbox/js/bootbox.min.js") !!}--}}
-{{--{!! HTML::script("resources/assets/js/media-lightbox.js?v.5") !!}--}}
-{{--{!! HTML::script("resources/assets/js/forms/multidata.js") !!}--}}
+{{--{!! HTML::script("js/bootbox/js/bootbox.min.js") !!}--}}
+{{--{!! HTML::script("js/media-lightbox.js?v.5") !!}--}}
+{{--{!! HTML::script("js/forms/multidata.js") !!}--}}
 
 {{--{!! $javascript !!}--}}
 
@@ -148,7 +148,7 @@
 
 </body>
 {!! BBFrameworkJs() !!}
-{{--{!! HTML::style("resources/assets/css/core_styles.css") !!}--}}
+{{--{!! HTML::style("css/core_styles.css") !!}--}}
 
 </html>
 

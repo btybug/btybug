@@ -9,7 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Events\CustomFormSubmittedEvent;
 use App\User;
 
-use App\helpers\helpers;
+use Sahakavatar\Cms\Helpers\helpers;
 use DB, Notifynder, Module;
 use RegEmails, Image;
 use App\Models\Layouts;

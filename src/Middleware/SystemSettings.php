@@ -4,8 +4,8 @@ use Closure,Config,Carbon\Carbon,Session;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Session\Store;
-//use App\helpers\helpers;
-//use App\Repositories\AdminsettingRepository as Settings;
+//use Sahakavatar\Cms\Helpers\helpers;
+//use Sahakavatar\Settings\Repository\AdminsettingRepository as Settings;
 //TODO Clean or remove
 class SystemSettings {
     protected $session;

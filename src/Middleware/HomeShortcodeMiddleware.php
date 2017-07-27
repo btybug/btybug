@@ -2,7 +2,6 @@
 
 namespace Sahakavatar\Cms\Middleware;
 
-use App\Modules\Create\Forms;
 use Closure;
 
 class HomeShortcodeMiddleware

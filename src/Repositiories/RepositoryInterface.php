@@ -53,14 +53,33 @@ interface RepositoryInterface
      */
     public function findOrFail(int $id, array $columns, array $with = []);
 
+
     /**
      * @param string $attribute
      * @param string $value
+     * @param string $operator
      * @param array $columns
      * @param array $with
      * @return mixed
      */
-    public function findBy(string $attribute, string $value, array $columns, array $with = []);
+    public function findBy(string $attribute, string $value, string $operator, array $columns, array $with = []);
+
+
+    /**
+     * @param array $conditions
+     * @param array $columns
+     * @param array $with
+     * @return mixed
+     */
+    public function findAllByMultiple(array $conditions, array $columns, array $with = []);
+
+    /**
+     * @param array $conditions
+     * @param array $columns
+     * @param array $with
+     * @return mixed
+     */
+    public function findOneByMultiple(array $conditions, array $columns, array $with = []);
 
     /**
      * @param array $data
@@ -100,6 +119,13 @@ interface RepositoryInterface
      * @return mixed
      */
     public function deleteByCondition(string $attribute, string $value);
+
+    /**
+     * @param string $key
+     * @param string $value
+     * @return mixed
+     */
+    public function pluck(string $key, string $value);
 
 
 

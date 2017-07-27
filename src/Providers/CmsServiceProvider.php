@@ -1,16 +1,11 @@
 <?php
 
 namespace Sahakavatar\Cms\Providers;
-
-//use TorMorten\Eventy;
-
 use Illuminate\Support\ServiceProvider;
 
 
 class CmsServiceProvider extends ServiceProvider
 {
-
-
     /**
      * Bootstrap any application services.
      *
@@ -31,8 +26,6 @@ class CmsServiceProvider extends ServiceProvider
         $this->app->register('Sahakavatar\Modules\Providers\ModuleServiceProvider');
         $this->app->register('Avatar\Avatar\Providers\AvatarServiceProvider');
     }
-
-
     /**
      * Register any application services.
      *

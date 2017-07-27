@@ -17,6 +17,19 @@ abstract class GeneralRepository implements RepositoryInterface
     protected $model;
 
     /**
+     * GeneralRepository constructor.
+     */
+    public function __construct()
+    {
+        $this->model = $this->model();
+    }
+
+    /**
+     * @return mixed
+     */
+    protected  abstract function model();
+
+    /**
      * @return mixed
      */
     public function getAll()
@@ -66,6 +79,14 @@ abstract class GeneralRepository implements RepositoryInterface
     }
 
     /**
+     * @return mixed
+     */
+    public function first()
+    {
+        return $this->model->first();
+    }
+
+    /**
      * @param int $id
      * @param array $columns
      * @param array $with
@@ -76,19 +97,51 @@ abstract class GeneralRepository implements RepositoryInterface
         return $this->model->with($with)->findOrFail($id, $columns);
     }
 
+
     /**
      * @param string $attribute
      * @param string $value
+     * @param string $operator
      * @param array $columns
      * @param array $with
      * @return mixed
      */
-    public function findBy(string $attribute, string $value, array $columns = ['*'], array $with = [])
+    public function findBy(string $attribute, string $value, string $operator = '=', array $columns = ['*'], array $with = [])
     {
         return $this->model
             ->with($with)
             ->where($attribute, $value)
             ->first($columns);
+    }
+
+    /**
+     * @param array $conditions
+     * @param array $columns
+     * @param array $with
+     * @return mixed
+     */
+    public function findAllByMultiple(array $conditions, array $columns = ['*'], array $with = [])
+    {
+        $model = $this->model->with($with);
+        foreach ($conditions as $column => $condition) {
+            $model = $model->where($column, $condition);
+        }
+        return $model->get($columns);
+    }
+
+    /**
+     * @param array $conditions
+     * @param array $columns
+     * @param array $with
+     * @return mixed
+     */
+    public function findOneByMultiple(array $conditions, array $columns = ['*'], array $with = [])
+    {
+        $model = $this->model->with($with);
+        foreach ($conditions as $column => $condition) {
+            $model = $model->where($column, $condition);
+        }
+        return $model->first($columns);
     }
 
     /**
@@ -151,10 +204,18 @@ abstract class GeneralRepository implements RepositoryInterface
      */
     public function deleteByCondition(string $attribute, string $value)
     {
-        return $this->where($attribute, $value)->delete() ? true : false;
+        return $this->model->where($attribute, $value)->delete() ? true : false;
 
     }
 
-
+    /**
+     * @param string $key
+     * @param string $value
+     * @return mixed
+     */
+    public function pluck(string $key, string $value)
+    {
+        return $this->model->pluck($key, $value);
+    }
 
 }

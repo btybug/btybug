@@ -8,7 +8,7 @@
 
 namespace Sahakavatar\Cms\Models;
 
-//use App\helpers\helpers;
+//use Sahakavatar\Cms\Helpers\helpers;
 use Sahakavatar\Manage\Models\FrontendPage;
 use Assets;
 use Auth;
