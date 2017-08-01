@@ -780,3 +780,8 @@ function BBGetUserRole($id = null)
 
     return null;
 }
+
+function BBGetAllValidations()
+{
+    return \Config::get('validations');
+}

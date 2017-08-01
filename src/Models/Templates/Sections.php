@@ -87,6 +87,9 @@ class Sections extends TplModel
     public static function getTypes()
     {
         $types = [];
+        return [];
+        //TODO: make with tags
+
         $data = @json_decode(File::get(config('paths.sections_path') . 'configTypes.json'), 1)['types'];
         if (count($data)) {
             foreach ($data as $type) {
