@@ -11,14 +11,14 @@
 
 namespace App\Http\Controllers\Admincp;
 
-use App\Core\CmsItemReader;
+use Sahakavatar\Cms\Services\CmsItemReader;
 use Sahakavatar\Cms\Helpers\helpers;
 use App\Http\Controllers\Controller;
-use App\Models\ContentLayouts\ContentLayouts;
-use App\Models\Templates\Sections;
-use App\Models\Templates\Templates as Tpl;
-use App\Models\Templates\Units;
-use App\Models\Templates\Widgets;
+use Sahakavatar\Cms\Models\ContentLayouts\ContentLayouts;
+use Sahakavatar\Cms\Models\Sections;
+use Sahakavatar\Cms\Models\Templates as Tpl;
+use Sahakavatar\Cms\Models\Templates\Units;
+use Sahakavatar\Cms\Models\Widgets;
 use App\Models\Themes\Themes;
 use App\Modules\Create\Models\Menu;
 use App\Modules\Create\Models\Menus\BackendMenus;

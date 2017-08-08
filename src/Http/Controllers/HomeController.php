@@ -2,9 +2,9 @@
 
 namespace Sahakavatar\Cms\Http\Controllers;
 
-use App\Models\ContentLayouts\ContentLayouts;
+use Sahakavatar\Cms\Models\ContentLayouts\ContentLayouts;
 use App\Models\Home;
-use App\Models\Templates\Units;
+use Sahakavatar\Cms\Models\Templates\Units;
 use Illuminate\Http\Request;
 
 /**

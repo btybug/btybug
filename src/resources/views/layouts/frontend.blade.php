@@ -11,12 +11,12 @@
     <link rel="stylesheet" href="{{ url("css/bootstrap/css/bootstrap.min.css") }}" />
     <link rel="stylesheet" href="{{ url("css/font-awesome/css/font-awesome.min.css") }}" />
     <link rel="stylesheet" href="{{ url("js/jquery-ui/jquery-ui.min.css") }}" />
-    {{--{!! HTML::style("resources/assets/css/admin.css?v=0.392") !!}--}}
-    {{--{!! HTML::style("resources/assets/css/dashboard-css.css?v=0.2") !!}--}}
-    {{--{!! HTML::style("resources/assets/css/admin-theme.css?v2.91",['id' => 'stylecolor']) !!}--}}
+    {{--{!! HTML::style("/css/admin.css?v=0.392") !!}--}}
+    {{--{!! HTML::style("/css/dashboard-css.css?v=0.2") !!}--}}
+    {{--{!! HTML::style("/css/admin-theme.css?v2.91",['id' => 'stylecolor']) !!}--}}
 
 <!--BB:CSS-->
-    {{--{!! HTML::style("resources/assets/css/core_styles.css") !!}--}}
+    {{--{!! HTML::style("/css/core_styles.css") !!}--}}
     {{--{!! HTML::style("/resources/views/layouts/themes/admintheme/css/style.css") !!}--}}
     {{--{!! HTML::style("/resources/views/layouts/themes/admintheme/css/font-awesome/css/font-awesome.min.css") !!}--}}
     {{--{!! BBlinkFonts() !!}--}}

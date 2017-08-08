@@ -4,7 +4,7 @@ use File;
 
 /**
  * Class ContentLayouts
- * @package App\Models\ContentLayouts
+ * @package Sahakavatar\Cms\Models\ContentLayouts
  */
 class ContentLayouts
 {

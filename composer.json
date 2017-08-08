@@ -7,7 +7,7 @@
         }
     ],
     "require": {
-        "tormjens/eventy":"dev-master",
+
         "sahak.avatar/avatar":"dev-master",
         "sahak.avatar/console":"dev-master",
         "sahak.avatar/framework":"dev-master",

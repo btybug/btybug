@@ -12,7 +12,7 @@ use File;
 
 /**
  * Trait autoinclude
- * @package App\Models\ContentLayouts
+ * @package Sahakavatar\Cms\Models\ContentLayouts
  */
 trait autoinclude
 {

@@ -12,7 +12,7 @@ use File;
 
 /**
  * Class CmsItemRegistrator
- * @package App\Modules\Modules\Models
+ * @package Sahakavatar\Modules\Models\Models
  */
 class CmsItemRegister
 {

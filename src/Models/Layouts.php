@@ -11,7 +11,7 @@ namespace Sahakavatar\Cms\Models;
 use File;
 use View;
 use App\Models\Corepage;
-use App\Models\Templates\Templates;
+use Sahakavatar\Cms\Models\Templates;
 
 
 /**

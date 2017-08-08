@@ -1,7 +1,7 @@
 <?php
 namespace Sahakavatar\Cms\Models\Templates;
 
-use App\Core\CmsItemReader;
+use Sahakavatar\Cms\Services\CmsItemReader;
 use Sahakavatar\Cms\Models\Templates\Eloquent\Abstractions\TplModel;
 use Sahakavatar\Cms\Models\Templates\TplVariations;
 use Sahakavatar\Settings\Models\TemplateVariations;

@@ -785,3 +785,29 @@ function BBGetAllValidations()
 {
     return \Config::get('validations');
 }
+function issetReturn($array, $item, $default = null)
+{
+
+    if (is_array($array)) {
+        if (isset($array[$item]) && $array[$item] != "") {
+            return $array[$item];
+        }
+    }
+
+    return $default;
+}
+
+//function BBlinkFonts()
+//{
+//    $helper = new \Sahakavatar\Cms\Helpers\helpers();
+//    $fonts = $helper->getFontList();
+//    $links = '';
+//    if (count($fonts)) {
+//        foreach ($fonts as $font) {
+//            if (isset($font["items"]['config']))
+//                $links .= "<link href='/resources/assets/fonts/" . $font['folder'] . "/" . $font['items']['config']->css . ".css' rel='stylesheet' />";
+//        }
+//    }
+//
+//    return $links;
+//}

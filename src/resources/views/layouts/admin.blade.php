@@ -13,16 +13,17 @@
     <meta content="width=device-width, initial-scale=1" name="viewport"/>
     <meta content="" name="description"/>
     <meta content="" name="author"/>
+{{--{!! HTML::style("/css/bootstrap/css/bootstrap.min.css") !!}--}}
 
-{!! HTML::style("/css/admin.css?v=0.392") !!}
 <!-- Latest compiled and minified CSS -->
-{{--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">--}}
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+{!! HTML::style("/css/admin.css?v=0.392") !!}
 
 {{--<!-- Optional theme -->--}}
 {{--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">--}}
 
 <!-- Latest compiled and minified JavaScript -->
-{!! HTML::style("/css/dashboard-css.css?v=0.2") !!}
+{{--{!! HTML::style("/css/dashboard-css.css?v=0.2") !!}--}}
 {{--    {{ asset("css/admin-theme.css?v2.91") }}--}}
 <!--BB:CSS-->
 {{--{!! HTML::style(BBAdminThemeUrl(), array('id'=>'backend-css')) !!}--}}
@@ -31,8 +32,7 @@
 {{--{!! BBFrameworkCss() !!}--}}
 {{--{!! BBCustomCss() !!}--}}
 {{--{!! HTML::style("css/builder-tool.css") !!}--}}
-{!! HTML::script("/js/jquery-2.1.4.min.js") !!}
-{!! HTML::script("/js/jquery-ui/jquery-ui.min.js") !!}
+
 @yield('CSS')
 @stack('css')
 
@@ -103,6 +103,7 @@
                                         @endif
                                     </nav>
                                     <!--BB:PageContent-->
+
                                     @include(BBgetPageLayout(),['settings'=>BBgetPageLayoutSettings()])
                                     @yield('content')
                                     @yield('content2')
@@ -116,7 +117,9 @@
 </div>
 @include('modal')
 {{ csrf_field() }}
-
+{!! HTML::script("/js/jquery-2.1.4.min.js") !!}
+{!! HTML::script("/js/jquery-ui/jquery-ui.min.js") !!}
+<script src="https://npmcdn.com/tether@1.2.4/dist/js/tether.min.js"></script>
 {!! HTML::script("/css/bootstrap/js/bootstrap.min.js") !!}
 {!! HTML::script("/js/admin.js?v=6.0") !!}
 

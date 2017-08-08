@@ -13,7 +13,7 @@ use File;
 
 /**
  * Class ContentLayoutVariations
- * @package App\Models\ContentLayouts
+ * @package Sahakavatar\Cms\Models\ContentLayouts
  */
 class ContentLayoutVariations extends TplVariations
 {

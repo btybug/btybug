@@ -1,11 +1,11 @@
 <?php
 namespace Sahakavatar\Cms\Models\Templates;
 
-use App\Models\Templates\Eloquent\Abstractions\TplModel;
+use Sahakavatar\Cms\Models\Eloquent\Abstractions\TplModel;
 
 /**
  * Class Widgets
- * @package App\Models\Templates
+ * @package Sahakavatar\Cms\Models
  */
 class Widgets extends TplModel
 {
@@ -105,7 +105,7 @@ class Widgets extends TplModel
      */
     public function variations ()
     {
-        return $this->allVars('App\Models\Templates\TplVariations');
+        return $this->allVars('Sahakavatar\Cms\Models\TplVariations');
     }
 
     /**

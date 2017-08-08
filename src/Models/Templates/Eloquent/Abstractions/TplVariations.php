@@ -12,7 +12,7 @@ use File;
 
 /**
  * Class TplVariations
- * @package App\Models\Templates\Eloquent\Abstractions
+ * @package Sahakavatar\Cms\Models\Eloquent\Abstractions
  */
 abstract class TplVariations
 {

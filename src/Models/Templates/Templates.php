@@ -38,7 +38,7 @@ class Templates extends TplModel
      */
     public function variations()
     {
-        return $this->allVars('App\Models\Templates\TplVariations');
+        return $this->allVars('Sahakavatar\Cms\Models\TplVariations');
     }
 
     public function makeVariation($array)

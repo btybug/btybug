@@ -1,12 +1,12 @@
 <?php namespace Sahakavatar\Cms\Models\ContentLayouts;
 
-use App\Core\CmsItemReader;
+use Sahakavatar\Cms\Services\CmsItemReader;
 use File;
-use App\Models\ContentLayouts\ContentLayoutVariations;
+use Sahakavatar\Cms\Models\ContentLayouts\ContentLayoutVariations;
 
 /**
  * Class ContentLayouts
- * @package App\Models\ContentLayouts
+ * @package Sahakavatar\Cms\Models\ContentLayouts
  */
 class MainBody
 {

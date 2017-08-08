@@ -30,7 +30,7 @@ class Sections extends TplModel
      */
     public function variations()
     {
-        return $this->allVars('App\Models\Templates\SectionVariations');
+        return $this->allVars('Sahakavatar\Cms\Models\SectionVariations');
     }
 
     public function makeVariation($array)

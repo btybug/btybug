@@ -105,6 +105,8 @@ abstract class TplModel implements TplInterface, Arrayable
      */
     public  function getAll($selfType=null)
     {
+        //FIXME:optimise this function
+        if($selfType){
             $configFileData = $this->getRegisteredDataFromFileBySelfType($selfType);
             if($configFileData) {
                 foreach($configFileData as $key => $currentGear) {
@@ -118,6 +120,27 @@ abstract class TplModel implements TplInterface, Arrayable
                     }
                 }
             }
+        }else{
+            $configFileData=[];
+            foreach ($this->configs as $key=>$value){
+                $selfType=$key;
+                $newData=$this->getRegisteredDataFromFileBySelfType($key);
+                $configFileData= array_merge($configFileData,$newData);
+                if($configFileData) {
+                    foreach($configFileData as $key => $currentGear) {
+                        if($this->checkGearInFileStructureWithPath($currentGear['path']) && strtolower($selfType) == strtolower($currentGear['self_type'])) {
+                            $tpl=new static;
+                            $tpl->original = $tpl->attributes = $currentGear;
+                            $tpl->path = base_path($currentGear['path']);
+                            $tpl->folders[] = $tpl->main_type . DS . $tpl->type . DS . $tpl->slug;
+                            $tpl->folders[] = $tpl->type . DS . $tpl->slug;
+                            $this->before[] = $tpl;
+                        }
+                    }
+                }
+            }
+        }
+
             return $this;
         }
 
@@ -377,9 +400,8 @@ abstract class TplModel implements TplInterface, Arrayable
     public static function find($slug)
     {
         $tpl = null;
-        $getLatesClassObj = get_called_class();
         $instance = new static;
-        $instance->getAll($getLatesClassObj::$type);
+        $instance->getAll();
         foreach ($instance->before as $static) {
             $attrs = $static->toArray();
             if (isset($attrs['slug']) && $attrs['slug'] == $slug) {
@@ -627,7 +649,6 @@ abstract class TplModel implements TplInterface, Arrayable
     public function path($path = null)
     {
         $path = ($path) ? base_path($this->tplpath . DS . $path) : base_path($this->tplpath);
-
         if (!File::isDirectory($path)) return false;
         $this->dir = $path;
         return $this;
@@ -711,6 +732,23 @@ abstract class TplModel implements TplInterface, Arrayable
 
     public function setTplPath($path) {
         $this->tplpath = $path;
+    }
+
+    public function addTag($tag)
+    {
+        $this->tags[]=$tag;
+        return $this;
+    }
+
+    public function removeTag($tag)
+    {
+        if(is_array($this->tags)){
+            $index=array_search($tag,$this->tags);
+            if($index){
+              unset($this->tags[$index]);
+            }
+        }
+
     }
 
 }

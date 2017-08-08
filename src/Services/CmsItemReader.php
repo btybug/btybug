@@ -10,6 +10,7 @@ namespace Sahakavatar\Cms\Services;
 
 use File;
 use Sahakavatar\Cms\Models\Templates\Eloquent\Abstractions\TplModel;
+use Sahakavatar\Cms\Models\Templates\UnitsVariations;
 
 class CmsItemReader extends TplModel
 {
@@ -116,7 +117,7 @@ class CmsItemReader extends TplModel
 
     public function variations()
     {
-        return $this->allVars('App\Models\Templates\UnitsVariations');
+        return $this->allVars(UnitsVariations::class);
     }
 
 
