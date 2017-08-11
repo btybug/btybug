@@ -4,9 +4,6 @@
 use Avatar\Avatar\Repositories\Plugins;
 use Sahakavatar\Cms\Models\ContentLayouts\autoinclude;
 use Sahakavatar\Cms\Models\Templates\Eloquent\Abstractions\TplModel;
-use Sahakavatar\Cms\Models\Templates\UnitsVariations;
-use Sahakavatar\Cms\Models\Templates\Templates;
-use Sahakavatar\Resources\Models\Files\traits\FilesPreview;
 
 class Units extends TplModel
 {
