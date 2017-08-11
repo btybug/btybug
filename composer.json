@@ -6,10 +6,11 @@
             "email": "hakobyan.sahak88@gmail.com"
         }
     ],
+    "type": "module",
     "require": {
 
-        "sahak.avatar/avatar":"dev-master",
         "sahak.avatar/console":"dev-master",
+        "sahak.avatar/avatar":"dev-master",
         "sahak.avatar/framework":"dev-master",
         "sahak.avatar/manage":"dev-master",
         "sahak.avatar/resources":"dev-master",
