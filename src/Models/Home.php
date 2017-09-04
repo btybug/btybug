@@ -63,6 +63,8 @@ class Home
                 $settings=array_merge($settings,$page_settings);
             }
             $settings['main_content'] = $page->main_content;
+            $settings['content_type'] = $page->content_type;
+            $settings['template'] = $page->template;
             return view('cms::front_pages', compact('page', 'settings'));
         }
 

@@ -103,7 +103,6 @@ class CustomSCMiddleware
             $fn = $val[$key];
             $content = $this->sortCoder($key, $fn, $content);
             $posCode = "[$key";
-//            dd(strpos($content, $posCode));
             if (strpos($content, $posCode)) {
                 $content = $this->htmlContentHandler($content);
             }

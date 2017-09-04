@@ -1,4 +1,7 @@
-<!DOCTYPE html>
+@php
+    $page = \Sahakavatar\Cms\Services\RenderService::getFrontPageByURL();
+@endphp
+        <!DOCTYPE html>
 <html lang="@yield('locale')">
 <head>
     <meta charset="utf-8">
@@ -6,35 +9,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title')</title>
     @yield('metas')
-    <link type="image/x-icon" rel="icon" href="{{ asset('assets/favicon.ico') }}" />
-    <link type="image/x-icon" rel="shortcut icon" href="{{ asset('assets/favicon.ico') }}" />
-    <link rel="stylesheet" href="{{ url("css/bootstrap/css/bootstrap.min.css") }}" />
-    <link rel="stylesheet" href="{{ url("css/font-awesome/css/font-awesome.min.css") }}" />
-    <link rel="stylesheet" href="{{ url("js/jquery-ui/jquery-ui.min.css") }}" />
-    {{--{!! HTML::style("/css/admin.css?v=0.392") !!}--}}
-    {{--{!! HTML::style("/css/dashboard-css.css?v=0.2") !!}--}}
-    {{--{!! HTML::style("/css/admin-theme.css?v2.91",['id' => 'stylecolor']) !!}--}}
-
-<!--BB:CSS-->
-    {{--{!! HTML::style("/css/core_styles.css") !!}--}}
-    {{--{!! HTML::style("/resources/views/layouts/themes/admintheme/css/style.css") !!}--}}
-    {{--{!! HTML::style("/resources/views/layouts/themes/admintheme/css/font-awesome/css/font-awesome.min.css") !!}--}}
-    {{--{!! BBlinkFonts() !!}--}}
-    {!! \Sahakavatar\Framework\Models\Framework::activeCss() !!}
-    {!! \Sahakavatar\Framework\Models\Framework::customCss() !!}
-    <link rel="apple-touch-icon" href="{{ asset('assets/apple-touch-icon.png') }}" />
+    <link type="image/x-icon" rel="icon" href="{{ asset('assets/favicon.ico') }}"/>
+    <link type="image/x-icon" rel="shortcut icon" href="{{ asset('assets/favicon.ico') }}"/>
+    {!! BBactiveCss()  !!}
+    <link rel="stylesheet" href="{{ url("css/font-awesome/css/font-awesome.min.css") }}"/>
+    <link rel="stylesheet" href="{{ url("js/jquery-ui/jquery-ui.min.css") }}"/>
+    <link rel="apple-touch-icon" href="{{ asset('assets/apple-touch-icon.png') }}"/>
+    {!! HTML::style('custom/css/'.str_replace(' ','-',$page->title).'.css') !!}
     {{--<link rel="stylesheet" href="{{ asset("resources/assets/css/bootstrap.css?v=1.1") }}" />--}}
     @yield('css')
+    @stack('CSS')
 <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
     <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
     <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
-    <script src="{{ url("js/jquery-3.2.1.min.js") }}" type="text/javascript"></script>
+    {!! HTML::script("/js/jquery-2.1.4.min.js") !!}
     <script src="{{ url("js/jquery-ui/jquery-ui.min.js") }}" type="text/javascript"></script>
-    <script src="{{ url("css/bootstrap/js/bootstrap.min.js") }}" type="text/javascript"></script>
-
+    <script src="https://npmcdn.com/tether@1.2.4/dist/js/tether.min.js"></script>
+    {!! HTML::script('custom/js/'.str_replace(' ','-',$page->title).'.js') !!}
+    <script src="{!! url('css/bootstrap/js/bootstrap.min.js') !!}"></script>
     {!! HTML::script("/js/tinymice/tinymce.min.js") !!}
     {!! HTML::script("/js/UiElements/bb_iframejs.js") !!}
 </head>
@@ -72,7 +67,6 @@
 @endif
 @yield('content')
 <!-- jQuery first, then Bootstrap JS. -->
-
 @yield('js')
 </body>
 </html>

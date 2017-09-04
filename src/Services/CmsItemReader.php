@@ -77,6 +77,18 @@ class CmsItemReader extends TplModel
         return $_instance->getAll($selfType);
     }
 
+    public function sortByTag($tag)
+    {
+        $units = $this->run();
+        $result = [];
+        foreach ($units as $unit) {
+            if (isset($unit->tags) && array_search($tag, $unit->tags) > -1) {
+                $result[] = $unit;
+            }
+        }
+        return collect($result);
+    }
+
     public function deleteGear()
     {
         if ($this && $this->self_type) {

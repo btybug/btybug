@@ -24,8 +24,11 @@
   | and give it the controller to call when that URI is requested.
   |
  */
-Route::get('units/styles/{model}/{slug}/{path}', 'HomeController@unitStyles')->where('path', '.*');
-Route::get('units/scripts/{model}/{slug}/{path}', 'HomeController@unitScripts')->where('path', '.*');
+//Route::get('units/styles/{slug}/{path}', 'HomeController@unitStyles')->where('path', '.*');
+Route::get('custom/css/{file}', 'HomeController@unitStyles');
+Route::get('custom/js/{file}', 'HomeController@unitScripts');
+//Route::get('units/scripts/{slug}/{path}', 'HomeController@unitScripts')->where('path', '.*');
+Route::get('units/img/{slug}/{path}', 'HomeController@unitImg')->where('path', '.*');
 if (\Illuminate\Support\Facades\Schema::hasTable('admin_pages')) {
     Route::get(BBGetAdminLoginUrl(), '\App\Modules\Users\Http\Controllers\Auth\AuthController@getAdminLogin')->middleware('guest');
     Route::post(BBGetAdminLoginUrl(), ['before' => 'throttle:2,60', 'uses' => '\App\Modules\Users\Http\Controllers\Auth\AuthController@postAdminLogin'])->middleware('guest');

@@ -1,6 +1,5 @@
 <?php namespace Sahakavatar\Cms\Models\Templates;
 
-//use Sahakavatar\Cms\Services\CmsItemReader;
 use Avatar\Avatar\Repositories\Plugins;
 use Sahakavatar\Cms\Models\ContentLayouts\autoinclude;
 use Sahakavatar\Cms\Models\Templates\Eloquent\Abstractions\TplModel;
@@ -9,38 +8,10 @@ class Units extends TplModel
 {
     use autoinclude;
 
-    protected $tplpath = 'resources/units';
-
-    protected $config = 'config.json';
-
-    public $variationPath = 'variations';
-
     public static $type = 'units';
-
-
-    public function variations()
-    {
-        return $this->allVars(UnitsVariations::class);
-    }
-
-    public function makeVariation($array)
-    {
-        $vars = new TplVariations();
-        return $vars->createVariation($this, $array);
-    }
-    public function scopeMakeVariation(array $array=[])
-    {
-        $vars = new TplVariations();
-        return $vars->createVariation($this, $array);
-    }
-
-    public static function findUnit($slug) {
-        $slug = explode('.', $slug);
-        if(!isset($slug[0])) {
-            return null;
-        }
-        return self::find($slug[0]);
-    }
+    public $variationPath = 'variations';
+    protected $tplpath = 'resources/units';
+    protected $config = 'config.json';
 
     public static function getAllUnits()
     {
@@ -83,36 +54,6 @@ class Units extends TplModel
         return UnitsVariations::delete($id, $tpl);
     }
 
-    public static function findVariation($id)
-    {
-        $slug = explode('.', $id);
-        $variation = new UnitsVariations();
-
-        $tpl = self::find($slug[0]);
-        return $variation->findVarition($tpl, $id);
-    }
-
-    public static function findByVariation($id)
-    {
-        $slug = explode('.', $id);
-        $variation = new UnitsVariations();
-
-        $tpl = self::find($slug[0]);
-        return $tpl;
-    }
-
-    public function renderSettings(array $variables = [])
-    {
-        $path = $this->path;
-        $variables['tplPath'] = $path;
-        $variables['_this']=$this;
-        $slug = $this->slug;
-        if (!\File::exists($path . '/settings.blade.php')) return "Undefined Settings Blade!";
-        \View::addLocation(realpath($this->path));
-        \View::addNamespace("$slug", realpath($this->path));
-        return \View::make("$slug::settings")->with($variables)->render();
-    }
-
     /**
      * @param $slug
      * @return mixed
@@ -120,7 +61,7 @@ class Units extends TplModel
     public static function renderLivePreview($slug = NULL, $type = 'frontend')
     {
         $ui = Units::findUnit($slug);
-        if(!$ui) {
+        if (!$ui) {
             return false;
         }
         $variation = self::findVariation($slug);
@@ -133,13 +74,30 @@ class Units extends TplModel
         $settings = (isset($variation->settings) && $variation->settings) ? $variation->settings : [];
         $body = url('/admin/console/backend/units/settings-iframe', $slug);
         $dataSettings = url('/admin/console/backend/units/settings-iframe', $slug) . '/settings';
-        if($type = 'frontend') {
+        if ($type = 'frontend') {
             $body = url('/admin/uploads/gears/units/settings-iframe', $slug);
             $dataSettings = url('/admin/uploads/gears/units/settings-iframe', $slug) . '/settings';
         }
         $data['body'] = $body;
         $data['settings'] = $dataSettings;
         return view('console::backend.gears.units.preview', compact(['ui', 'id', 'data', 'settings', 'variation']));
+    }
+
+    public static function findUnit($slug)
+    {
+        $slug = explode('.', $slug);
+        if (!isset($slug[0])) {
+            return null;
+        }
+        return self::find($slug[0]);
+    }
+
+    public static function findVariation($id)
+    {
+        $slug = explode('.', $id);
+        $variation = new UnitsVariations();
+        $tpl = self::find($slug[0]);
+        return $variation->findVarition($tpl, $id);
     }
 
     /**
@@ -149,15 +107,16 @@ class Units extends TplModel
      * @param null $isSave
      * @return array|bool
      */
-    public static function saveSettings($slug, $title = NULL, $data, $isSave = NULL) {
-        if($isSave && $isSave == 'save') {
+    public static function saveSettings($slug, $title = NULL, $data, $isSave = NULL)
+    {
+        if ($isSave && $isSave == 'save') {
             $unit = self::findUnit($slug);
             $existingVariation = self::findVariation($slug);
             $dataToInsert = [
                 'title' => $title,
                 'settings' => $data
             ];
-            if(!$existingVariation) {
+            if (!$existingVariation) {
                 $variation = new UnitsVariations();
                 $variation = $variation->createVariation($unit, $dataToInsert);
             } else {
@@ -165,11 +124,11 @@ class Units extends TplModel
                 $existingVariation->settings = $dataToInsert['settings'];
                 $variation = $existingVariation;
             }
-            if(!$variation->settings) {
+            if (!$variation->settings) {
                 $variation->setAttributes('settings', []);
             }
             $settings = (isset($variation->settings) && $variation->settings) ? $variation->settings : [];
-            if($variation->save()) {
+            if ($variation->save()) {
                 //dd($variation->id);
                 return [
                     'html' => $unit->render(['settings' => $settings, 'source' => BBGiveMe('array', 5), 'cheked' => 1]),
@@ -185,12 +144,49 @@ class Units extends TplModel
         return false;
     }
 
-    public function plugin()
+    public static function findByVariation($id)
     {
-        $plugins=new Plugins();
-        return $plugins->find($this->plugin);
+        $slug = explode('.', $id);
+        $variation = new UnitsVariations();
+
+        $tpl = self::find($slug[0]);
+        return $tpl;
     }
 
+    public function variations()
+    {
+        return $this->allVars(UnitsVariations::class);
+    }
+
+    public function makeVariation($array)
+    {
+        $vars = new TplVariations();
+        return $vars->createVariation($this, $array);
+    }
+
+    public function scopeMakeVariation(array $array = [])
+    {
+        $vars = new TplVariations();
+        return $vars->createVariation($this, $array);
+    }
+
+    public function renderSettings(array $variables = [])
+    {
+        $path = $this->path;
+        $variables['tplPath'] = $path;
+        $variables['_this'] = $this;
+        $slug = $this->slug;
+        if (!\File::exists($path . '/settings.blade.php')) return "Undefined Settings Blade!";
+        \View::addLocation(realpath($this->path));
+        \View::addNamespace("$slug", realpath($this->path));
+        return \View::make("$slug::settings")->with($variables)->render();
+    }
+
+    public function plugin()
+    {
+        $plugins = new Plugins();
+        return $plugins->find($this->plugin);
+    }
 
 
 }

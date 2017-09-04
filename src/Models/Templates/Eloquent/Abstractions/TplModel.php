@@ -27,13 +27,7 @@ abstract class TplModel implements TplInterface, Arrayable
      * @var string
      */
     public $configs = [
-        'hf' => 'hf.json',
-        'page_sections' => 'page_sections.json',
-        'sections' => 'sections.json',
         'units' => 'units.json',
-        'main_body' => 'main_body.json',
-        'templates' => 'templates.json',
-        'assets' => 'framework_assets.json'
     ];
 
     public static $type;
@@ -108,9 +102,11 @@ abstract class TplModel implements TplInterface, Arrayable
         //FIXME:optimise this function
         if($selfType){
             $configFileData = $this->getRegisteredDataFromFileBySelfType($selfType);
+
             if($configFileData) {
                 foreach($configFileData as $key => $currentGear) {
-                    if($this->checkGearInFileStructureWithPath($currentGear['path']) && strtolower($selfType) == strtolower($currentGear['self_type'])) {
+
+                    if($this->checkGearInFileStructureWithPath($currentGear['path'])) {
                         $tpl=new static;
                         $tpl->original = $tpl->attributes = $currentGear;
                         $tpl->path = base_path($currentGear['path']);
@@ -119,16 +115,15 @@ abstract class TplModel implements TplInterface, Arrayable
                         $this->before[] = $tpl;
                     }
                 }
+
             }
         }else{
-            $configFileData=[];
             foreach ($this->configs as $key=>$value){
                 $selfType=$key;
-                $newData=$this->getRegisteredDataFromFileBySelfType($key);
-                $configFileData= array_merge($configFileData,$newData);
+                $configFileData=$this->getRegisteredDataFromFileBySelfType($key);
                 if($configFileData) {
                     foreach($configFileData as $key => $currentGear) {
-                        if($this->checkGearInFileStructureWithPath($currentGear['path']) && strtolower($selfType) == strtolower($currentGear['self_type'])) {
+                        if($this->checkGearInFileStructureWithPath($currentGear['path'])) {
                             $tpl=new static;
                             $tpl->original = $tpl->attributes = $currentGear;
                             $tpl->path = base_path($currentGear['path']);
@@ -140,7 +135,6 @@ abstract class TplModel implements TplInterface, Arrayable
                 }
             }
         }
-
             return $this;
         }
 
@@ -292,7 +286,6 @@ abstract class TplModel implements TplInterface, Arrayable
         return $this->makeWidgetTemplate($paths);
 
     }
-
     public function recursiveFindAllUnits()
     {
         $templates = $this->getAll()->run();
@@ -303,10 +296,6 @@ abstract class TplModel implements TplInterface, Arrayable
         return $this->makeWidgetTemplate($paths);
 
     }
-
-
-
-
     /**
      * @param $paths
      * @return mixed
@@ -351,7 +340,6 @@ abstract class TplModel implements TplInterface, Arrayable
         }else{
             $tpl = "tpl";
         }
-
         return View::make("$slug::$tpl")->with($variables)->with(['tplPath' => $path,'_this'=>$this])->render();
     }
 
@@ -455,6 +443,7 @@ abstract class TplModel implements TplInterface, Arrayable
     }
 
     public function checkGearInFileStructureWithPath($path) {
+
         if($path) {
             return File::isDirectory(base_path($path));
         }
@@ -709,12 +698,32 @@ abstract class TplModel implements TplInterface, Arrayable
     }
     public function style($path)
     {
-        return \Html::style('units/styles/'.$this->self_type.'/'.$this->slug.'/'.$path);
+        if(!File::exists($this->path.DS.$path)) abort(500);
+        $styles=[];
+        if(\Session::has('custom.styles')){
+            $styles=\Session::get('custom.styles', []);
+        }
+        $slug=$this->slug;
+        $content=File::get($this->path.DS.$path);
+        $styles[md5($content)]="/*$slug*/".File::get($this->path.DS.$path);
+       \Session::put('custom.styles',$styles);
+    }
+    public function img($path)
+    {
+        return url('units/img/'.$this->slug.'/'.$path);
     }
 
     public function script($path)
     {
-        return \Html::script('units/scripts/'.$this->self_type.'/'.$this->slug.'/'.$path);
+        if(!File::exists($this->path.DS.$path)) abort(500);
+        $styles=[];
+        if(\Session::has('custom.scripts')){
+            $styles=\Session::get('custom.scripts', []);
+        }
+        $slug=$this->slug;
+        $content=File::get($this->path.DS.$path);
+        $styles[md5($content)]="/*$slug*/ \r\n".$content;
+        \Session::put('custom.scripts',$styles);
     }
 
     /**

@@ -1,4 +1,7 @@
-<!DOCTYPE html>
+@php
+    $page = \Sahakavatar\Cms\Services\RenderService::getPageByURL();
+@endphp
+        <!DOCTYPE html>
 <!--[if IE 8]>
 <html lang="en" class="ie8 no-js"> <![endif]-->
 <!--[if IE 9]>
@@ -13,26 +16,10 @@
     <meta content="width=device-width, initial-scale=1" name="viewport"/>
     <meta content="" name="description"/>
     <meta content="" name="author"/>
-{{--{!! HTML::style("/css/bootstrap/css/bootstrap.min.css") !!}--}}
-
-<!-- Latest compiled and minified CSS -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+{!! BBactiveCss()  !!}
 {!! HTML::style("/css/admin.css?v=0.392") !!}
-
-{{--<!-- Optional theme -->--}}
-{{--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">--}}
-
-<!-- Latest compiled and minified JavaScript -->
-{{--{!! HTML::style("/css/dashboard-css.css?v=0.2") !!}--}}
-{{--    {{ asset("css/admin-theme.css?v2.91") }}--}}
-<!--BB:CSS-->
-{{--{!! HTML::style(BBAdminThemeUrl(), array('id'=>'backend-css')) !!}--}}
-
-{{--{!! BBlinkFonts() !!}--}}
-{{--{!! BBFrameworkCss() !!}--}}
-{{--{!! BBCustomCss() !!}--}}
-{{--{!! HTML::style("css/builder-tool.css") !!}--}}
-
+{!! HTML::style("css/builder-tool.css") !!}
+{!! HTML::style('custom/'.$page->slug.'.css') !!}
 @yield('CSS')
 @stack('css')
 
@@ -43,93 +30,61 @@
 </head>
 <body data-background="[BB:Background]">
 <div id="wrapper">
-    @php
-        $page = \Sahakavatar\Cms\Services\RenderService::getPageByURL();
-    @endphp
+
     @if($page)
-        @if($page->left_bar)
-            {!! BBleftBar() !!}
-            <div id="main-wrapper" style="margin-left: 227px;">
-                @else
-                    <div id="main-wrapper" style="margin-left: 0px;">
-                        @endif
-                        @else
-                            {!! BBleftBar() !!}
-                            <div id="main-wrapper" style="margin-left: 227px;">
-                                @endif
-                                @if($page)
-                                    @if($page->header)
-                                        {!! BBheaderBack() !!}
-                                    @endif
-                                @else
-                                    {!! BBheaderBack() !!}
-                                @endif
-                                <div class="middle-wrapper">
-                                    <nav class="row">
-                                        @if (isset($errors) && count($errors) > 0)
-                                            <div class="alert alert-danger" role="alert">
-                                                <button type="button" class="close" data-dismiss="alert"
-                                                        aria-label="Close"><span aria-hidden="true">&times;</span>
-                                                </button>
-                                                <ul>
-                                                    @foreach ($errors->all() as $error)
-                                                        <li>{!! $error !!}</li>
-                                                    @endforeach
-                                                </ul>
-                                            </div>
-                                        @endif
-                                        @if (session('flash.message') != null)
-                                            <div class="flash alert {{ Session::has('flash.class') ? session('flash.class') : 'alert-success' }}"
-                                                 role="alert">
-                                                <button type="button" class="close" data-dismiss="alert"
-                                                        aria-label="Close"><span aria-hidden="true">&times;</span>
-                                                </button>
-                                                {!! session('flash.message') !!}
-                                            </div>
-                                        @endif
-
-                                        @if(Session::has('message'))
-                                            <div class="m-t-10 alert {{ Session::get('alert-class', 'alert-info') }} alert-dismissible"
-                                                 role="alert">
-                                                <button type="button" class="close" data-dismiss="alert"
-                                                        aria-label="Close"><span aria-hidden="true">&times;</span>
-                                                </button>
-                                                {!! Session::get('message') !!}
-                                                @php
-                                                    Session::forget('message');
-                                                    Session::forget('alert-class');
-                                                @endphp
-                                            </div>
-                                        @endif
-                                    </nav>
-                                    <!--BB:PageContent-->
-
-                                    @include(BBgetPageLayout(),['settings'=>BBgetPageLayoutSettings()])
-                                    @yield('content')
-                                    @yield('content2')
-
-
-                                    {{--@yield('main_content')--}}
-                                </div>
-                            </div>
+        {!! BBheaderBack() !!}
+        <div style="background: #e2e2e2;">
+            <nav class="row">
+                @if (isset($errors) && count($errors) > 0)
+                    <div class="alert alert-danger" role="alert">
+                        <button type="button" class="close" data-dismiss="alert"
+                                aria-label="Close"><span aria-hidden="true">&times;</span>
+                        </button>
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>{!! $error !!}</li>
+                            @endforeach
+                        </ul>
                     </div>
-            </div>
+                @endif
+                @if (session('flash.message') != null)
+                    <div class="flash alert {{ Session::has('flash.class') ? session('flash.class') : 'alert-success' }}"
+                         role="alert">
+                        <button type="button" class="close" data-dismiss="alert"
+                                aria-label="Close"><span aria-hidden="true">&times;</span>
+                        </button>
+                        {!! session('flash.message') !!}
+                    </div>
+                @endif
+
+                @if(Session::has('message'))
+                    <div class="m-t-10 alert {{ Session::get('alert-class', 'alert-info') }} alert-dismissible"
+                         role="alert">
+                        <button type="button" class="close" data-dismiss="alert"
+                                aria-label="Close"><span aria-hidden="true">&times;</span>
+                        </button>
+                        {!! Session::get('message') !!}
+                        @php
+                            Session::forget('message');
+                            Session::forget('alert-class');
+                        @endphp
+                    </div>
+                @endif
+            </nav>
+            @include(BBgetPageLayout(),['settings'=>BBgetPageLayoutSettings()])
+        </div>
+    @endif
 </div>
 @include('modal')
 {{ csrf_field() }}
 {!! HTML::script("/js/jquery-2.1.4.min.js") !!}
 {!! HTML::script("/js/jquery-ui/jquery-ui.min.js") !!}
 <script src="https://npmcdn.com/tether@1.2.4/dist/js/tether.min.js"></script>
-{!! HTML::script("/css/bootstrap/js/bootstrap.min.js") !!}
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+        integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+        crossorigin="anonymous"></script>
 {!! HTML::script("/js/admin.js?v=6.0") !!}
-
-{{--{!! HTML::script("js/bootbox/js/bootbox.min.js") !!}--}}
-{{--{!! HTML::script("js/media-lightbox.js?v.5") !!}--}}
-{{--{!! HTML::script("js/forms/multidata.js") !!}--}}
-
-{{--{!! $javascript !!}--}}
-
-
+{!! HTML::script('custom/js/'.str_replace(' ','-',$page->title).'.js') !!}
 <script>
     $(function () {
         if ($('[data-role="browseMedia"]').length > 0) {
@@ -148,10 +103,6 @@
         });
     </script>
 @endif
-
 </body>
-{!! BBFrameworkJs() !!}
-{{--{!! HTML::style("css/core_styles.css") !!}--}}
-
 </html>
 

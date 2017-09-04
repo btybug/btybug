@@ -10,6 +10,7 @@ namespace Sahakavatar\Cms\Services;
 
 
 use Sahakavatar\Console\Repository\AdminPagesRepository;
+use Sahakavatar\Console\Repository\FrontPagesRepository;
 use Sahakavatar\User\Repository\RoleRepository;
 
 class RenderService extends GeneralService
@@ -22,13 +23,34 @@ class RenderService extends GeneralService
         $adminPageRepo = new AdminPagesRepository();
         $url = \Request::route()->uri();
         $urlWithoutAdmin = $route = substr($url, 6);
-
         $page = $adminPageRepo->model()->where('url', $url)->orWhere(function ($query) use ($url, $urlWithoutAdmin) {
             $query->where('url', $urlWithoutAdmin)
                 ->orWhere(function ($query) use ($url, $urlWithoutAdmin) {
                     $paramsUrl = self::replaceParametrs();
                     $query->where('url', "/" . $url)
-                        ->orWhere('url', $paramsUrl);
+                        ->orWhere(function ($query) use ($paramsUrl) {
+                            $query->where('url', "/" . $paramsUrl)
+                                ->orWhere('url', $paramsUrl);
+                        });
+                });
+        })->first();
+
+        return $page;
+    }
+    public static function getFrontPageByURL()
+    {
+        $adminPageRepo = new FrontPagesRepository();
+        $url = \Request::route()->uri();
+        $urlWithoutAdmin = $route = substr($url, 6);
+        $page = $adminPageRepo->model()->where('url', $url)->orWhere(function ($query) use ($url, $urlWithoutAdmin) {
+            $query->where('url', $urlWithoutAdmin)
+                ->orWhere(function ($query) use ($url, $urlWithoutAdmin) {
+                    $paramsUrl = self::replaceParametrs();
+                    $query->where('url', "/" . $url)
+                        ->orWhere(function ($query) use ($paramsUrl) {
+                            $query->where('url', "/" . $paramsUrl)
+                                ->orWhere('url', $paramsUrl);
+                        });
                 });
         })->first();
 
@@ -37,13 +59,21 @@ class RenderService extends GeneralService
 
     public static function replaceParametrs()
     {
-        $segments = \Request::segments();
-        self::$segment_array = $segments;
-        $params = \Request::route()->parameters();
+        $url = \Request::route()->uri;
+        $segments = explode('/',$url);
+
+        $params = \Request::route()->parameterNames();
+
+
         if (count($params)) {
-            $array = array_where($segments, function ($key, $value) use ($params) {
-                if (in_array($value, $params)) {
-                    self::$segment_array[$key] = '{param}';
+            $array = array_where($segments, function ( $value, $key) use ($params) {
+                if(str_contains($value,'{')){
+                    $value = str_replace('{','',str_replace('}','',$value));
+                    if (in_array($value, $params)) {
+                        self::$segment_array[$key] = '{param}';
+                    }
+                }else{
+                    self::$segment_array[$key] = $value;
                 }
             });
         }

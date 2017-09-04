@@ -1,7 +1,7 @@
 @extends('cms::layouts.admin')
-@section('main_content')
+@section('content')
     @yield('parag')
-    <section class="row" style="margin: 0 -5px;">
+    <div class="row" style="margin: 0 -5px;">
         <div class="box box-default color-palette-box">
             <div class="box-body">
                 @inject('section','Sahakavatar\Cms\Helpers\Tabs')
@@ -44,7 +44,7 @@
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 @stop
 
 @push('css')

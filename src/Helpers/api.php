@@ -7,10 +7,10 @@
  */
 
 
-function BBaddShortcode($key, $shortcode)
+function BBaddShortcode($key, $function)
 {
     $codes = \Config::get('shortcode.extra', []);
-    array_push($codes, [$key => $shortcode]);
+    array_push($codes, [$key => $function]);
     \Config::set('shortcode.extra', $codes);
 }
 
@@ -59,8 +59,7 @@ function BBRenderTpl($variation_id, $on_empty = null)
     if (isset($slug[0]) && isset($slug[1])) {
         $widget_id = $slug[0];
         $variationID = $slug[1];
-
-        $widget = \Sahakavatar\Cms\Models\Templates\Templates::find($widget_id);
+        $widget = \Sahakavatar\Cms\Models\Templates\Units::find($widget_id);
         if (!is_null($widget)) {
             $variation = $widget->findVariation($variation_id);
             if (!is_null($variation)) {
@@ -72,7 +71,6 @@ function BBRenderTpl($variation_id, $on_empty = null)
                 return $widget->render(compact(['variation', 'section', 'settings']));
             }
         }
-
         return 'Wrong widget';
     }
 
@@ -81,26 +79,15 @@ function BBRenderTpl($variation_id, $on_empty = null)
 
 function BBRenderPageSections($variation_id, $source = [], $main_view = null)
 {
-
     $slug = explode('.', $variation_id);
-
     if (isset($slug[0]) && isset($slug[1])) {
         $content_layout = $slug[0];
         $section = \Sahakavatar\Cms\Models\ContentLayouts\ContentLayouts::find($content_layout);
-
-
         if (!is_null($section)) {
             $variation = $section->findVariation($variation_id);
             if (!is_null($variation)) {
-
                 $settings = $variation->toArray();
-//                if ($section->have_settings && !$settings) {
-//                    $settings = [];
-//                }
-
-//                $liveSettings = array_except($source, ['pl', 'pl_live_settings', 'page_id']);
                 $liveSettings = $source;
-
                 if (count($liveSettings) && is_array($liveSettings) && is_array($settings)) {
                     array_filter($settings, function ($value) {
                         return $value !== '';
@@ -111,33 +98,20 @@ function BBRenderPageSections($variation_id, $source = [], $main_view = null)
                     $settings = array_merge($liveSettings, $settings);
                 }
                 $settings['main_view'] = $main_view;
-
                 return $section->render($settings);
             }
         }
-
         return false;
     }
 }
-
-
-function BBdiv($action, $key, $html, array $array = [])
+function BBRenderPageBody($slug, $data = [], $main_view = null)
 {
-    $BBarrays = [
-        'main_body' => 'BBRenderMainView',
-        'sections' => 'BBRenderSections'
+    $section = \Sahakavatar\Cms\Models\ContentLayouts\ContentLayouts::renderPageBody($slug, $data);
+    return $section;
+}
 
-    ];
-    $bbRenderFunction = $BBarrays[$action];
-    $route = Request::route();
-    if ($action == 'main_body' && $route->uri() == "admin/manage/frontend/pages/page-preview/{id}") {
-        $param = $route->parameter('id');
-        $page = \Sahakavatar\Manage\Models\FrontendPage::find($param);
-        if ($page) {
-            if ($page->type != "custom" && $page->type != "tags")
-                return false;
-        }
-    }
+function BBdiv($key, $html, array $array = [])
+{
 
     $atributes = ' ';
     $value = '';
@@ -169,11 +143,8 @@ function BBdiv($action, $key, $html, array $array = [])
     if (strpos($key, '[]')) {
         $array = 'data-array="true"';
     }
-
-    $data_key = str_replace('[]', '', $key);
-    $renderedUnit = $bbRenderFunction($value);
-
-    return '<div data-action=' . $action . ' data-key="' . $data_key . '" ' . $atributes . ' >' . (($renderedUnit) ? $renderedUnit : $html) . '</div><input class="bb-button-realted-hidden-input" type="hidden" ' . $array . ' value="' . $value . '" data-name="' . $data_key . '" name="' . $key . '">';
+    $renderedUnit = BBRenderUnits($value);
+    return '<div data-action="unit"' . ' data-key="' . $key . '" ' . $atributes . ' >' . (($renderedUnit) ? $renderedUnit : $html) . '</div><input class="bb-button-realted-hidden-input" type="hidden" ' . $array . ' value="' . $value . '" data-name="' . $key . '" name="' . $key . '">';
 }
 
 function BBRenderSections($variation_id, $source = [])
@@ -192,11 +163,9 @@ function BBRenderSections($variation_id, $source = [])
                 if ($section->have_settings && !$settings) {
                     $settings = [];
                 }
-
                 return $section->render(compact(['variation', 'settings', 'source']));
             }
         }
-
         return false;
     }
 }
@@ -216,7 +185,7 @@ function BBRenderBackTpl($variation_id, $on_empty = null)
         $widget_id = $slug[0];
         $variationID = $slug[1];
 
-        $widget = \Sahakavatar\Cms\Models\Templates\BackendTpl::find($widget_id);
+        $widget = \Sahakavatar\Cms\Models\Templates\Units::find($widget_id);
         if (!is_null($widget)) {
             $variation = $widget->findVariation($variation_id);
             if (!is_null($variation)) {
@@ -238,6 +207,7 @@ function BBRenderBackTpl($variation_id, $on_empty = null)
 function BBleftBar()
 {
     $tpl = \Sahakavatar\Settings\Models\Settings::where('section', 'setting_system')->where('settingkey', 'backend_left_bar')->first();
+//    dd($tpl);
     if ($tpl and !empty($tpl->val)) {
         return BBRenderBackTpl($tpl->val);
     }
@@ -245,16 +215,24 @@ function BBleftBar()
 
 function BBheaderBack()
 {
-    $tpl = \Sahakavatar\Settings\Models\Settings::where('section', 'setting_system')->where('settingkey', 'backend_header')->first();
-    if ($tpl and !empty($tpl->val)) {
-        return BBRenderBackTpl($tpl->val);
+    $page = \Sahakavatar\Cms\Services\RenderService::getPageByURL();
+    $data = [];
+    if($page->settings){
+        $data = json_decode($page->settings,true);
+    }else{
+        $settingsRepo = new \Sahakavatar\Settings\Repository\AdminsettingRepository();
+        $settings = $settingsRepo->findBy('section','backend_settings');
+        if($settings && $settings->val) $data = json_decode($settings->val,true);
+    }
+
+    if(isset($data['header']) && $data['header'] && isset($data['header_unit'])){
+        return BBRenderUnits($data['header_unit']);
     }
 }
 
 function BBgetPageLayout()
 {
     $route = \Request::route();
-
     if ($route) {
         if (isset($_GET['pl_live_settings']) && $_GET['pl_live_settings'] == 'page_live') {
             $layoutID = $_GET['pl'];
@@ -266,14 +244,18 @@ function BBgetPageLayout()
         }
     }
     $page = \Sahakavatar\Cms\Services\RenderService::getPageByURL();
-
-    if (!$page or !$page->layout_id) return \Sahakavatar\Cms\Models\ContentLayouts\ContentLayouts::defaultPageSection();
-
-    $layout = \Sahakavatar\Cms\Models\ContentLayouts\ContentLayouts::findVariation($page->layout_id);
-    if ($layout) {
-        $data = explode('.', $page->layout_id);
-        $layout = \Sahakavatar\Cms\Models\ContentLayouts\ContentLayouts::find($data[0]);
-        return 'ContentLayouts.' . $layout->folder . '.' . $layout->layout;
+    $data = [];
+    if($page->settings){
+        $data = json_decode($page->settings,true);
+    }else{
+        $settingsRepo = new \Sahakavatar\Settings\Repository\AdminsettingRepository();
+        $settings = $settingsRepo->findBy('section','backend_settings');
+        if($settings && $settings->val) $data = json_decode($settings->val,true);
+    }
+    if(isset($data['backend_page_section']) && $data['backend_page_section']){
+        $slug = explode('.', $data['backend_page_section']);
+        $layout = \Sahakavatar\Cms\Models\ContentLayouts\ContentLayouts::find($slug[0]);
+        if($layout) return 'ContentLayouts.' . $layout->folder . '.' . $layout->layout;
     }
 }
 
@@ -300,26 +282,26 @@ function BBgetPageLayoutSettings()
     }
 
     if ($page) {
-        if ($page->settings) {
-            $settings = @json_decode($page->settings, true);
-            $layout = \Sahakavatar\Cms\Models\ContentLayouts\ContentLayouts::findVariation($page->layout_id);
-            if ($layout) {
-                $mainSettings = $settings ? array_merge($settings, $layout->settings) : $layout->settings;
+        $data = [];
+        if($page->settings){
+            $data = json_decode($page->settings,true);
+        }else{
+            $settingsRepo = new \Sahakavatar\Settings\Repository\AdminsettingRepository();
+            $settings = $settingsRepo->findBy('section','backend_settings');
+            if($settings && $settings->val) $data = json_decode($settings->val,true);
+        }
+
+        if(isset($data['backend_page_section']) && $data['backend_page_section']){
+            $layout = \Sahakavatar\Cms\Models\ContentLayouts\ContentLayouts::findVariation($data['backend_page_section']);
+            if($layout){
+                $mainSettings = array_merge($data, $layout->settings);
                 $json = '<input type="hidden" id="page_layout_settings_json" data-json=' . json_encode($mainSettings, true) . '>';
                 echo $json;
                 return $mainSettings;
             }
-        } else {
-            $layout = \Sahakavatar\Cms\Models\ContentLayouts\ContentLayouts::findVariation($page->layout_id);
-            $settings = $layout->settings;
-            $json = '<input type="hidden" id="page_layout_settings_json" data-json=' . json_encode($layout->settings, true) . '>';
-            echo $json;
-            return $settings;
         }
     }
-
     return ['options' => [], 'json' => json_encode([], true)];
-
 }
 
 //TODO Transver in Hooks package
@@ -349,11 +331,11 @@ if (!function_exists('BBGetUserAvatar')) {
     {
         if ($id) {
             if ($user = \App\User::find($id)) {
-                return ($user->profile->avatar) ? url($user->profile->avatar) : '/resources/assets/images/avatar.png';
+                return ($user->profile->avatar) ? url($user->profile->avatar) : '/images/avatar.png';
             }
         } else {
             if (Auth::check()) {
-                return (Auth::user()->profile->avatar) ? url(Auth::user()->profile->avatar) : '/resources/assets/images/avatar.png';
+                return (Auth::user()->profile->avatar) ? url(Auth::user()->profile->avatar) : '/images/avatar.png';
             }
         }
 
@@ -383,8 +365,7 @@ if (!function_exists('BBGetUserName')) {
                     return Auth::user()->username;
                 }
 
-                return (Auth::user()->profile->first_name || Auth::user()->profile->last_name) ? Auth::user(
-                    )->profile->first_name . ' ' . Auth::user()->profile->last_name : Auth::user()->username;
+                return (Auth::user()->profile->first_name || Auth::user()->profile->last_name) ? Auth::user()->profile->first_name . ' ' . Auth::user()->profile->last_name : Auth::user()->username;
             }
         }
 
@@ -413,6 +394,7 @@ function BBAdminMenu()
 
     return $menu;
 }
+
 function BBAdminMenuWalker($menu_array)
 {
 
@@ -462,7 +444,7 @@ function BBgetSiteLogo()
     $logo = \Sahakavatar\Settings\Models\Settings::where('section', 'setting_system')->where('settingkey', 'site_logo')->first();
     if (!$logo) return '';
 
-    return url('/resources/assets/images/logo/', $logo->val);
+    return url('images/logo', $logo->val);
 }
 
 function BBgetSiteName()
@@ -474,15 +456,18 @@ function BBgetSiteName()
 
 function BBRenderUnits($variation_id, $source = [], $data = NULL)
 {
+
     $field = null;
     $cheked = null;
     $slug = explode('.', $variation_id);
     if (isset($slug[0]) && isset($slug[1])) {
         $widget_id = $slug[0];
         $variationID = $slug[1];
+
         $unit = \Sahakavatar\Cms\Models\Templates\Units::find($widget_id);
         if (!is_null($unit)) {
             $variation = $unit->findVariation($variation_id);
+
             if (!is_null($variation)) {
                 $settings = $variation->settings;
                 if ($unit->have_settings && !$settings) {
@@ -496,7 +481,6 @@ function BBRenderUnits($variation_id, $source = [], $data = NULL)
                         $field = $source['field'];
                     }
                 }
-
                 return $unit->render(compact(['variation', 'settings', 'source', 'field', 'cheked', 'data']));
             }
         }
@@ -504,53 +488,55 @@ function BBRenderUnits($variation_id, $source = [], $data = NULL)
         return 'Wrong Unit';
     }
 }
+
 //TODO transver in Avatar
 function plugins_path($path = null)
 {
-    return rtrim(base_path(config('avatar.plugins.path').DS. $path), '/');
+    return rtrim(base_path(config('avatar.plugins.path') . DS . $path), '/');
 }
+
 //TODO transver in Manage
 function hierarchyAdminPagesListFull($data, $parent = true, $icon = true, $id = 0)
 {
     $output = '';
     // Loop through items
-    foreach ($data as $item) {
-        $children = $item->childs;
+    if ($data) {
+        foreach ($data as $item) {
+            $children = $item->childs;
 
-        $output .= ' <ol class="pagelisting">';
-        $output .= '<li data-id="' . $item->id . '">';
-        $output .= '<div class="listinginfo">';
-        $output .= '<div class="lsitingbutton">';
-        $output .= '<a href="' . url('/admin/manage/frontend/pages/settings', $item->id) . '" class="btn"><i class="fa fa-pencil"></i></a>';
-        if ($item->type == 'custom') {
-            $output .= '<a href="' . url('/admin/manage/frontend/pages/new', $item->id) . '" class="btn"><i class="fa fa-plus"></i></a>';
-            $output .= '<a data-href="' . url('/admin/manage/frontend/pages/delete') . '" data-key="' . $item->id . '" data-type="Page ' . $item->title . '"  class="delete-button btn trashBtn"><i class="fa fa-trash"></i></a>';
-        }
+            $output .= ' <ol class="pagelisting">';
+            $output .= '<li data-id="' . $item->id . '">';
+            $output .= '<div class="listinginfo">';
+            $output .= '<div class="lsitingbutton">';
+            $output .= '<a href="' . url('/admin/manage/frontend/pages/settings', $item->id) . '" class="btn"><i class="fa fa-pencil"></i></a>';
+            if ($item->type == 'custom') {
+                $output .= '<a href="' . url('/admin/manage/frontend/pages/new', $item->id) . '" class="btn"><i class="fa fa-plus"></i></a>';
+                $output .= '<a data-href="' . url('/admin/manage/frontend/pages/delete') . '" data-key="' . $item->id . '" data-type="Page ' . $item->title . '"  class="delete-button btn trashBtn"><i class="fa fa-trash"></i></a>';
+            }
 //        $output .= '<a data-toggle="collapse" data-pagecolid="' . $item->id . '" data-parent="#accordion' . $item->id . '" href="#collapseOne' . $item->id . '" aria-expanded="true" aria-controls="collapseOne" class="link_name collapsed">';
 //        $output .= $item->title;
 //        $output .= '</a>';
-        $output .= '</div>';
-        $output .= '<button class="btn btn-collapse" type="button" data-caction="collapse">';
-        if (count($children)) {
-            $output .= '<i class="fa fa-minus" data-collapse="' . $item->id . '" aria-hidden="true"></i>';
-        }
-        $output .= '</button>';
+            $output .= '</div>';
+            $output .= '<button class="btn btn-collapse" type="button" data-caction="collapse">';
+            if (count($children)) {
+                $output .= '<i class="fa fa-minus" data-collapse="' . $item->id . '" aria-hidden="true"></i>';
+            }
+            $output .= '</button>';
 
-        $output .= '<span class="listingtitle">' . $item->title . '</span>';
-        $output .= '</div>';
-        /* Actions */
-        /* Actions END */
-        if (count($children)) {
-            $output .= hierarchyAdminPagesListFull($children, false, $icon, 0);
-        }
+            $output .= '<span class="listingtitle">' . $item->title . '</span>';
+            $output .= '</div>';
+            /* Actions */
+            /* Actions END */
+            if (count($children)) {
+                $output .= hierarchyAdminPagesListFull($children, false, $icon, 0);
+            }
 
 //        $output .= '</li>';
-        // If this is the top parent
-        $output .= '</li>';
-        $output .= '</ol>';
+            // If this is the top parent
+            $output .= '</li>';
+            $output .= '</ol>';
+        }
     }
-
-
     // Return data tree
     return $output;
 }
@@ -605,7 +591,6 @@ function BBbutton($action, $key, $text, array $array = [])
             if ($k != 'model') {
                 $atributes .= "$k=\"$v\"";
             }
-
         }
     }
     if (isset($array['model'])) {
@@ -621,18 +606,48 @@ function BBbutton($action, $key, $text, array $array = [])
                 $value = $model[$key];
             }
         }
-
     }
     $hiddenName = isset($array['data-name-prefix']) ? $array['data-name-prefix'] . '[' . $key . ']' : $key;
     $array = '';
     if (strpos($key, '[]')) {
         $array = 'data-array="true"';
     }
-
     $data_key = str_replace('[]', '', $key);
-
-
     return '<button type="button" data-action=' . $action . ' data-key="' . $data_key . '" ' . $atributes . ' >' . $text . '</button><input class="bb-button-realted-hidden-input" type="hidden" ' . $array . ' value="' . $value . '" data-name="' . $data_key . '" name="' . $hiddenName . '">';
+}
+function BBbutton2($type,$key,$tag,$text,$array=[]){
+    $atributes = ' ';
+    $value = '';
+    $array['class'] = $array['class'] . " BBbuttons";
+    $array['data-type'] = $tag;
+    if (count($array)) {
+        foreach ($array as $k => $v) {
+            if ($k != 'model') {
+                $atributes .= "$k=\"$v\"";
+            }
+        }
+    }
+    if (isset($array['model'])) {
+        $model = $array['model'];
+        if (is_string($model)) {
+            $value = $model;
+        } else {
+            if (is_object($model)) {
+                $model = $model->toArray();
+            }
+
+            if (isset($model[$key])) {
+                $value = $model[$key];
+            }
+        }
+    }
+    $hiddenName = isset($array['data-name-prefix']) ? $array['data-name-prefix'] . '[' . $key . ']' : $key;
+    $array = '';
+    if (strpos($key, '[]')) {
+        $array = 'data-array="true"';
+    }
+    $data_key = str_replace('[]', '', $key);
+    return '<button type="button" data-action=' . $type . ' data-key="' . $data_key . '" ' . $atributes . ' >' . $text . '</button><input class="bb-button-realted-hidden-input" type="hidden" ' . $array . ' value="' . $value . '" data-name="' . $data_key . '" name="' . $hiddenName . '">';
 }
 
 function BBgetDateFormat($date, $format = null)
@@ -765,6 +780,7 @@ function BBGetUserCover($id = null)
     return null;
 }
 
+//TODO transver in User
 function BBGetUserRole($id = null)
 {
     if ($id) {
@@ -785,6 +801,7 @@ function BBGetAllValidations()
 {
     return \Config::get('validations');
 }
+
 function issetReturn($array, $item, $default = null)
 {
 
@@ -795,6 +812,247 @@ function issetReturn($array, $item, $default = null)
     }
 
     return $default;
+}
+
+
+/**
+ * @param null $id
+ * @return mixed|null|string
+ */
+//TODO transver in USER
+function BBGetUser($id = null, $column = 'username')
+{
+    if ($id) {
+        $userRepo = new \Sahakavatar\User\Repository\UserRepository();
+        $user = $userRepo->find($id);
+        if ($user) {
+            if (isset($user->$column)) {
+                return $user->$column;
+            } elseif (isset($user->profile)) {
+                if (isset($user->profile->$column))
+                    return $user->profile->$column;
+            }
+        }
+    } else {
+        if (Auth::check()) {
+            if (isset(Auth::user()->$column)) {
+                return Auth::user()->$column;
+            } elseif (isset(Auth::user()->profile)) {
+                if (isset(Auth::user()->profile->$column))
+                    return Auth::user()->profile->$column;
+            }
+        }
+    }
+
+    return null;
+}
+
+//TODO transver in Console
+function hierarchyAdminPagesListWithModuleName($data, $moduleCh = null, $icon = true, $roleSlug = null, $checkbox = false)
+{
+    $plugins = new \Avatar\Avatar\Repositories\Plugins();
+    $plugins->modules();
+    $modules = $plugins->getPlugins()->toArray();
+    $plugins->plugins();
+    $extras = $plugins->getPlugins()->toArray();
+    $modules = array_merge($extras, (array)$modules);
+    $adminRepo = new \Sahakavatar\Console\Repository\AdminPagesRepository();
+    $output = "";
+    if (count($data)) {
+        foreach ($data as $module) {
+            if ($moduleCh == null or $moduleCh->namespace == $module->module_id) {
+                if (!$module->module_id) {
+                    if ($checkbox === true) {
+                        $output .= hierarchyAdminPagesListPermissions($adminRepo->main(), true, $icon, $roleSlug);
+                    } else {
+                        if ($roleSlug == null) {
+                            $output .= hierarchyAdminPagesListFull($adminRepo->main(), true, $icon, 0);
+                        } else {
+                            $output .= hierarchyAdminPagesList($adminRepo->main(), true, $icon, 0, $roleSlug);
+                        }
+                    }
+                } else {
+                    $plugins->modules();
+                    $value = $plugins->find($module->module_id);
+                    if (!$value) {
+                        $plugins->plugins();
+                        $value = $plugins->find($module->module_id);
+                    }
+                    if ($value) {
+                        if ($checkbox === true) {
+                            $output .= hierarchyAdminPagesListPermissions($adminRepo->PagesByModulesParent($value), true, $icon, $roleSlug);
+                        } else {
+                            if ($roleSlug == null) {
+                                $output .= hierarchyAdminPagesListFull($adminRepo->PagesByModulesParent($value), true, $icon, 0);
+                            } else {
+                                $output .= hierarchyAdminPagesList($adminRepo->PagesByModulesParent($value), true, $icon, 0, $roleSlug);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return $output;
+}
+
+//TODO transver in Console
+function hierarchyAdminPagesList($data, $parent = true, $icon = true, $id = 0, $roleSlug = null)
+{//dd($roleSlug);
+    $children = [];
+    $output = ' <ul id="accordion" class="panel-group" data-nav-drag="" role="tablist" aria-multiselectable="true">';
+
+    // Loop through items
+    foreach ($data as $item) {//dd($roleSlug);
+        if (\Sahakavatar\Console\Services\StructureService::checkAccess($item->id, $roleSlug)) {
+            if ($parent) {
+                $output .= '<li data-id="' . $item->id . '" data-drag="' . $item->title . '" id="headingOne' . $item->id . '" data-details=\'\' data-name="' . $item->title . '"  data-url=' . $item->url . ' ';
+
+                if (count($item->childs)) {
+                    $output .= 'data-child="' . $item->id . '" ';
+                }
+                $output .= 'class="panel panel-default page_col">';
+
+            } else {
+                $output .= '<li data-id="' . $item->id . '" data-details=\'\' data-name="' . $item->title . '" data-url=' . $item->url . ' class="panel panel-default list_items page_col">';
+            }
+
+            $output .= '<div class="panel-heading" role="tab" id="headingOne" >';
+            $output .= '<h4 class="panel-title">';
+            if (count($item->childs)) {
+                $output .= '<i class="childitem fa fa-object-group" data-drop="unit"></i>';
+            }
+            $output .= '<a data-toggle="collapse" data-pagecolid="' . $item->id . '" data-parent="#accordion' . $item->id . '" href="#collapseOne' . $item->id . '" aria-expanded="true" aria-controls="collapseOne" class="link_name collapsed">';
+            $output .= $item->title;
+            $output .= '</a>';
+            $output .= '</h4>';
+            $output .= '</div>';
+            /* Actions */
+            /* Actions END */
+
+            if (count($item->childs)) {
+                $output .= '<ul id="collapseOne' . $item->id . '" class="panel-collapse collapse"  role="tabpanel" aria-labelledby="headingOne' . $item->id . '">';
+                $output .= '<div class="panel-body">';
+                $children = $item->childs;
+                $output .= hierarchyAdminPagesList($children, false, $icon, 0, $roleSlug);
+                $output .= '</div>';
+                $output .= '</ul>';
+            }
+
+            $output .= '</li>';
+        }
+        // If this is the top parent
+
+    }
+
+    $output .= '</ul>';
+
+    // Return data tree
+    return $output;
+}
+
+//TODO transver in Console
+function hierarchyAdminPagesListPermissions($data, $parent = true, $icon = true, $role, $checkbox = false)
+{
+    $children = [];
+    $output = ' <ul class="panel-group" role="tablist" aria-multiselectable="true">';
+    // Loop through items
+    foreach ($data as $item) {//dd($roleSlug);
+        if ($parent) {
+            $output .= '<li data-id="' . $item->id . '" class="panel panel-default page_col">';
+        } else {
+            $output .= '<li data-id="' . $item->id . '" class="panel panel-default list_items page_col">';
+        }
+
+        $output .= '<div class="panel-heading" role="tab" id="headingOne" >';
+        $output .= '<h4 class="panel-title">';
+        $output .= '<a data-toggle="collapse" data-pagecolid="' . $item->id . '" data-parent="#accordion' . $item->id . '" href="#collapseOne' . $item->id . '" aria-expanded="true" aria-controls="collapseOne" class="link_name collapsed">';
+        $output .= $item->title;
+
+        if ($role->id === 1) {
+            $output .= '<span class="pull-right" style="color:#1fec7e;">All Access</span>';
+        } else {
+            $permissionRepo = new \Sahakavatar\User\Repository\PermissionRoleRepository(\Sahakavatar\User\Repository\RoleRepository::class);
+            if ($item->parent) {
+                $parentPerm = $item->parent_permission_role_with_role($role->id);
+                if ($parentPerm) {
+                    $isChecked = $permissionRepo->getBackendPagesWithRoleAndPage($role->id, $item->id);
+                    $output .= "<span class=\"pull-right\">" . Form::checkbox("permission[$role->id][$item->id]", 1, ($isChecked) ? "checked" : null, ['class' => 'show-child-perm', 'data-module' => $item->module_id, 'data-pageid' => $item->id, 'data-roleid' => $role->id, 'data-page-type' => 'back', 'style' => 'left:0;']) . "</span>";
+                } else {
+                    $output .= '<span class="pull-right" style="color:#ec0e0a;">No Access <i class="fa fa-minus-square"></i></span>';
+                }
+            } else {
+                $isChecked = $permissionRepo->getBackendPagesWithRoleAndPage($role->id, $item->id);
+                $output .= "<span class=\"pull-right\">" . Form::checkbox("permission[$role->id][$item->id]", 1, ($isChecked) ? "checked" : null, ['class' => 'show-child-perm', 'data-module' => $item->module_id, 'data-pageid' => $item->id, 'data-roleid' => $role->id, 'data-page-type' => 'back', 'style' => 'left:0;']) . "</span>";
+            }
+        }
+
+        $output .= '</a>';
+        $output .= '</h4>';
+        $output .= '</div>';
+        /* Actions */
+        /* Actions END */
+        if (count($item->childs)) {
+            $output .= '<ul id="collapseOne' . $item->id . '" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">';
+            $output .= '<div class="panel-body">';
+            $children = $item->childs;
+            $output .= hierarchyAdminPagesListPermissions($children, false, $icon, $role);
+            $output .= '</div>';
+            $output .= '</ul>';
+        }
+        $output .= '</li>';
+        // If this is the top parent
+    }
+    $output .= '</ul>';
+    // Return data tree
+    return $output;
+}
+
+//TODO transver in Manage
+function hierarchyAdminPagesListHierarchy($data, $parent = true, $icon = true, $id = 0)
+{
+    $output = '';
+    // Loop through items
+    if ($data) {
+        foreach ($data as $item) {
+            $children = $item->childs;
+
+            $output .= ' <ol class="pagelisting">';
+            $output .= '<li data-id="' . $item->id . '">';
+            $output .= '<div class="listinginfo">';
+            $output .= '<div class="lsitingbutton">';
+            $output .= '<a href="' . url('/admin/console/structure/pages/settings', $item->id) . '" class="btn"><i class="fa fa-pencil"></i></a>';
+//            if ($item->type == 'custom') {
+//                $output .= '<a href="' . url('/admin/manage/frontend/pages/new', $item->id) . '" class="btn"><i class="fa fa-plus"></i></a>';
+//                $output .= '<a data-href="' . url('/admin/manage/frontend/pages/delete') . '" data-key="' . $item->id . '" data-type="Page ' . $item->title . '"  class="delete-button btn trashBtn"><i class="fa fa-trash"></i></a>';
+//            }
+//        $output .= '<a data-toggle="collapse" data-pagecolid="' . $item->id . '" data-parent="#accordion' . $item->id . '" href="#collapseOne' . $item->id . '" aria-expanded="true" aria-controls="collapseOne" class="link_name collapsed">';
+//        $output .= $item->title;
+//        $output .= '</a>';
+            $output .= '</div>';
+            $output .= '<button class="btn btn-collapse" type="button" data-caction="collapse">';
+            if (count($children)) {
+                $output .= '<i class="fa fa-minus" data-collapse="' . $item->id . '" aria-hidden="true"></i>';
+            }
+            $output .= '</button>';
+
+            $output .= '<span class="listingtitle">' . $item->title . '</span>';
+            $output .= '</div>';
+            /* Actions */
+            /* Actions END */
+            if (count($children)) {
+                $output .= hierarchyAdminPagesListHierarchy($children, false, $icon, 0);
+            }
+
+//        $output .= '</li>';
+            // If this is the top parent
+            $output .= '</li>';
+            $output .= '</ol>';
+        }
+    }
+    // Return data tree
+    return $output;
 }
 
 //function BBlinkFonts()
@@ -811,3 +1069,120 @@ function issetReturn($array, $item, $default = null)
 //
 //    return $links;
 //}
+//TODO:find the right direction for this function
+function BBgetUnitAttr($id, $key)
+{
+    $section = \Sahakavatar\Cms\Models\Templates\Units::findByVariation($id);
+    if ($section) return $section->{$key};
+    return false;
+
+}
+
+function BBgetLayoutAttr($id, $key)
+{
+    $section = \Sahakavatar\Cms\Models\ContentLayouts\ContentLayouts::findByVariation($id);
+    if ($section) return $section->{$key};
+    return false;
+
+}
+
+//TODO: move to console module
+function BBRegisterAdminPages($module, $title = null, $url, $layout = null, $parent = 0)
+{
+
+    $adminPagesRepo = new \Sahakavatar\Console\Repository\AdminPagesRepository();
+    if (!$title) $title = $module . ' page title';
+
+    if (substr($url, 0, 6) != "/admin" && substr($url, 0, 5) != "admin") {
+        $adminstr = "/admin";
+        if (substr($url, 0, 1) != "/") $adminstr = $adminstr . "/";
+        $url = $adminstr . $url;
+    }
+
+    $page = $adminPagesRepo->create([
+        'module_id' => $module,
+        'title' => $title,
+        'url' => $url,
+        'permission' => BBmakeUrlPermission($url),
+        'slug' => uniqid(),
+        'layout_id' => null,
+        'is_default' => 0,
+        'parent_id' => $parent
+    ]);
+
+    return $page;
+}
+
+function BBmakeUrlPermission($url, $sinbol = '.')
+{
+    if (!$url) return false;
+    $url = str_replace('/', $sinbol, $url);
+    $url = parametazor($url);
+    if (isset($url[0]) && $url[0] == '.') {
+        $url = substr($url, 1);
+    }
+
+    return $url;
+}
+
+function parametazor($url)
+{
+    preg_match('/{(.*?)}/', $url, $matches);
+    if (count($matches)) {
+        $url = str_replace($matches[0], 'code_1941', $url);
+        preg_match('/{(.*?)}/', $url, $matches2);
+        $url = parametazor($url);
+    }
+    $url = str_replace('code_1941', '{param}', $url);
+    return $url;
+}
+
+function modules_path($path = '')
+{
+    return app()->basePath('vendor' . DS . 'sahak.avatar') . ($path ? DS . $path : $path);
+}
+
+function BBCheckLoginEnabled()
+{
+    $settings = \Sahakavatar\Settings\Models\Settings::where('settingkey', 'enable_login')->first();
+    if ($settings) {
+        return ($settings->val) ? true : false;
+    }
+    return false;
+}
+
+function BBrenderPageContent($settings){
+    if($settings['content_type']=='template'){
+        return BBRenderUnits($settings['template']);
+    }
+    if($settings['content_type']=='editor'){
+        return $settings['main_content'];
+    }
+    return 'Main Content';
+}
+ function BBstyle($path)
+{
+
+    if(!\File::exists($path)) exit;
+    $styles=[];
+
+    if(\Session::has('custom.styles')){
+        $styles=\Session::get('custom.styles', []);
+    }
+    $content=\File::get($path);
+    $styles[md5($content)]="\r\n".\File::get($path);
+    \Session::put('custom.styles',$styles);
+}
+
+function BBscript($path)
+{
+    if(!\File::exists($this->path.DS.$path)) abort(500);
+    $styles=[];
+    if(\Session::has('custom.scripts')){
+        $styles=\Session::get('custom.scripts', []);
+    }
+    $slug=$this->slug;
+    $content=\File::get($path);
+    $styles[md5($content)]="\r\n".$content;
+    \Session::put('custom.scripts',$styles);
+}

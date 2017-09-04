@@ -9,22 +9,16 @@
  *
  */
 
-namespace App\Http\Controllers\Admincp;
+namespace Sahakavatar\Cms\Http\Controllers\Admincp;
 
-use Sahakavatar\Cms\Services\CmsItemReader;
-use Sahakavatar\Cms\Helpers\helpers;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Sahakavatar\Cms\Helpers\helpers;
 use Sahakavatar\Cms\Models\ContentLayouts\ContentLayouts;
-use Sahakavatar\Cms\Models\Sections;
-use Sahakavatar\Cms\Models\Templates as Tpl;
+use Sahakavatar\Cms\Models\Templates\Sections;
 use Sahakavatar\Cms\Models\Templates\Units;
 use Sahakavatar\Cms\Models\Widgets;
-use App\Models\Themes\Themes;
-use App\Modules\Create\Models\Menu;
-use App\Modules\Create\Models\Menus\BackendMenus;
-use App\Modules\Resources\Models\Files\FilesBB;
-use App\Modules\Uploads\Models\Style;
-use Illuminate\Http\Request;
+use Sahakavatar\Cms\Services\CmsItemReader;
 use View;
 
 
@@ -64,11 +58,13 @@ class ModalityController extends Controller
             'icons' => 'getIcons',
             'templates' => 'getTpls',
             'theme' => 'getTheme',
+            'unit' => 'getUnit',//working with tags
             'units' => 'getUnits',
             'files' => 'getFiles',
             'page_sections' => 'getPageSections',
             'sections' => 'getSections',
             'main_body' => 'getMainBody',
+            'layouts' => 'getLayouts'//working with tags
         ];
 
         $data = $request->all();
@@ -91,12 +87,12 @@ class ModalityController extends Controller
         isset($data['place']) ? $place = $data['place'] : $place = 'frontend';
         isset($data['type']) ? $type = $data['type'] : $type = 'header';
 
-        if($place == 'frontend'){
+        if ($place == 'frontend') {
             $templates = CmsItemReader::getAllGearsByType('hf')
                 ->where('place', $place)
                 ->where('type', $type)
                 ->run();
-        }else{
+        } else {
             $templates = CmsItemReader::getAllGearsByType('templates')
                 ->where('place', $place)
                 ->where('type', $type)
@@ -106,7 +102,7 @@ class ModalityController extends Controller
 
         if (!count($templates)) return \Response::json(['error' => true]);
 
-        $html = View::make('styles.templates', compact('templates'))->render();
+        $html = View::make('cms::styles.templates', compact('templates'))->render();
 
         return \Response::json(['error' => false, 'html' => $html]);
     }
@@ -124,7 +120,7 @@ class ModalityController extends Controller
 
         if (!count($menus)) return \Response::json(['error' => true]);
 
-        $html = View::make('styles.menus', compact('menus'))->render();
+        $html = View::make('cms::styles.menus', compact('menus'))->render();
 
         return \Response::json(['error' => false, 'html' => $html]);
     }
@@ -133,6 +129,15 @@ class ModalityController extends Controller
      * @param $data
      * @return \Illuminate\Http\JsonResponse
      */
+    public function getUnit($data)
+    {
+        $key = $data['type'];
+        $units = CmsItemReader::getAllGearsByType('units')->sortByTag($key);
+        if (!count($units)) return \Response::json(['error' => true]);
+        $html = View::make('cms::styles.units', compact('units', 'data'))->render();
+        return \Response::json(['error' => false, 'html' => $html]);
+    }
+
     public function getUnits($data)
     {
         $key = $data['key'];
@@ -147,40 +152,38 @@ class ModalityController extends Controller
                 ->where('place', $type);
         }
 
-        if(isset($data['item'])){
+        if (isset($data['item'])) {
             $units->where('slug', $data['item']);
         }
 
-        if(isset($data['module'])){
+        if (isset($data['module'])) {
             $units->where('module_slug', $data['module']);
         }
 
-        if(isset($data['mt'])) {
+        if (isset($data['mt'])) {
             $units->where('main_type', $data['mt']);
         }
 
-        if(isset($data['group'])) {
+        if (isset($data['group'])) {
             $units->where('group', $data['group']);
         }
         $units = $units->run();
-        if(isset($data['except'])) {
+        if (isset($data['except'])) {
             $except = json_decode($data['except'], true);
-            if($units && count($units) && $except && !empty($except)) {
+            if ($units && count($units) && $except && !empty($except)) {
                 $unitsArr = [];
-                foreach($except as $key => $setting) {
+                foreach ($except as $key => $setting) {
                     $unitsArr[] = explode('.', $setting)[0];
                 }
-                foreach($units as $key => $blogUnit) {
-                    if(in_array($blogUnit->slug, $unitsArr)) {
+                foreach ($units as $key => $blogUnit) {
+                    if (in_array($blogUnit->slug, $unitsArr)) {
                         unset($units[$key]);
                     }
                 }
             }
         }
-
         if (!count($units)) return \Response::json(['error' => true]);
-        $html = View::make('styles.units', compact('units','data'))->render();
-
+        $html = View::make('cms::styles.units', compact('units', 'data'))->render();
         return \Response::json(['error' => false, 'html' => $html]);
     }
 
@@ -193,7 +196,7 @@ class ModalityController extends Controller
 
         if (!count($files)) return \Response::json(['error' => true]);
 
-        $html = View::make('styles.units_files', compact('files'))->render();
+        $html = View::make('cms::styles.units_files', compact('files'))->render();
 
         return \Response::json(['error' => false, 'html' => $html]);
     }
@@ -222,7 +225,7 @@ class ModalityController extends Controller
 
         if (!count($templates)) return \Response::json(['error' => true]);
 
-        $html = View::make('styles.widgets', compact('templates'))->render();
+        $html = View::make('cms::styles.widgets', compact('templates'))->render();
 
         return \Response::json(['error' => false, 'html' => $html]);
     }
@@ -234,7 +237,7 @@ class ModalityController extends Controller
     public function getTheme($data)
     {
         $layouts = Themes::active()->layouts();
-        $html = View::make('styles.theme', compact('layouts'))->render();
+        $html = View::make('cms::styles.theme', compact('layouts'))->render();
 
         return \Response::json(['error' => false, 'html' => $html]);
     }
@@ -248,7 +251,7 @@ class ModalityController extends Controller
         $fonts = $this->helpers->getFontList();
         if (!count($fonts)) return \Response::json(['error' => true]);
         //dd($fonts);
-        $html = View::make('styles.icons', compact('fonts'))->render();
+        $html = View::make('cms::styles.icons', compact('fonts'))->render();
 
         return \Response::json(['error' => false, 'html' => $html]);
     }
@@ -268,7 +271,7 @@ class ModalityController extends Controller
         if (!count($styles)) return \Response::json(['error' => true]);
         $items = Style::where('type', $type)->where('sub', key($styles))->get();
 
-        $html = View::make('styles.styles', compact('styles', 'items', 'type'))->render();
+        $html = View::make('cms::styles.styles', compact('styles', 'items', 'type'))->render();
 
         return \Response::json(['error' => false, 'html' => $html]);
     }
@@ -277,15 +280,11 @@ class ModalityController extends Controller
     {
         $key = $data['key'];
         isset($data['type']) ? $type = $data['type'] : $type = 'frontend';
-
         $layouts = CmsItemReader::getAllGearsByType('page_sections')
             ->where('place', $type)
             ->run();
-
         if (!count($layouts)) return \Response::json(['error' => true]);
-
-        $html = View::make('styles.page_sections', compact('layouts'))->render();
-
+        $html = View::make('cms::styles.page_sections', compact('layouts'))->render();
         return \Response::json(['error' => false, 'html' => $html]);
     }
 
@@ -293,17 +292,14 @@ class ModalityController extends Controller
     {
 
         $key = $data['key'];
-
         isset($data['type']) ? $type = $data['type'] : $type = 'horizontal';
         isset($data['place']) ? $place = $data['place'] : $place = 'frontend';
         $sections = CmsItemReader::getAllGearsByType('sections')
             ->where('place', $place)
             ->where('type', $type)
             ->run();
-
         if (!count($sections)) return \Response::json(['error' => true]);
-
-        $html = View::make('styles.sections', compact('sections'))->render();
+        $html = View::make('cms::styles.sections', compact('sections'))->render();
 
         return \Response::json(['error' => false, 'html' => $html]);
     }
@@ -323,7 +319,7 @@ class ModalityController extends Controller
 
         if (!count($main_body)) return \Response::json(['error' => true]);
 
-        $html = View::make('styles.main_body', compact('main_body'))->render();
+        $html = View::make('cms::styles.main_body', compact('main_body'))->render();
 
         return \Response::json(['error' => false, 'html' => $html]);
     }
@@ -339,7 +335,7 @@ class ModalityController extends Controller
         if (!$layout) return \Response::json(['error' => true]);
         $items = $layout->variations();
         $ajax = true;
-        $html = View::make('styles.page_sections', compact(['items', 'ajax']))->render();
+        $html = View::make('cms::styles.page_sections', compact(['items', 'ajax']))->render();
 
         return \Response::json(['error' => false, 'html' => $html]);
     }
@@ -355,7 +351,7 @@ class ModalityController extends Controller
         if (!$section) return \Response::json(['error' => true]);
         $items = $section->variations();
         $ajax = true;
-        $html = View::make('styles.sections', compact(['items', 'ajax']))->render();
+        $html = View::make('cms::styles.sections', compact(['items', 'ajax']))->render();
 
         return \Response::json(['error' => false, 'html' => $html]);
     }
@@ -374,7 +370,7 @@ class ModalityController extends Controller
         if (!$main_body) return \Response::json(['error' => true]);
         $items = $main_body->variations();
         $ajax = true;
-        $html = View::make('styles.main_body', compact(['items', 'ajax']))->render();
+        $html = View::make('cms::styles.main_body', compact(['items', 'ajax']))->render();
 
         return \Response::json(['error' => false, 'html' => $html]);
     }
@@ -390,7 +386,7 @@ class ModalityController extends Controller
 
         $items = Style::where('type', $type)->where('sub', $sub)->get();
         $ajax = true;
-        $html = View::make('styles.styles', compact(['items', 'ajax']))->render();
+        $html = View::make('cms::styles.styles', compact(['items', 'ajax']))->render();
 
         return \Response::json(['error' => false, 'html' => $html]);
     }
@@ -410,7 +406,7 @@ class ModalityController extends Controller
         if (!$tpl) return \Response::json(['error' => true]);
         $items = $tpl->variations();
         $ajax = true;
-        $html = View::make('styles.templates', compact(['items', 'ajax']))->render();
+        $html = View::make('cms::styles.templates', compact(['items', 'ajax']))->render();
 
         return \Response::json(['error' => false, 'html' => $html]);
     }
@@ -428,7 +424,7 @@ class ModalityController extends Controller
         if (!$unit) return \Response::json(['error' => true]);
         $items = $unit->variations();
         $ajax = true;
-        $html = View::make('styles.units', compact(['items', 'ajax', 'key']))->render();
+        $html = View::make('cms::styles.units', compact(['items', 'ajax', 'key']))->render();
 
         return \Response::json(['error' => false, 'html' => $html]);
     }
@@ -446,7 +442,7 @@ class ModalityController extends Controller
         if (!$tpl) return \Response::json(['error' => true]);
         $items = $tpl->variations();
         $ajax = true;
-        $html = View::make('styles.widgets', compact(['items', 'ajax', 'tpl']))->render();
+        $html = View::make('cms::styles.widgets', compact(['items', 'ajax', 'tpl']))->render();
 
         return \Response::json(['error' => false, 'html' => $html]);
     }
@@ -464,6 +460,15 @@ class ModalityController extends Controller
         $html = View::make('settings::_partials.menus', compact(['menus']))->render();
 
         return $html;
+    }
+
+    public function getLayouts($data)
+    {
+        $tag = $data['type'];
+        $layouts = ContentLayouts::sortByTag($tag);
+        if (!count($layouts)) return \Response::json(['error' => true]);
+        $html = View::make('cms::styles.page_sections', compact('layouts'))->render();
+        return \Response::json(['error' => false, 'html' => $html]);
     }
 
 }

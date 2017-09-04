@@ -118,6 +118,19 @@ class CmsItemUploader
     private function getGearPathByType($gear)
     {
         $gearsArray = [
+            'themes' => [
+                'path' => 'resources' . DS . 'views' . DS. 'Themes' . DS,
+                'model' => "Sahakavatar\\Cms\\Models\\Themes",
+                'self_type' => 'themes',
+                'required_keys' => [
+                    'main_type' => true,
+                    'self_type' => true,
+                    'title' => true,
+                    'type' => true
+                ], 'equal_keys' => [
+                    'self_type' => 'units'
+                ]
+            ],
             'units' => [
                 'path' => 'resources' . DS . 'units' . DS,
                 'model' => "App\\Models\\Templates\\Units",
@@ -228,7 +241,6 @@ class CmsItemUploader
     public function run($request, $place = 'backend')
     {
         $isValid = $this->isCompress($request);
-
         if (!$isValid) return $this->ResponseError('Uploaded data is InValid!!!', 500);
 
         $response = $this->upload($request);

@@ -1,28 +1,18 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: Comp2
- * Date: 11/17/2016
- * Time: 2:33 PM
+ * User: Admin
+ * Date: 7/10/2016
+ * Time: 5:24 PM
  */
 
-namespace Sahakavatar\Cms\Models\Templates;
+namespace Sahakavatar\Cms\Models;
 
 use Sahakavatar\Cms\Models\Templates\Eloquent\Abstractions\TplVariations as variations;
 use File;
 
-class UnitsVariations extends variations
+class SectionVariations extends variations
 {
-    /**
-     * @var string
-     */
-    protected $templatesPath = 'units';
-
-    /**
-     * @var string
-     */
-    protected $variationPath = 'variations';
-
     /**
      * @param array $arg
      * @return mixed
@@ -30,12 +20,12 @@ class UnitsVariations extends variations
     public function renderVariation(array $arg = [])
     {
         $slug = explode('.', $this->id);
-        return Units::find($slug[0])->render(['variation' => $this->settings, 'args' => $arg]);
+        return Sections::find($slug[0])->render(['variation' => $this->settings, 'args' => $arg]);
     }
 
     public function findVarition($tpl, $id)
     {
-        $path = base_path($tpl->path . DS . $tpl->variationPath . DS . $id . '.json');
+        $path = $tpl->path . '/' . $tpl->variationPath .'/'.$id . '.json';
         if (File::exists($path)) {
             $all = new $this;
             $all->id = File::name($path);
@@ -51,7 +41,7 @@ class UnitsVariations extends variations
     public function createVariation($tpl, $array)
     {
         $id = $tpl->slug . '.' . uniqid();
-        $path = $tpl->path . DS . $tpl->variationPath . DS . $id . '.json';
+        $path = $tpl->path . '/' . $tpl->variationPath . '/' . $id . '.json';
         $array['id'] = $id;
         $all = new $this;
         $all->id = $id;
@@ -63,5 +53,4 @@ class UnitsVariations extends variations
         return $all;
 
     }
-
 }
