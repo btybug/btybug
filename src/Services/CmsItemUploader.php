@@ -241,6 +241,7 @@ class CmsItemUploader
     public function run($request, $place = 'backend')
     {
         $isValid = $this->isCompress($request);
+
         if (!$isValid) return $this->ResponseError('Uploaded data is InValid!!!', 500);
 
         $response = $this->upload($request);
