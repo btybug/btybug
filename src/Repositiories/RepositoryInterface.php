@@ -128,5 +128,4 @@ interface RepositoryInterface
     public function pluck(string $key, string $value);
 
 
-
 }

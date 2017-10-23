@@ -39,7 +39,8 @@
                                     {!! $key !!}
                                 </div>
                                 <div class="col-sm-5 p-l-0 p-r-10">
-                                    <input name="selcteunit" data-key="title" readonly="readonly" data-id="{!! $placeholder['value'] !!}"
+                                    <input name="selcteunit" data-key="title" readonly="readonly"
+                                           data-id="{!! $placeholder['value'] !!}"
                                            class="page-layout-title form-control"
                                            value="{!! BBgetUnitAttr($placeholder['value'],'title') !!}">
                                 </div>

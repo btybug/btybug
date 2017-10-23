@@ -27,7 +27,7 @@ abstract class GeneralRepository implements RepositoryInterface
     /**
      * @return mixed
      */
-    protected  abstract function model();
+    protected abstract function model();
 
     /**
      * @return mixed

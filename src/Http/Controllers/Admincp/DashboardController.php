@@ -1,18 +1,11 @@
 <?php namespace Sahakavatar\Cms\Http\Controllers\Admincp;
 
-use App\Events\OrderShipped;
-use App\Events\PodcastWasPurchased;
-use Faker\Factory as faker;
-use Illuminate\Http\Request;
-use App\Http\Requests;
 use App\Http\Controllers\Controller;
-use App\Events\CustomFormSubmittedEvent;
-use App\User;
-
-use Sahakavatar\Cms\Helpers\helpers;
-use DB, Notifynder, Module;
-use RegEmails, Image;
+use App\Http\Requests;
 use App\Models\Layouts;
+use Illuminate\Http\Request;
+use Notifynder;
+use RegEmails;
 
 
 /**

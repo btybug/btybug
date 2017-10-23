@@ -1,17 +1,16 @@
 /* Options CSS */
-.oulined{
+.oulined {
     outline: 2px solid red;
 }
 
-.filler{
+.filler {
     min-width: 30px;
     display: inline-table;
     height: 30px;
-    color:red;
+    color: red;
     line-height: 30px;
     padding: 0 10px;
 }
-
 
 .icon-item {
     text-align: center;
@@ -79,18 +78,18 @@
     position: relative;
 }
 
-.txt-drag-over{
-    outline: 3px dashed rgb(97, 179, 255)!important;
+.txt-drag-over {
+    outline: 3px dashed rgb(97, 179, 255) !important;
 }
 
 pre {
-    margin: 0!important;
+    margin: 0 !important;
     background-color: #FFFFFF;
     border: 1px solid #dfdfdf;
-    outline: 0!important;
-    border-radius: 0!important;
+    outline: 0 !important;
+    border-radius: 0 !important;
 }
 
-.loading-results{
-    display:none;
+.loading-results {
+    display: none;
 }

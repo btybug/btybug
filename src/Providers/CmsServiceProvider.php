@@ -1,6 +1,7 @@
 <?php
 
 namespace Sahakavatar\Cms\Providers;
+
 use Illuminate\Support\ServiceProvider;
 
 
@@ -26,6 +27,7 @@ class CmsServiceProvider extends ServiceProvider
         $this->app->register('Sahakavatar\Modules\Providers\ModuleServiceProvider');
         $this->app->register('Avatar\Avatar\Providers\AvatarServiceProvider');
     }
+
     /**
      * Register any application services.
      *
@@ -33,7 +35,7 @@ class CmsServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        include __DIR__.'/../standards/constants.php';
+        include __DIR__ . '/../standards/constants.php';
         $this->app->register(EventyServiceProvider::class);
         $this->app->register(RouteServiceProvider::class);
     }

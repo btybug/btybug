@@ -18,6 +18,7 @@ use Sahakavatar\Cms\Models\ContentLayouts\ContentLayouts;
 use Sahakavatar\Cms\Models\Templates\Sections;
 use Sahakavatar\Cms\Models\Templates\Units;
 use Sahakavatar\Cms\Models\Widgets;
+use Sahakavatar\Cms\Repositories\MenuRepository;
 use Sahakavatar\Cms\Services\CmsItemReader;
 use View;
 
@@ -34,15 +35,17 @@ class ModalityController extends Controller
      * @var helpers
      */
     private $helpers;
+    private $menuRepo;
 
 
     /**
      * ModalityController constructor.
      * @param Widget $widget
      */
-    public function __construct()
+    public function __construct(MenuRepository $menuRepository)
     {
         $this->helpers = new helpers;
+        $this->menuRepo = $menuRepository;
     }
 
     /**
@@ -116,7 +119,7 @@ class ModalityController extends Controller
         $key = $data['key'];
         isset($data['type']) ? $type = $data['type'] : $type = 'frontend';
 
-        $menus = Menu::where('section', $type)->get();
+        $menus = $this->menuRepo->getBy('place', $type);
 
         if (!count($menus)) return \Response::json(['error' => true]);
 
@@ -132,9 +135,15 @@ class ModalityController extends Controller
     public function getUnit($data)
     {
         $key = $data['type'];
-        $units = CmsItemReader::getAllGearsByType('units')->sortByTag($key);
+        $units = Units::all()->sortByTag($key);
+
         if (!count($units)) return \Response::json(['error' => true]);
-        $html = View::make('cms::styles.units', compact('units', 'data'))->render();
+        if(isset($data['multiple']) && $data['multiple'] == true){
+            $html = View::make('cms::styles.multiple-units', compact('units', 'data'))->render();
+        }else{
+            $html = View::make('cms::styles.units', compact('units', 'data'))->render();
+        }
+
         return \Response::json(['error' => false, 'html' => $html]);
     }
 
@@ -420,7 +429,6 @@ class ModalityController extends Controller
         $id = $request->get('id');
         $unit = Units::find($id);
         $key = $request->key;
-
         if (!$unit) return \Response::json(['error' => true]);
         $items = $unit->variations();
         $ajax = true;

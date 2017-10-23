@@ -9,7 +9,7 @@ class HomeShortcodeMiddleware
     /**
      * @var
      */
-    public $conf=[];
+    public $conf = [];
     protected $except = [
         '/admin/create/get-sortcodes',
         '/admin/create/test',
@@ -63,7 +63,7 @@ class HomeShortcodeMiddleware
      */
     protected function searcer($content)
     {
-        $this->conf = \config::get('shortcode.code',[]);
+        $this->conf = \config::get('shortcode.code', []);
         foreach ($this->conf as $fn) {
             $content = $this->sortCoder($fn, $content);
             $posCode = "[$fn";

@@ -35,7 +35,7 @@ class CmsItemReader extends TplModel
                             $tpl = new static;
 //                            $conf = base_path($currentGear['path']) . '/' . $tpl->config;
                             $tpl->original = $tpl->attributes = $currentGear;
-                            $tpl->path = base_path($currentGear['path']);
+                            $tpl->path = ($currentGear['path']);
                             $tpl->folders[] = $tpl->main_type . DS . $tpl->type . DS . $tpl->slug;
                             $tpl->folders[] = $tpl->type . DS . $tpl->slug;
                             $templates->before[] = $tpl;
@@ -59,7 +59,7 @@ class CmsItemReader extends TplModel
                             $tpl = new static;
 //                            $conf = base_path($currentGear['path']) . '/' . $tpl->config;
                             $tpl->original = $tpl->attributes = $currentGear;
-                            $tpl->path = base_path($currentGear['path']);
+                            $tpl->path = ($currentGear['path']);
                             $tpl->folders[] = $tpl->main_type . DS . $tpl->type . DS . $tpl->slug;
                             $tpl->folders[] = $tpl->type . DS . $tpl->slug;
                             $templates->before[] = $tpl;
@@ -71,23 +71,13 @@ class CmsItemReader extends TplModel
         }
     }
 
-    public static function getAllGearsByType($selfType = null)
+    public static function getAllGearsByType()
     {
         $_instance = new static();
-        return $_instance->getAll($selfType);
+        return $_instance->getAll();
     }
 
-    public function sortByTag($tag)
-    {
-        $units = $this->run();
-        $result = [];
-        foreach ($units as $unit) {
-            if (isset($unit->tags) && array_search($tag, $unit->tags) > -1) {
-                $result[] = $unit;
-            }
-        }
-        return collect($result);
-    }
+
 
     public function deleteGear()
     {
@@ -103,8 +93,8 @@ class CmsItemReader extends TplModel
                         && !$mainConfigFileDecoded[$this->slug]['is_core']) {
                         unset($mainConfigFileDecoded[$this->slug]);
                         $editedMainConfigFileEncoded = json_encode($mainConfigFileDecoded);
-                        if (File::put($mainConfigFilePath, $editedMainConfigFileEncoded) && File::exists(base_path($this->path))) {
-                            return File::deleteDirectory(base_path($this->path));
+                        if (File::put($mainConfigFilePath, $editedMainConfigFileEncoded) && File::exists(($this->path))) {
+                            return File::deleteDirectory(($this->path));
                         }
                     }
                 }

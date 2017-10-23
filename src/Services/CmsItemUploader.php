@@ -8,10 +8,13 @@
 
 namespace Sahakavatar\Cms\Services;
 
-use Sahakavatar\Cms\Helpers\helpers;
 use File;
 use Illuminate\Http\Request;
+use Sahakavatar\Cms\Helpers\helpers;
+use Sahakavatar\Cms\Models\ContentLayouts\ContentLayouts;
 use Sahakavatar\Cms\Models\Templates\TplVariations;
+use Sahakavatar\Cms\Models\Templates\Units;
+use Sahakavatar\Cms\Models\Templates\UnitsVariations;
 use Sahakavatar\Modules\Models\Fields;
 use Zipper;
 
@@ -118,46 +121,23 @@ class CmsItemUploader
     private function getGearPathByType($gear)
     {
         $gearsArray = [
-            'themes' => [
-                'path' => 'resources' . DS . 'views' . DS. 'Themes' . DS,
-                'model' => "Sahakavatar\\Cms\\Models\\Themes",
-                'self_type' => 'themes',
-                'required_keys' => [
-                    'main_type' => true,
-                    'self_type' => true,
-                    'title' => true,
-                    'type' => true
-                ], 'equal_keys' => [
-                    'self_type' => 'units'
-                ]
-            ],
             'units' => [
-                'path' => 'resources' . DS . 'units' . DS,
-                'model' => "App\\Models\\Templates\\Units",
+                'path' => config('paths.units_uplaod'),
+                'model' => "Sahakavatar\\Cms\\Models\\Templates\\Units",
+                'variation' => "Sahakavatar\\Cms\\Models\\Templates\\UnitsVariations",
                 'self_type' => 'units',
                 'required_keys' => [
-                    'main_type' => true,
-                    'self_type' => true,
                     'title' => true,
-                    'type' => true
+                    'type' => true,
+                    'tags' => true,
                 ], 'equal_keys' => [
-                    'self_type' => 'units'
+                    'type' => 'unit'
                 ]
-            ], 'sections' => [
-                'path' => 'resources' . DS . 'sections' . DS,
-                'model' => "App\\Models\\Templates\\Sections",
-                'self_type' => 'sections',
-                'required_keys' => [
-                    'self_type' => true,
-                    'title' => true,
-                    'type' => true
-                ],
-                'equal_keys' => [
-                    'self_type' => 'sections'
-                ]
-            ], 'page_sections' => [
+            ],
+            'page_sections' => [
                 'path' => 'resources' . DS . 'views' . DS . 'ContentLayouts' . DS,
-                'model' => "App\\Models\\ContentLayouts\\ContentLayouts",
+                'model' => "Sahakavatar\\Cms\\Models\\ContentLayouts\\ContentLayouts",
+                'variation' => "Sahakavatar\\Cms\\Models\\ContentLayouts\\ContentLayoutVariations",
                 'self_type' => 'page_sections',
                 'required_keys' => [
                     'self_type' => true,
@@ -166,43 +146,6 @@ class CmsItemUploader
                 ],
                 'equal_keys' => [
                     'self_type' => 'page_sections'
-                ]
-            ], 'HF' => [
-                'path' => 'resources' . DS . 'templates' . DS,
-                'model' => "App\\Models\\ContentLayouts\\ContentLayouts",
-                'self_type' => 'HF',
-                'required_keys' => [
-                    'self_type' => true,
-                    'type' => true,
-                    'title' => true,
-                    'type' => true
-                ],
-                'equal_keys' => [
-                    'self_type' => 'HF'
-                ]
-            ], 'main_body' => [
-                'path' => 'resources' . DS . 'views' . DS . 'ContentLayouts' . DS,
-                'model' => "App\\Models\\ContentLayouts\\ContentLayouts",
-                'self_type' => 'main_body',
-                'required_keys' => [
-                    'self_type' => true,
-                    'title' => true,
-                    'type' => true
-                ],
-                'equal_keys' => [
-                    'self_type' => 'main_body'
-                ]
-            ], 'templates' => [
-                'path' => 'resources' . DS . 'templates' . DS,
-                'model' => "App\\Models\\ContentLayouts\\ContentLayouts",
-                'self_type' => 'templates',
-                'required_keys' => [
-                    'self_type' => true,
-                    'type' => true,
-                    'title' => true
-                ],
-                'equal_keys' => [
-                    'self_type' => 'templates'
                 ]
             ]
         ];
@@ -241,9 +184,7 @@ class CmsItemUploader
     public function run($request, $place = 'backend')
     {
         $isValid = $this->isCompress($request);
-
         if (!$isValid) return $this->ResponseError('Uploaded data is InValid!!!', 500);
-
         $response = $this->upload($request);
         $response['place'] = $place;
 
@@ -253,19 +194,19 @@ class CmsItemUploader
                 File::deleteDirectory($this->uf, true);
                 $basePath = base_path($this->path . $result['data']['folder']);
                 $registerPath = $this->path . $result['data']['folder'];
-                CmsItemRegister::registerGear($basePath, $registerPath, $response['place'], $this->self_type);
-                $variation = $this->makeVariations($result['data']);
-                $this->registerField($basePath, $variation);
-                return $result;
-            } else {
-                File::deleteDirectory($this->uf, true);
-                return $result;
+                if(CmsItemRegister::registerGear($basePath, $registerPath, $response['place'], $this->self_type)){
+                    $variation = $this->makeVariations($result['data']);
+                    $this->registerField($basePath, $variation);
+                    return $result;
+                }else{
+                    $response['error']=true;
+                    $response['code']=301;
+                    $response['message']='unit exists';
+                };
             }
-        } else {
+        }
             File::deleteDirectory($this->uf, true);
             return $response;
-        }
-
     }
 
     //uxel ver@ nshvac cod@
@@ -345,16 +286,14 @@ class CmsItemUploader
         $this->name = $data['data'];
         $this->slug = $data['slug'];
         $this->place = $data['place'];
-
         if (File::exists($this->uf . $this->folder . DS . 'config.json')) {
             $file = $this->uf . $this->folder . DS . 'config.json';
+
             $response = $this->validate($file);
             if ($response['error'])
                 return $response;
-
-            $this->dir = $this->path . $this->folder;
+            $this->dir = base_path($this->path . $this->folder);
             File::copyDirectory($this->uf . $this->folder, $this->dir);
-
             return $response;
         } else {
             if (File::exists($this->uf . $this->folder . DS . $this->name . DS . 'config.json')) {
@@ -363,13 +302,11 @@ class CmsItemUploader
                 if ($response['error'])
                     return $response;
 
-                $this->dir = $this->path . $this->folder;
+                $this->dir = base_path($this->path . $this->folder);
                 File::copyDirectory($this->uf . $this->folder . DS . $this->name, $this->dir);
-
                 return $response;
             }
         }
-
         return $this->uf . $this->folder . DS . 'config.json';
     }
 
@@ -438,8 +375,11 @@ class CmsItemUploader
             }
         }
         File::makeDirectory($variation_path);
-        $gearObject = CmsItemReader::getAllGearsByType($this->self_type)->where('slug', $data['slug'])->first();
-        $variation = new TplVariations();
+        $model = $this->gear['model'];
+        $model_variation = $this->gear['variation'];
+        $gearObject = $model::find($data['slug']);
+        $variation = new $model_variation();
+
         return $variation->createVariation($gearObject, ['title' => 'Default'])->save();
     }
 

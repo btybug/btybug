@@ -7,6 +7,7 @@
  */
 
 namespace Sahakavatar\Cms\Models\ExtraModules;
+
 use File;
 
 class config
@@ -20,18 +21,18 @@ class config
 
     public function __construct()
     {
-        $this->jsons['modules']=storage_path('app/modules.json');
-        $this->jsons['plugins']=storage_path('app/plugins.json');
-        $this->jsons['extras']=storage_path('app/plugins.json');
-        $this->jsons['addons']=storage_path('app/addons.json');
-        foreach ($this->jsons as $path){
-            if (!File::exists($path)){
-                File::put($path,json_encode([],true));
+        $this->jsons['modules'] = storage_path('app/modules.json');
+        $this->jsons['plugins'] = storage_path('app/plugins.json');
+        $this->jsons['extras'] = storage_path('app/plugins.json');
+        $this->jsons['addons'] = storage_path('app/addons.json');
+        foreach ($this->jsons as $path) {
+            if (!File::exists($path)) {
+                File::put($path, json_encode([], true));
             }
         }
-        $this->modules=json_decode(File::get($this->jsons['modules']),true);
-        $this->plugins=json_decode(File::get($this->jsons['plugins']),true);
-        $this->extras=json_decode(File::get($this->jsons['plugins']),true);
-        $this->addons=json_decode(File::get($this->jsons['addons']),true);
+        $this->modules = json_decode(File::get($this->jsons['modules']), true);
+        $this->plugins = json_decode(File::get($this->jsons['plugins']), true);
+        $this->extras = json_decode(File::get($this->jsons['plugins']), true);
+        $this->addons = json_decode(File::get($this->jsons['addons']), true);
     }
 }

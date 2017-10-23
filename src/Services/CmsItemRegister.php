@@ -171,42 +171,51 @@ class CmsItemRegister
 
     public static function registerGear($path, $relativePath, $type, $gearType = NULL, $moduleData = NULL)
     {
+
         if ($gearType && File::isDirectory($path)) {
+
             $configJsonFile = $path . DS . self::$configFileName;
             if (File::isFile($configJsonFile)) {
                 $file = File::get($configJsonFile);
                 $configFileData = json_decode($file, true);
-                if (isset($configFileData['self_type']) && $configFileData['self_type'] == $gearType) {
-                    $configFileData['slug'] = $moduleData ? uniqid() : $configFileData['slug'];
-                    $configFileData['folder'] = isset($configFileData['folder']) ? $configFileData['folder'] : basename($path);
-                    $configFileData['created_at'] = isset($configFileData['created_at']) ? $configFileData['created_at'] : time('now');
-                    $configFileData['place'] = isset($configFileData['place']) ? $configFileData['place'] : self::$places[$type];
-                    $configFileData['path'] = $moduleData ? $relativePath . DS . self::$configDirectoryName . DS
-                        . self::$gearsDirectoryName . DS . $type . DS . self::$gearsSelfTypeStructure[$gearType]
-                        . DS . basename($path) : $relativePath;
-                    if ($moduleData && isset($moduleData['slug'])) {
-                        $configFileData['module_slug'] = $moduleData['slug'];
+                $configFileData['slug'] = $moduleData ? uniqid() : $configFileData['slug'];
+                $configFileData['folder'] = isset($configFileData['folder']) ? $configFileData['folder'] : basename($path);
+                $configFileData['created_at'] = isset($configFileData['created_at']) ? $configFileData['created_at'] : time('now');
+                $configFileData['place'] = isset($configFileData['place']) ? $configFileData['place'] : self::$places[$type];
+                $configFileData['path'] = (($moduleData ? $relativePath . DS . self::$configDirectoryName . DS
+                    . self::$gearsDirectoryName . DS . $type . DS . self::$gearsSelfTypeStructure[$gearType]
+                    . DS . basename($path) : $relativePath));
+                $configFileData['path'] = str_replace('\\', '/', $configFileData['path']);
+                if ($moduleData && isset($moduleData['slug'])) {
+                    $configFileData['module_slug'] = $moduleData['slug'];
+                }
+                $configFileData['is_core'] = $moduleData ? 1 : 0;
+                $configFileName = strtolower($gearType) . self::EXT;
+                $storageConfigContainerFile = storage_path('app' . DS . $configFileName);
+                if (!File::isFile($storageConfigContainerFile)) {
+                    $dataToInsert = [
+                        $configFileData['slug'] => $configFileData
+                    ];
+                } else {
+                    $existingData = File::get(storage_path('app' . DS . $configFileName));
+                    $existingDataDecoded = json_decode($existingData, true);
+                    $isUnique = self::isUnique($existingDataDecoded, $configFileData);
+                    if (!$isUnique) {
+                        $path=base_path($configFileData['path']);
+                        if(File::isDirectory($path)){
+                            File::deleteDirectory($path);
+                        }
+                        return false;
                     }
-                    $configFileData['is_core'] = $moduleData ? 1 : 0;
-                    $configFileName = strtolower($gearType) . self::EXT;
-                    $storageConfigContainerFile = storage_path('app' . DS . $configFileName);
-                    if (!File::isFile($storageConfigContainerFile)) {
-                        $dataToInsert = [
-                            $configFileData['slug'] => $configFileData
-                        ];
-                    } else {
-                        $existingData = File::get(storage_path('app' . DS . $configFileName));
-                        $existingDataDecoded = json_decode($existingData, true);
-                        $existingDataDecoded[$configFileData['slug']] = $configFileData;
-                        $dataToInsert = $existingDataDecoded;
+                    $existingDataDecoded[$configFileData['slug']] = $configFileData;
+                    $dataToInsert = $existingDataDecoded;
+                }
 
-                    }
-                    $configFileData = json_encode($configFileData, true);
-//                    dd($configFileData,$configJsonFile);
-                    if (File::put($configJsonFile, $configFileData)
-                        && File::put(storage_path('app' . DS . $configFileName), json_encode($dataToInsert, true))) {
-                        return true;
-                    }
+
+                $configFileData = json_encode($configFileData, true);
+                if (File::put($configJsonFile, $configFileData)
+                    && File::put(storage_path('app' . DS . $configFileName), json_encode($dataToInsert, true))) {
+                    return true;
                 }
             }
         }
@@ -399,5 +408,17 @@ class CmsItemRegister
         }
     }
 
+    public static function isUnique($coreData, $unitData)
+    {
+        $needle = $unitData['title'] . $unitData['author'];
+        foreach ($coreData as $existing) {
+            $delta = $existing['title'] . $existing['author'];
 
+            if ($delta == $needle) {
+                echo $delta .'=='. $needle;
+                return false;
+            }
+        }
+        return true;
+    }
 }

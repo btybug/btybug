@@ -2,6 +2,7 @@
 
 use Avatar\Avatar\Repositories\Plugins;
 use Sahakavatar\Cms\Models\ContentLayouts\autoinclude;
+use Sahakavatar\Cms\Models\ContentLayouts\ContentLayouts;
 use Sahakavatar\Cms\Models\Templates\Eloquent\Abstractions\TplModel;
 
 class Units extends TplModel
@@ -12,23 +13,6 @@ class Units extends TplModel
     public $variationPath = 'variations';
     protected $tplpath = 'resources/units';
     protected $config = 'config.json';
-
-    public static function getAllUnits()
-    {
-        $templates = [];
-        $ui_units = self::all()->run();
-        $tpl = new Templates();
-        $tpl_units = $tpl->recursiveFindAllUnits();
-        foreach ($ui_units as $unit) {
-            $templates[] = $unit;
-        }
-        foreach ($tpl_units as $unit) {
-            $templates[] = $unit;
-        }
-        $data = new static;
-        $data->before = collect($templates);
-        return $data;
-    }
 
     public static function getAllUnitsPluck()
     {
@@ -60,17 +44,11 @@ class Units extends TplModel
      */
     public static function renderLivePreview($slug = NULL, $type = 'frontend')
     {
-        $ui = Units::findUnit($slug);
-        if (!$ui) {
+        $ui = $model = Units::findByVariation($slug);
+        if (!$model) {
             return false;
         }
         $variation = self::findVariation($slug);
-//        $ui = CmsItemReader::getAllGearsByType('units')->where('slug', $slug)
-//        if (!$variation && $ui) {
-//            $variation = new UnitsVariations();
-//            $data['variation'] = $variation->createVariation($ui, []);
-//            $slug = $data['variation']->id;
-//        }
         $settings = (isset($variation->settings) && $variation->settings) ? $variation->settings : [];
         $body = url('/admin/console/backend/units/settings-iframe', $slug);
         $dataSettings = url('/admin/console/backend/units/settings-iframe', $slug) . '/settings';
@@ -80,7 +58,7 @@ class Units extends TplModel
         }
         $data['body'] = $body;
         $data['settings'] = $dataSettings;
-        return view('console::backend.gears.units.preview', compact(['ui', 'id', 'data', 'settings', 'variation']));
+        return view('console::backend.gears.units.preview', compact(['model',"ui", 'id', 'data', 'settings', 'variation']));
     }
 
     public static function findUnit($slug)
@@ -131,13 +109,13 @@ class Units extends TplModel
             if ($variation->save()) {
                 //dd($variation->id);
                 return [
-                    'html' => $unit->render(['settings' => $settings, 'source' => BBGiveMe('array', 5), 'cheked' => 1]),
+                    'html' => $unit->renderLive(['settings' => $settings, 'source' => BBGiveMe('array', 5), 'cheked' => 1]),
                     'slug' => $variation->id
                 ];
             }
         } else {
             return [
-                'html' => self::findByVariation($slug)->render(['settings' => $data]),
+                'html' => self::findByVariation($slug)->renderLive(['settings' => $data]),
                 'slug' => $slug
             ];
         }
@@ -169,24 +147,30 @@ class Units extends TplModel
         $vars = new TplVariations();
         return $vars->createVariation($this, $array);
     }
-
-    public function renderSettings(array $variables = [])
-    {
-        $path = $this->path;
-        $variables['tplPath'] = $path;
-        $variables['_this'] = $this;
-        $slug = $this->slug;
-        if (!\File::exists($path . '/settings.blade.php')) return "Undefined Settings Blade!";
-        \View::addLocation(realpath($this->path));
-        \View::addNamespace("$slug", realpath($this->path));
-        return \View::make("$slug::settings")->with($variables)->render();
-    }
-
     public function plugin()
     {
         $plugins = new Plugins();
         return $plugins->find($this->plugin);
     }
 
+    public function delete(){
+        $mainConfigFilePath = storage_path('app' . DS  . 'units.json');
+        if (\File::exists($mainConfigFilePath)) {
+            $mainConfigFile = \File::get(storage_path('app' . DS  . 'units.json'));
+            $mainConfigFileDecoded = json_decode($mainConfigFile, true);
+            if ($mainConfigFileDecoded) {
+                if (array_key_exists($this->slug, $mainConfigFileDecoded)
+                    && isset($mainConfigFileDecoded[$this->slug]['slug'])
+                    && $mainConfigFileDecoded[$this->slug]['slug'] == $this->slug) {
+                    unset($mainConfigFileDecoded[$this->slug]);
+                    $editedMainConfigFileEncoded = json_encode($mainConfigFileDecoded);
+                    if (\File::put($mainConfigFilePath, $editedMainConfigFileEncoded)) {
+                        return \File::deleteDirectory($this->path);
+                    }
+                }
+            }
+        }
+        return false;
+    }
 
 }

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <!--[if IE 8]>
 <html lang="en" class="ie8 no-js"> <![endif]-->
@@ -16,19 +15,10 @@
     <meta content="width=device-width, initial-scale=1" name="viewport"/>
     <meta content="" name="description"/>
     <meta content="" name="author"/>
-    {!! HTML::style('//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css') !!}
 
+    {!! BBCss() !!}
     {!! HTML::style('/js/jquery-ui/jquery-ui.min.css') !!}
-
-    {!! HTML::script("/css/bootstrap/js/bootstrap.min.js") !!}
     {!! HTML::style('/css/cms.css') !!}
-    {!! HTML::script("/js/jquery-2.1.4.min.js") !!}
-    {!! HTML::script("/js/jquery-ui/jquery-ui.min.js") !!}
-    {!! HTML::script("/js/tinymice/tinymce.min.js") !!}
-    {!! HTML::style("css/animate.css") !!}
-    {{--{!! HTML::style("/css/core_styles.css") !!}--}}
-   
-    {{--{!! BBlinkFonts() !!}--}}
     @yield('CSS')
     @stack('css')
 </head>
@@ -37,18 +27,31 @@
 
 <div class="container-fluid coreheadersetting m-b-10">
     <div class="row">
-          <div class="col-xs-4 p-t-10">
-                  <div class="form-group">
-                    <label class="sr-only" for="itemname">itemname</label>
-                    <input type="text" class="form-control" id="itemname" placeholder="itemname" value="{!! $variation->title or null !!}">
-                  </div>
-          </div>
-          <div class="col-xs-4  p-t-10">
-                  <button class="btn btn-success" data-settingaction="save"> save</button>
-          </div>
-          <div class="col-xs-4 text-right  p-t-10">
-                  <button class="btn btn-info" data-settingaction="setting"> Setting</button>
-          </div>
+        <div class="col-xs-4 p-t-10">
+            <div class="form-group">
+                <label class="sr-only" for="itemname">itemname</label>
+                @if(isset($variation))
+                    <input type="hidden" id="itemname" value="{!! $variation->title !!}">
+                    <div class="form-control">{!! $variation->title !!}</div>
+                @else
+                    <input type="text" class="form-control" id="itemname" placeholder="itemname"
+                           value="">
+                @endif
+            </div>
+        </div>
+        <div class="col-xs-4  p-t-10">
+
+        </div>
+        <div class="col-xs-4 text-right  p-t-10">
+            <button class="btn btn-danger" data-settingaction="console">Console</button>
+            <button class="btn btn-info" data-settingaction="setting"> Setting</button>
+            <button class="btn btn-success" data-settingaction="save"> save</button>
+            @if($model->self_type == "page_sections")
+                <a href="{!! url("/admin/uploads/gears/page-sections/variations/$model->slug") !!}" class="btn btn-warning">Close</a>
+            @else
+                <a href="{!! url("/admin/uploads/units/units-variations/$model->slug") !!}" class="btn btn-warning">Close</a>
+            @endif
+        </div>
     </div>
 </div>
 <header class="hide">
@@ -60,7 +63,8 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
                 {{--{!! Form::submit('Save',['class' => 'btn btn-success pull-right m-r-10']) !!}--}}
                 <h4 class="modal-title" id="myModalLabel"></h4>
             </div>
@@ -76,13 +80,13 @@
 </div>
 
 
-<div class="previewlivesetting" >
-      <div data-loadifram="preview">
+<div class="previewlivesetting">
+    <div data-loadifram="preview">
         @yield('content')
-      </div>
-      <div>
-           @yield('settings')
-      </div>
+    </div>
+    <div>
+        @yield('settings')
+    </div>
 </div>
 
 <input name="token" type="hidden" value="{{ csrf_token() }}" id="token"/>
@@ -90,6 +94,10 @@
 </body>
 {{--{!! HTML::script("/js/UiElements/bb_styles.js?v.5") !!}--}}
 {{--{!! HTML::script("/js/UiElements/ui-preview-setting.js") !!}--}}
+{!! BBJquery() !!}
+{!! BBMainFrontJS() !!}
+{!! HTML::script("/js/jquery-ui/jquery-ui.min.js") !!}
+{!! HTML::script("/js/tinymice/tinymce.min.js") !!}
 
 @yield('JS')
 @stack('javascript')

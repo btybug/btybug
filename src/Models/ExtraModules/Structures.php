@@ -8,8 +8,6 @@
 
 namespace Sahakavatar\Cms\Models\ExtraModules;
 
-use Sahakavatar\Cms\Models\ExtraModules\config;
-
 /**
  * Class Structures
  * @package App\Models\ExtraModules
@@ -68,6 +66,15 @@ class Structures
             return $this;
             // TODO: Implement __set() method.
         }
+    }
+
+    /**
+     * @return bool
+     */
+    public function toArray()
+    {
+        if (isset($this->attributes)) return $this->attributes;
+        return false;
     }
 
     /**
@@ -280,15 +287,6 @@ class Structures
         $json = $config->{$type};
         $json[$this->slug] = $this->toArray();
         return \File::put($path, json_encode($json, true));
-    }
-
-    /**
-     * @return bool
-     */
-    public function toArray()
-    {
-        if (isset($this->attributes)) return $this->attributes;
-        return false;
     }
 
     /**

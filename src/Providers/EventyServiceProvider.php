@@ -121,7 +121,7 @@ class EventyServiceProvider extends ServiceProvider
 
         \Eventy::addAction('my.shortcode', function ($what) {
 //            echo $what;
-            $codes = \Config::get('shortcode.code',[]);
+            $codes = \Config::get('shortcode.code', []);
             foreach ($what as $key => $value) {
                 $codes[] = $value;
             }
@@ -129,15 +129,15 @@ class EventyServiceProvider extends ServiceProvider
             return (\Config::get('shortcode.code'));
         });
         \Eventy::addAction('my.scripts', function ($what) {
-            $codes = \Config::get('scripts',[]);
-            $codes[]= $what;
+            $codes = \Config::get('scripts', []);
+            $codes[] = $what;
             \Config::set('scripts', $codes);
             return (\Config::get('script'));
         });
 
         \Eventy::addAction('script.groups', function ($what) {
-            $codes = \Config::get('script_groups',[]);
-            $codes[]= $what;
+            $codes = \Config::get('script_groups', []);
+            $codes[] = $what;
             \Config::set('script_groups', $codes);
             return (\Config::get('script_groups'));
         });
@@ -305,7 +305,7 @@ class EventyServiceProvider extends ServiceProvider
         });
 
         // BBPreparePost
-       \Blade::directive('BBPreparePost', function ($expression) {
+        \Blade::directive('BBPreparePost', function ($expression) {
             return "<?php BBPreparePost($expression) ?>";
         });
 

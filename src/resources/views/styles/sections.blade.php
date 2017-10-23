@@ -20,7 +20,8 @@
                     @foreach($section->variations() as $item)
                         <li>
                             <a href="javascript:void(0)" class="btn text-center item">
-                                <input type="hidden" data-action="placeholder_section" data-value="{!! $item->id !!}"/><img src="{!! url('images/form-list2.jpg') !!}"></a>
+                                <input type="hidden" data-action="placeholder_section"
+                                       data-value="{!! $item->id !!}"/><img src="{!! url('images/form-list2.jpg') !!}"></a>
                             <span>{!! $item->title !!}</span>
                         </li>
                     @endforeach
@@ -30,7 +31,9 @@
                     @foreach($items as $item)
                         <li>
                             <a class="btn text-center item">
-                                <input type="hidden" data-action="placeholder_section" data-value="{!! $item->id !!}"/><img src="{!! url('images/form-list2.jpg') !!}"> </a>
+                                <input type="hidden" data-action="placeholder_section"
+                                       data-value="{!! $item->id !!}"/><img src="{!! url('images/form-list2.jpg') !!}">
+                            </a>
                             <span>{!! $item->title !!}</span>
                         </li>
                     @endforeach

@@ -16,11 +16,15 @@ use File;
  */
 abstract class TplVariations
 {
+    protected static $_instanceV = null;
+    /**
+     * @var
+     */
+    public $updated_at;
     /**
      * @var
      */
     protected $variationPath;
-
     /**
      * @var null
      */
@@ -29,7 +33,6 @@ abstract class TplVariations
      * @var string
      */
     protected $path;
-
     protected $file;
     /**
      * @var
@@ -38,17 +41,11 @@ abstract class TplVariations
     /**
      * @var
      */
-    public $updated_at;
-    /**
-     * @var
-     */
     protected $attributes;
     /**
      * @var
      */
     protected $original;
-
-    protected static $_instanceV = null;
 
     /**
      * TplVariations constructor.
@@ -63,10 +60,53 @@ abstract class TplVariations
     }
 
     /**
+     * @return null
+     */
+    public static function instanceV()
+    {
+        if (!static::$_instanceV) {
+            static::$_instanceV = new static;
+        }
+        return static::$_instanceV;
+    }
+
+    /**
+     * @param $id
+     * @param $tpl
+     * @return bool
+     */
+    public static function delete($id, $tpl)
+    {
+        $vPath = $tpl->path . DS . $tpl->variationPath . DS . $id . '.json';
+        if (File::exists($vPath)) return File::delete($vPath);
+        return false;
+    }
+
+    /**
+     * @param $method
+     * @param $parameters
+     * @return mixed
+     */
+    public static function __callStatic($method, $parameters)
+    {
+        $instance = new static;
+
+        return call_user_func_array([$instance, $method], $parameters);
+    }
+
+    /**
      * @param array $arg
      * @return mixed
      */
     abstract function renderVariation(array $arg = []);
+//    public static function __callStatic($name, $arguments)
+//    {
+//        dd($name);
+//        if($name=='findVariation'){
+//            call_user_func_array([static::instanceV(),'scopeFindVarition'],$arguments);
+//        }
+//        // TODO: Implement __callStatic() method.
+//    }
 
     /**
      * @param $tpl
@@ -80,7 +120,11 @@ abstract class TplVariations
      */
     public function findV($tpl)
     {
-        $path = $tpl . '/variations';
+        if(is_dir($tpl.'/variations')){
+            $path =$tpl . '/variations';
+        }else{
+            $path =base_path($tpl) . '/variations';
+        }
         $vars = File::allFiles($path);
         $array = array();
         foreach ($vars as $var) {
@@ -98,32 +142,6 @@ abstract class TplVariations
         }
         return collect($array);
     }
-    /**
-     * @return null
-     */
-    public static function instanceV()
-    {
-        if (!static::$_instanceV) {
-            static::$_instanceV = new static;
-        }
-        return static::$_instanceV;
-    }
-//    public static function __callStatic($name, $arguments)
-//    {
-//        dd($name);
-//        if($name=='findVariation'){
-//            call_user_func_array([static::instanceV(),'scopeFindVarition'],$arguments);
-//        }
-//        // TODO: Implement __callStatic() method.
-//    }
-    /**
-     * @return bool
-     */
-    public function toArray()
-    {
-        if (isset($this->attributes)) return $this->attributes;
-        return false;
-    }
 
     /**
      * @param $name
@@ -133,6 +151,29 @@ abstract class TplVariations
     {
         $result = isset($this->toArray()[$name]) ? $this->toArray()[$name] : false;
         return $result;
+    }
+
+    /**
+     * @param $name
+     * @param $value
+     * @return $this
+     */
+    public function __set($name, $value)
+    {
+        if (isset($this->attributes[$name])) {
+            $this->attributes[$name] = $value;
+            return $this;
+            // TODO: Implement __set() method.
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    public function toArray()
+    {
+        if (isset($this->attributes)) return $this->attributes;
+        return false;
     }
 
     /**
@@ -151,20 +192,6 @@ abstract class TplVariations
     public function getAttributes()
     {
         return $this->attributes;
-    }
-
-    /**
-     * @param $name
-     * @param $value
-     * @return $this
-     */
-    public function __set($name, $value)
-    {
-        if (isset($this->attributes[$name])) {
-            $this->attributes[$name] = $value;
-            return $this;
-            // TODO: Implement __set() method.
-        }
     }
 
     /**
@@ -191,18 +218,6 @@ abstract class TplVariations
     }
 
     /**
-     * @param $id
-     * @param $tpl
-     * @return bool
-     */
-    public static function delete($id, $tpl)
-    {
-        $vPath = $tpl->path . DS . $tpl->variationPath . DS . $id . '.json';
-        if (File::exists($vPath)) return File::delete($vPath);
-        return false;
-    }
-
-    /**
      *
      */
     public function scopeDelete()
@@ -215,7 +230,7 @@ abstract class TplVariations
      * @param $array
      * @return mixed
      */
-   abstract public function createVariation($tpl, $array);
+    abstract public function createVariation($tpl, $array);
 
     /**
      * @param $namspace
@@ -225,18 +240,6 @@ abstract class TplVariations
     protected function belongsTo($namspace, $primary)
     {
         return $namspace::find($this->$primary);
-    }
-
-    /**
-     * @param $method
-     * @param $parameters
-     * @return mixed
-     */
-    public static function __callStatic($method, $parameters)
-    {
-        $instance = new static;
-
-        return call_user_func_array([$instance, $method], $parameters);
     }
 
 }

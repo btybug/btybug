@@ -17,7 +17,6 @@
         @if($page->header)
             {!! BBheader() !!}
         @endif
-
         {!! BBRenderPageSections($page->page_layout,$settings) !!}
         @if($page->footer)
             {!! BBfooter() !!}

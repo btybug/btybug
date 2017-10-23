@@ -13,22 +13,28 @@ interface TplInterface
 {
 
     /**
-     * @param $key
-     * @param $value
-     * @return mixed
-     */
-    public  function stWhere($key,$value);
-
-    /**
      * @param null $path
      * @return mixed
      */
     public static function get($path = null);
 
     /**
+     * @param $slug
      * @return mixed
      */
-    public function getAll($selfType=null);
+    public static function find($slug);
+
+    /**
+     * @param $key
+     * @param $value
+     * @return mixed
+     */
+    public function stWhere($key, $value);
+
+    /**
+     * @return mixed
+     */
+    public function getAll();
 
     /**
      * @param $key
@@ -42,12 +48,6 @@ interface TplInterface
      * @return mixed
      */
     public function createVariation(array $array);
-
-    /**
-     * @param $slug
-     * @return mixed
-     */
-    public static function find($slug);
 
     /**
      * @return mixed

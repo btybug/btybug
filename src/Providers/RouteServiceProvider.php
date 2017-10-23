@@ -59,7 +59,7 @@ class RouteServiceProvider extends ServiceProvider
 //                'middleware' => ['admin:Users'],
                 'namespace' => $this->namespace,
             ], function ($router) {
-                require __DIR__.'/../Routes/web.php';
+                require __DIR__ . '/../Routes/web.php';
             });
         });
     }

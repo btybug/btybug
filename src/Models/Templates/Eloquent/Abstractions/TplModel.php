@@ -8,10 +8,11 @@
 
 namespace Sahakavatar\Cms\Models\Templates\Eloquent\Abstractions;
 
-use Sahakavatar\Cms\Models\Templates\Eloquent\Interfaces\TplInterface;
-use Sahakavatar\Modules\Models\Validation;
+use File;
+use HTML;
 use Illuminate\Contracts\Support\Arrayable;
-use File, View, HTML;
+use Sahakavatar\Cms\Models\Templates\Eloquent\Interfaces\TplInterface;
+use View;
 
 /**
  * Class TplModel
@@ -19,10 +20,11 @@ use File, View, HTML;
  */
 abstract class TplModel implements TplInterface, Arrayable
 {
+    public static $type;
     /**
-     * @var string
+     * @var null
      */
-    protected $tplpath;
+    protected static $_instance = null;
     /**
      * @var string
      */
@@ -30,22 +32,27 @@ abstract class TplModel implements TplInterface, Arrayable
         'units' => 'units.json',
     ];
 
-    public static $type;
-
 
     /**
      * @var
      */
-
-    /**
-     * @var
-     */
-    private $path;
     /**
      * @var
      */
     public $appPath;
-    public $folders=[];
+    public $folders = [];
+    /**
+     * @var
+     */
+    public $dir;
+    /**
+     * @var array
+     */
+    public $before = [];
+    /**
+     * @var string
+     */
+    protected $tplpath;
     /**
      * @var
      */
@@ -55,20 +62,9 @@ abstract class TplModel implements TplInterface, Arrayable
      */
     protected $original;
     /**
-     * @var null
-     */
-    protected static $_instance = null;
-
-    /**
      * @var
      */
-    public $dir;
-
-    /**
-     * @var array
-     */
-    public $before = [];
-
+    private $path;
 
     /**
      * TplModel constructor.
@@ -76,6 +72,17 @@ abstract class TplModel implements TplInterface, Arrayable
     public function __construct()
     {
         if (!static::path()) return null;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function path($path = null)
+    {
+        $path = ($path) ? $this->tplpath . DS . $path : $this->tplpath;
+        if (!File::isDirectory($path)) return false;
+        $this->dir = $path;
+        return $this;
     }
 
     /**
@@ -95,77 +102,116 @@ abstract class TplModel implements TplInterface, Arrayable
     }
 
     /**
-     * @return mixed
+     * @param $slug
+     * @return null
      */
-    public  function getAll($selfType=null)
+    public static function find($slug)
     {
-        //FIXME:optimise this function
-        if($selfType){
-            $configFileData = $this->getRegisteredDataFromFileBySelfType($selfType);
-
-            if($configFileData) {
-                foreach($configFileData as $key => $currentGear) {
-
-                    if($this->checkGearInFileStructureWithPath($currentGear['path'])) {
-                        $tpl=new static;
-                        $tpl->original = $tpl->attributes = $currentGear;
-                        $tpl->path = base_path($currentGear['path']);
-                        $tpl->folders[] = $tpl->main_type . DS . $tpl->type . DS . $tpl->slug;
-                        $tpl->folders[] = $tpl->type . DS . $tpl->slug;
-                        $this->before[] = $tpl;
-                    }
-                }
-
-            }
-        }else{
-            foreach ($this->configs as $key=>$value){
-                $selfType=$key;
-                $configFileData=$this->getRegisteredDataFromFileBySelfType($key);
-                if($configFileData) {
-                    foreach($configFileData as $key => $currentGear) {
-                        if($this->checkGearInFileStructureWithPath($currentGear['path'])) {
-                            $tpl=new static;
-                            $tpl->original = $tpl->attributes = $currentGear;
-                            $tpl->path = base_path($currentGear['path']);
-                            $tpl->folders[] = $tpl->main_type . DS . $tpl->type . DS . $tpl->slug;
-                            $tpl->folders[] = $tpl->type . DS . $tpl->slug;
-                            $this->before[] = $tpl;
-                        }
-                    }
-                }
+        $instance = new static;
+        $configFileData = $instance->getRegisteredDataFromFileBySelfType();
+        if ($configFileData && isset($configFileData[$slug])) {
+            $currentGear = $configFileData[$slug];
+            if ($instance->checkGearInFileStructureWithPath($currentGear['path'])) {
+                $tpl = new static;
+                $tpl->path = base_path($currentGear['path']);
+                $currentGear['path'] = base_path($currentGear['path']);
+                $tpl->original = $tpl->attributes = $currentGear;
+                $tpl->folders[] = $tpl->main_type . DS . $tpl->type . DS . $tpl->slug;
+                $tpl->folders[] = $tpl->type . DS . $tpl->slug;
+                $instance->before = $tpl;
+                return $instance->run();
             }
         }
-            return $this;
-        }
-
-    /**
-     * @return mixed
-     */
-    public function toArray()
-    {
-        if (isset($this->attributes)) return $this->attributes;
-        return false;
+        return null;
     }
 
+    /**
+     * @return array
+     */
+    public function run()
+    {
+        return $this->before;
+    }
 
     /**
-     * @param $key
-     * @param $value
      * @return mixed
      */
-    public function scopeWhere($key, $value)
+    public static function getDir()
     {
-        $array = [];
-        $all = $this->before;
+        return self::$dir;
+    }
 
-        foreach ($all as $keyeer => $befores) {
-            $conf = $befores->toArray();
-            if (isset($conf[$key]) && $conf[$key] == $value) {
-                $array[] = $befores;
+    /**
+     * @param $dir
+     */
+    public static function setDir($dir)
+    {
+        self::$dir = $dir;
+    }
+
+    /**
+     * @return null
+     */
+    public static function instance()
+    {
+        if (!static::$_instance) {
+            static::$_instance = new static;
+        }
+        return static::$_instance;
+    }
+
+    /**
+     *
+     */
+
+
+    public static function __callStatic($name, $arguments)
+    {
+        $instance = new static;
+        if ($name === 'where') {
+            return call_user_func_array([$instance, 'stWhere'], $arguments);
+        }
+        if ($name === 'all') {
+            return call_user_func_array([$instance, 'getAll'], $arguments);
+        }
+        if ($name === 'allWidgets') {
+            return call_user_func_array([$instance, 'recursiveFindAllWidgets'], $arguments);
+        }
+        if ($name === 'lists') {
+            return call_user_func_array([$instance, 'listing'], $arguments);
+        }
+    }
+
+    private static function parseGearsConfigFileToArray()
+    {
+        $configFilePath = self::getGearsConfigFilePath();
+        if (File::isFile($configFilePath)) {
+            $configs = File::get($configFilePath);
+            if ($configs) {
+                return json_decode($configs, true);
+            }
+            return false;
+        }
+    }
+
+    private static function getGearsConfigFilePath()
+    {
+        return config('paths.GEARS_CONFIG_FILE') . DS . config('config.GEARS_CONFIG_FILE_NAME');
+    }
+
+    private static function getRegisteredDataFromFiles()
+    {
+        $result = [];
+        foreach (self::$configs as $config) {
+            $configFilePath = storage_path('app' . DS . $config);
+            if (File::isFile($configFilePath)) {
+                $configs = File::get($configFilePath);
+                if ($configs) {
+                    $result = array_merge($result, json_decode($configs, true));
+                }
             }
         }
-        $this->before = collect($array);
-        return $this;
+        return $result;
     }
 
     /**
@@ -190,23 +236,22 @@ abstract class TplModel implements TplInterface, Arrayable
 
     /**
      * @param $key
-     * @param null $value
-     * @return array
+     * @param $value
+     * @return mixed
      */
-    protected function listing($key, $value = null)
+    public function scopeWhere($key, $value)
     {
-        $lusts = array();
-        if (!$this->before) {
-            $tpl = $this->getAll();
-            foreach ($tpl->before as $template) {
-                $lusts[$template->toArray()[$key]] = $template->toArray()[$value];
+        $array = [];
+        $all = $this->before;
+
+        foreach ($all as $keyeer => $befores) {
+            $conf = $befores->toArray();
+            if (isset($conf[$key]) && $conf[$key] == $value) {
+                $array[] = $befores;
             }
-            return $lusts;
         }
-        foreach ($this->before as $template) {
-            $lusts[$template->toArray()[$key]] = $template->toArray()[$value];
-        }
-        return $lusts;
+        $this->before = collect($array);
+        return $this;
     }
 
     /**
@@ -219,6 +264,25 @@ abstract class TplModel implements TplInterface, Arrayable
         $variations[uniqid() . '.' . $this->slug] = $array;
         $this->setAttributes('variations', $variations);
         return $this->save();
+    }
+
+    /**
+     * @return $this
+     */
+    public function save()
+    {
+        $conf = $this->path . DS . $this->config;
+        File::put($conf, json_encode($this->toArray()));
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function toArray()
+    {
+        if (isset($this->attributes)) return $this->attributes;
+        return false;
     }
 
     /**
@@ -249,19 +313,6 @@ abstract class TplModel implements TplInterface, Arrayable
     }
 
     /**
-     * @return mixed
-     */
-    public function getCostumiser()
-    {
-        $conf = $this->path . '/customiser.php';
-        $array = [];
-        if (File::exists($conf)) {
-            $array = File::getRequire($conf);
-        }
-        return $array;
-    }
-
-    /**
      *
      */
     public function getRequireLogic()
@@ -286,16 +337,7 @@ abstract class TplModel implements TplInterface, Arrayable
         return $this->makeWidgetTemplate($paths);
 
     }
-    public function recursiveFindAllUnits()
-    {
-        $templates = $this->getAll()->run();
-        $paths = [];
-        foreach ($templates as $template) {
-            $paths[] = $template->path . DS . 'installable/units';
-        }
-        return $this->makeWidgetTemplate($paths);
 
-    }
     /**
      * @param $paths
      * @return mixed
@@ -321,6 +363,17 @@ abstract class TplModel implements TplInterface, Arrayable
         return collect($array);
     }
 
+    public function recursiveFindAllUnits()
+    {
+        $templates = $this->getAll()->run();
+        $paths = [];
+        foreach ($templates as $template) {
+            $paths[] = $template->path . DS . 'installable/units';
+        }
+        return $this->makeWidgetTemplate($paths);
+
+    }
+
     /**
      * @param array $variables
      * @return string
@@ -328,19 +381,39 @@ abstract class TplModel implements TplInterface, Arrayable
     public function render(array $variables = [])
     {
         $slug = $this->slug;
-        View::addLocation(realpath($this->path));
-        View::addNamespace("$slug", realpath($this->path));
-        $path=$this->path;
+        View::addLocation(($this->path));
+        View::addNamespace("$slug", $this->path);
+        $path = $this->path;
         if ($this->autoinclude) return $this->getAutoInclude()->getRender($variables['variation']->toArray(), "$slug::");
-        if($this->main_file){
-            $tpl = str_replace(".blade.php","",$this->main_file);
-            if(isset($variables['view_name'])){
+        if ($this->main_file) {
+            $tpl = str_replace(".blade.php", "", $this->main_file);
+            if (isset($variables['view_name'])) {
                 $tpl = $variables['view_name'];
             }
-        }else{
+        } else {
             $tpl = "tpl";
         }
-        return View::make("$slug::$tpl")->with($variables)->with(['tplPath' => $path,'_this'=>$this])->render();
+        return View::make("$slug::$tpl")->with($variables)->with(['tplPath' => $path, '_this' => $this])->render();
+    }
+
+    public function renderLive(array $variables = [])
+    {
+        $slug = $this->slug;
+        View::addLocation($this->path);
+        View::addNamespace("$slug", $this->path);
+        $path = $this->path;
+        if ($this->autoinclude) return $this->getAutoInclude()->getRender($variables['variation']->toArray(), "$slug::");
+        if ($this->example) {
+            $tpl = $this->example;
+        } elseif ($this->main_file) {
+            $tpl = str_replace(".blade.php", "", $this->main_file);
+            if (isset($variables['view_name'])) {
+                $tpl = $variables['view_name'];
+            }
+        } else {
+            $tpl = "tpl";
+        }
+        return View::make("$slug::$tpl")->with($variables)->with(['tplPath' => $path, '_this' => $this])->render();
     }
 
     /**
@@ -349,123 +422,50 @@ abstract class TplModel implements TplInterface, Arrayable
      */
     public function renderSettings(array $variables = [])
     {
-        $path=$this->path;
-        $variables['tplPath']=$path;
-        $variables['_this']=$this;
+        $path = $this->path;
+        $variables['tplPath'] = $path;
+        $variables['_this'] = $this;
         $slug = $this->slug;
-        if(!File::exists($path.'/settings.blade.php'))return "Undefined Settings Blade!";
-        View::addLocation(realpath($this->path));
-        View::addNamespace("$slug", realpath($this->path));
+        if (!File::exists($path . '/settings.blade.php')) return "Undefined Settings Blade!";
+        View::addLocation($this->path);
+        View::addNamespace("$slug", $this->path);
         return View::make("$slug::settings")->with($variables)->render();
     }
+
     public function renderStyles(array $variables = [])
     {
-        $path=$this->path;
-        $variables['tplPath']=$path;
-        $variables['_this']=$this;
+        $path = $this->path;
+        $variables['tplPath'] = $path;
+        $variables['_this'] = $this;
         $slug = $this->slug;
-        if(!File::exists($path.'/styles.blade.php'))return 'No Styles providet from this widget';
+        if (!File::exists($path . '/styles.blade.php')) return 'No Styles providet from this widget';
         View::addLocation(realpath($this->path));
         View::addNamespace("$slug", realpath($this->path));
         return View::make("$slug::styles")->with($variables)->render();
-    }
-    public function renderOptions(array $variables = [])
-    {
-        $path=$this->path;
-        $variables['tplPath']=$path;
-        $variables['_this']=$this;
-        $slug = $this->slug;
-        if(!File::exists($path.'/options.blade.php'))return 'No Options providet from this widget';
-        View::addLocation(realpath($this->path));
-        View::addNamespace("$slug", realpath($this->path));
-        return View::make("$slug::options")->with($variables)->render();
-    }
-
-    /**
-     * @param $slug
-     * @return null
-     */
-    public static function find($slug)
-    {
-        $tpl = null;
-        $instance = new static;
-        $instance->getAll();
-        foreach ($instance->before as $static) {
-            $attrs = $static->toArray();
-            if (isset($attrs['slug']) && $attrs['slug'] == $slug) {
-                $tpl = $static;
-            }
-        }
-        $instance->before = $tpl;
-        return $instance->run();
-    }
-    private static function parseGearsConfigFileToArray() {
-        $configFilePath = self::getGearsConfigFilePath();
-        if(File::isFile($configFilePath)) {
-            $configs = File::get($configFilePath);
-            if($configs) {
-                return json_decode($configs, true);
-            }
-            return false;
-        }
-    }
-
-    private static function getRegisteredDataFromFiles() {
-        $result = [];
-        foreach(self::$configs as $config) {
-            $configFilePath = storage_path('app' . DS . $config);
-            if(File::isFile($configFilePath)) {
-                $configs = File::get($configFilePath);
-                if($configs) {
-                    $result = array_merge($result, json_decode($configs, true));
-                }
-            }
-        }
-        return $result;
-    }
-
-    public function getRegisteredDataFromFileBySelfType($selfType) {
-        if($selfType) {
-            $configFileName = isset($this->configs[strtolower($selfType)]) ? $this->configs[strtolower($selfType)] : null;
-            $configFilePath = storage_path('app' . DS . $configFileName);
-            if(File::isFile($configFilePath)) {
-                $configs = File::get($configFilePath);
-                if($configs) {
-                    return json_decode($configs, true);
-                }
-            }
-        }
-        return false;
-    }
-
-    private static function getGearsConfigFilePath() {
-        return config('paths.GEARS_CONFIG_FILE') . DS. config('config.GEARS_CONFIG_FILE_NAME');
-    }
-
-    public function checkGearInFileStructureWithPath($path) {
-
-        if($path) {
-            return File::isDirectory(base_path($path));
-        }
-    }
-    /**
-     * @return bool
-     */
-    public function delete()
-    {
-        return File::deleteDirectory($this->path);
     }
 
     /**
      *
      */
 
-    /**
-     * @return array
-     */
-    public function run()
+    public function renderOptions(array $variables = [])
     {
-         return $this->before;
+        $path = $this->path;
+        $variables['tplPath'] = $path;
+        $variables['_this'] = $this;
+        $slug = $this->slug;
+        if (!File::exists($path . '/options.blade.php')) return 'No Options providet from this widget';
+        View::addLocation(realpath($this->path));
+        View::addNamespace("$slug", realpath($this->path));
+        return View::make("$slug::options")->with($variables)->render();
+    }
+
+    /**
+     * @return bool
+     */
+    public function delete()
+    {
+        return File::deleteDirectory($this->path);
     }
 
     /**
@@ -504,6 +504,19 @@ abstract class TplModel implements TplInterface, Arrayable
 
     /**
      * @param $name
+     * @param $value
+     */
+    public function __set($name, $value)
+    {
+        if (isset($this->attributes[$name])) {
+            $this->attributes[$name] = $value;
+            return $this;
+            // TODO: Implement __set() method.
+        }
+    }
+
+    /**
+     * @param $name
      * @return bool
      */
     public function __isset($name)
@@ -521,11 +534,14 @@ abstract class TplModel implements TplInterface, Arrayable
     }
 
     /**
-     * @return mixed
+     * @param $attributes
      */
-    public static function getDir()
+    public function setAttributes($key, $value)
     {
-        return self::$dir;
+        $attributes = $this->attributes;
+        $attributes[$key] = $value;
+        $this->attributes = $attributes;
+        return $this;
     }
 
     /**
@@ -544,31 +560,17 @@ abstract class TplModel implements TplInterface, Arrayable
         return $this->tplpath;
     }
 
+    public function setTplPath($path)
+    {
+        $this->tplpath = $path;
+    }
+
     /**
      * @return string
      */
     public function getConfig()
     {
         return $this->config;
-    }
-
-    /**
-     * @param $attributes
-     */
-    public function setAttributes($key, $value)
-    {
-        $attributes = $this->attributes;
-        $attributes[$key] = $value;
-        $this->attributes = $attributes;
-        return $this;
-    }
-
-    /**
-     * @param $dir
-     */
-    public static function setDir($dir)
-    {
-        self::$dir = $dir;
     }
 
     /**
@@ -585,6 +587,161 @@ abstract class TplModel implements TplInterface, Arrayable
     public function getPath()
     {
         return $this->path;
+    }
+
+    /**
+     * @param $namspace
+     * @return mixed
+     */
+    public function allVars($namspace)
+    {
+        $v = new $namspace();
+        return $v->findV($this->path);
+    }
+
+    /**
+     *
+     */
+    public function __destruct()
+    {
+//        unset($this->before);
+
+
+        // TODO: Implement __destruct() method.
+    }
+
+    public function style($path)
+    {
+        if (!File::exists($this->path . DS . $path)) abort(500);
+        $slug = $this->slug;
+        $content = File::get($this->path . DS . $path);
+        \Session::put('custom.styles.' . md5($content), "/*$slug*/" . File::get($this->path . DS . $path));
+    }
+
+    public function img($path)
+    {
+        return url('units/img/' . $this->slug . '/' . $path);
+    }
+
+    public function script($path)
+    {
+        if (!File::exists($this->path . DS . $path)) abort(500);
+        $styles = [];
+        if (\Session::has('custom.scripts')) {
+            $styles = \Session::get('custom.scripts', []);
+        }
+        $slug = $this->slug;
+        $content = File::get($this->path . DS . $path);
+        $styles[md5($content)] = "/*$slug*/ \r\n" . $content;
+        \Session::put('custom.scripts', $styles);
+    }
+
+    /**
+     * @param $path
+     * @return string
+     */
+    public function asset($path)
+    {
+        return HTML::image('appdata/template/image/avatar.png');
+    }
+
+    public function customiserFields()
+    {
+        $costumiser = $this->getCostumiser();
+        dd($costumiser);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCostumiser()
+    {
+        $conf = $this->path . '/customiser.php';
+        $array = [];
+        if (File::exists($conf)) {
+            $array = File::getRequire($conf);
+        }
+        return $array;
+    }
+
+    public function addTag($tag)
+    {
+        $this->tags[] = $tag;
+        return $this;
+    }
+
+    public function removeTag($tag)
+    {
+        if (is_array($this->tags)) {
+            $index = array_search($tag, $this->tags);
+            if ($index) {
+                unset($this->tags[$index]);
+            }
+        }
+
+    }
+
+    /**
+     * @param $key
+     * @param null $value
+     * @return array
+     */
+    protected function listing($key, $value = null)
+    {
+        $lusts = array();
+        if (!$this->before) {
+            $tpl = $this->getAll();
+            foreach ($tpl->before as $template) {
+                $lusts[$template->toArray()[$key]] = $template->toArray()[$value];
+            }
+            return $lusts;
+        }
+        foreach ($this->before as $template) {
+            $lusts[$template->toArray()[$key]] = $template->toArray()[$value];
+        }
+        return $lusts;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getAll()
+    {
+        $configFileData = $this->getRegisteredDataFromFileBySelfType();
+        if ($configFileData) {
+            foreach ($configFileData as $key => $currentGear) {
+                if ($this->checkGearInFileStructureWithPath($currentGear['path'])) {
+                    $tpl = new static;
+                    $tpl->path = $currentGear['path'];
+                    $currentGear['path'] = base_path($currentGear['path']);
+                    $tpl->original = $tpl->attributes = $currentGear;
+                    $tpl->folders[] = $tpl->main_type . DS . $tpl->type . DS . $tpl->slug;
+                    $tpl->folders[] = $tpl->type . DS . $tpl->slug;
+                    $this->before[] = $tpl;
+                }
+            }
+        }
+        return $this;
+    }
+
+    public function getRegisteredDataFromFileBySelfType()
+    {
+        $configFilePath = storage_path('app' . DS . 'units.json');
+        if (File::isFile($configFilePath)) {
+            $configs = File::get($configFilePath);
+            if ($configs) {
+                return json_decode($configs, true);
+            }
+        }
+        return false;
+    }
+
+    public function checkGearInFileStructureWithPath($path)
+    {
+
+        if ($path) {
+            return File::isDirectory(base_path($path));
+        }
     }
 
     /**
@@ -607,157 +764,16 @@ abstract class TplModel implements TplInterface, Arrayable
     {
         return $namspace::where($primary, $this->$foreign)->get();
     }
-
-    /**
-     * @param $name
-     * @param $value
-     */
-    public function __set($name, $value)
+    public function sortByTag($tag)
     {
-        if (isset($this->attributes[$name])) {
-            $this->attributes[$name] = $value;
-            return $this;
-            // TODO: Implement __set() method.
-        }
-    }
-
-    /**
-     * @return $this
-     */
-    public function save()
-    {
-        $conf = $this->path . DS . $this->config;
-        File::put($conf, json_encode($this->toArray()));
-        return $this;
-    }
-
-
-    /**
-     * @return mixed
-     */
-    public function path($path = null)
-    {
-        $path = ($path) ? base_path($this->tplpath . DS . $path) : base_path($this->tplpath);
-        if (!File::isDirectory($path)) return false;
-        $this->dir = $path;
-        return $this;
-    }
-
-    /**
-     * @return null
-     */
-    public static function instance()
-    {
-        if (!static::$_instance) {
-            static::$_instance = new static;
-        }
-        return static::$_instance;
-    }
-
-    /**
-     * @param $namspace
-     * @return mixed
-     */
-    public function allVars($namspace)
-    {
-        $v = new $namspace();
-        return $v->findV($this->path);
-    }
-
-    /**
-     *
-     */
-
-
-    public static function __callStatic($name, $arguments)
-    {
-        $instance = new static;
-        if ($name === 'where') {
-            return call_user_func_array([$instance, 'stWhere'], $arguments);
-        }
-        if ($name === 'all') {
-            return call_user_func_array([$instance, 'getAll'], $arguments);
-        }
-        if ($name === 'allWidgets') {
-            return call_user_func_array([$instance, 'recursiveFindAllWidgets'], $arguments);
-        }
-        if ($name === 'lists') {
-            return call_user_func_array([$instance, 'listing'], $arguments);
-        }
-    }
-
-    /**
-     *
-     */
-    public function __destruct()
-    {
-//        unset($this->before);
-
-
-        // TODO: Implement __destruct() method.
-    }
-    public function style($path)
-    {
-        if(!File::exists($this->path.DS.$path)) abort(500);
-        $styles=[];
-        if(\Session::has('custom.styles')){
-            $styles=\Session::get('custom.styles', []);
-        }
-        $slug=$this->slug;
-        $content=File::get($this->path.DS.$path);
-        $styles[md5($content)]="/*$slug*/".File::get($this->path.DS.$path);
-       \Session::put('custom.styles',$styles);
-    }
-    public function img($path)
-    {
-        return url('units/img/'.$this->slug.'/'.$path);
-    }
-
-    public function script($path)
-    {
-        if(!File::exists($this->path.DS.$path)) abort(500);
-        $styles=[];
-        if(\Session::has('custom.scripts')){
-            $styles=\Session::get('custom.scripts', []);
-        }
-        $slug=$this->slug;
-        $content=File::get($this->path.DS.$path);
-        $styles[md5($content)]="/*$slug*/ \r\n".$content;
-        \Session::put('custom.scripts',$styles);
-    }
-
-    /**
-     * @param $path
-     * @return string
-     */
-    public function asset($path)
-    {
-        return HTML::image('appdata/template/image/avatar.png');
-    }
-    public function customiserFields(){
-        $costumiser=$this->getCostumiser();
-        dd($costumiser);
-    }
-
-    public function setTplPath($path) {
-        $this->tplpath = $path;
-    }
-
-    public function addTag($tag)
-    {
-        $this->tags[]=$tag;
-        return $this;
-    }
-
-    public function removeTag($tag)
-    {
-        if(is_array($this->tags)){
-            $index=array_search($tag,$this->tags);
-            if($index){
-              unset($this->tags[$index]);
+        $units = $this->run();
+        $result = [];
+        foreach ($units as $unit) {
+            if (isset($unit->tags) && array_search($tag, $unit->tags) > -1) {
+                $result[] = $unit;
             }
         }
-
+        return collect($result);
     }
 
 }

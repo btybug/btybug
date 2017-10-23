@@ -1,10 +1,17 @@
 <?php namespace Sahakavatar\Cms\Models\Themes;
 
-use  Sahakavatar\Cms\Models\Templates\Eloquent\Abstractions\TplVariations;
 use File;
+use Sahakavatar\Cms\Models\Templates\Eloquent\Abstractions\TplVariations;
 
 class ThemeVariations extends TplVariations
 {
+    public static function delete($id, $tpl)
+    {
+        $vPath = $tpl->path . DS . $tpl->variationPath . 'variations' . DS . $id . '.json';
+        if (File::exists($vPath)) return File::delete($vPath);
+        return false;
+    }
+
     /**
      * @param array $arg
      */
@@ -23,7 +30,7 @@ class ThemeVariations extends TplVariations
         $path = $tpl->path . '/' . 'variations/' . $id . '.json';
         if (\File::exists($path)) {
             $all = new $this;
-            $all->template =$tpl->slug;
+            $all->template = $tpl->slug;
             $all->id = \File::name($path);
             $all->path = $tpl->path . '/' . 'variations/';
             $all->file = $path;
@@ -48,8 +55,8 @@ class ThemeVariations extends TplVariations
         $all = new $this;
         $all->id = $id;
         $all->path = $path;
-        if(!isset($array['settings'])) {
-            $array['settings']  = [];
+        if (!isset($array['settings'])) {
+            $array['settings'] = [];
         }
         $all->attributes = $array;
         $all->original = $all->attributes;
@@ -68,11 +75,5 @@ class ThemeVariations extends TplVariations
         $data['active'] = false;
         $this->attributes = $data;
         return $this;
-    }
-
-    public static function delete($id, $tpl) {
-        $vPath = $tpl->path . DS . $tpl->variationPath . 'variations' . DS . $id . '.json';
-        if (File::exists($vPath)) return File::delete($vPath);
-        return false;
     }
 }

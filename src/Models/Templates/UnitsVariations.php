@@ -8,8 +8,8 @@
 
 namespace Sahakavatar\Cms\Models\Templates;
 
-use Sahakavatar\Cms\Models\Templates\Eloquent\Abstractions\TplVariations as variations;
 use File;
+use Sahakavatar\Cms\Models\Templates\Eloquent\Abstractions\TplVariations as variations;
 
 class UnitsVariations extends variations
 {
@@ -35,7 +35,7 @@ class UnitsVariations extends variations
 
     public function findVarition($tpl, $id)
     {
-        $path = base_path($tpl->path . DS . $tpl->variationPath . DS . $id . '.json');
+        $path = $tpl->path . DS . $tpl->variationPath . DS . $id . '.json';
         if (File::exists($path)) {
             $all = new $this;
             $all->id = File::name($path);
@@ -48,6 +48,7 @@ class UnitsVariations extends variations
         }
         return null;
     }
+
     public function createVariation($tpl, $array)
     {
         $id = $tpl->slug . '.' . uniqid();

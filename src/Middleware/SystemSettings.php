@@ -1,13 +1,14 @@
 <?php namespace Sahakavatar\Cms\Middleware;
 
-use Closure,Config,Carbon\Carbon,Session;
+use Closure;
 use Illuminate\Contracts\Auth\Guard;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Session\Store;
+
 //use Sahakavatar\Cms\Helpers\helpers;
 //use Sahakavatar\Settings\Repository\AdminsettingRepository as Settings;
 //TODO Clean or remove
-class SystemSettings {
+class SystemSettings
+{
     protected $session;
     protected $timeout;
     protected $auth;
@@ -15,10 +16,11 @@ class SystemSettings {
     private $settings;
     private $timzones;
 
-    public function __construct(Guard $auth,Store $session
+    public function __construct(Guard $auth, Store $session
 //        , Settings $settings
-    ){
-        $this->session=$session;
+    )
+    {
+        $this->session = $session;
         $this->auth = $auth;
 //        $this->settings = $settings;
         $this->timzones = \Config::get('timezone');
@@ -27,11 +29,12 @@ class SystemSettings {
         // to seconds
 //        $this->timeout = (int)$sessionOutTimeInMinutes * 60;
     }
+
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
+     * @param  \Illuminate\Http\Request $request
+     * @param  \Closure $next
      * @return mixed
      */
     public function handle($request, Closure $next)

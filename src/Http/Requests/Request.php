@@ -6,6 +6,7 @@
  * Date: 7/19/2017
  * Time: 3:08 PM
  */
+
 namespace Sahakavatar\Cms\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;

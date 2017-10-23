@@ -23,7 +23,8 @@
                                         <a href="#" class="selectIcons item" data-csspr="icon" data-csspro="icon"
                                            data-val="{{ $font['items']['config']->prefix }} {{ $fkey }}">
                                             <i class="{{ $font['items']['config']->prefix }} {{ $fkey }}"></i>
-                                            <input type="hidden" data-action="icons" data-value="{{ $font['items']['config']->prefix }} {{ $fkey }}"/>
+                                            <input type="hidden" data-action="icons"
+                                                   data-value="{{ $font['items']['config']->prefix }} {{ $fkey }}"/>
                                         </a>
 
                                     </li>
@@ -42,7 +43,7 @@
         <div class="col-sm-4">
             <div class="form-group">
                 <label for="textcoloricon">Color Icon</label>
-                <input type="text" class="form-control" id="textcoloricon" >
+                <input type="text" class="form-control" id="textcoloricon">
             </div>
         </div>
 
@@ -72,7 +73,10 @@
 </div>
 
 <style>
-    .colpadding0 { padding:0;}
+    .colpadding0 {
+        padding: 0;
+    }
+
     .iconsliststduio {
         margin: 0 -4px;
         padding: 0;
@@ -97,14 +101,17 @@
         line-height: 30px;
         display: block;
     }
-    .iconsliststduio li > a > i {vertical-align:middle;}
+
+    .iconsliststduio li > a > i {
+        vertical-align: middle;
+    }
 
     .nav-tabs > li {
         float: left;
         margin-bottom: -1px;
     }
 
-    .fa,.bb {
+    .fa, .bb {
         display: inline-block;
         font: normal normal normal 14px/1 FontAwesome;
         font-size: inherit;

@@ -2,10 +2,10 @@
 
 namespace Sahakavatar\Cms\Http\Controllers;
 
+use Illuminate\Http\Request;
 use Sahakavatar\Cms\Models\ContentLayouts\ContentLayouts;
 use Sahakavatar\Cms\Models\Home;
 use Sahakavatar\Cms\Models\Templates\Units;
-use Illuminate\Http\Request;
 
 /**
  * Class HomeController
@@ -53,39 +53,55 @@ class HomeController extends Controller
 //    public function unitStyles($slug, $path)
     public function unitStyles($css)
     {
-        $styles=\Session::get('custom.styles', []);
-        $file='';
-        foreach ($styles as $style){
-            $file.=$style;
+        $stylePaths = session()->get('custom.styles', []);
+        $contentArray=[];
+        $content='';
+        foreach ($stylePaths as $path) {
+            if(\File::exists($path)){
+                $file=\File::get($path);
+                $contentArray[md5($file)]= $file;
+            }
         }
-        $file=str_replace(' ','',$file);
-        \Session::forget('custom.styles');
-        $response = \Response::make($file);
+        foreach ($contentArray as $style){
+            $content.="\r\n" .$style;
+        }
+        session()->forget('custom.styles');
+        $response = \Response::make($content);
         $response->header('Content-Type', 'text/css');
-        $response->header('Cache-Control', 'max-age=31104000');
+    //   $response->header('Cache-Control', 'max-age=31104000');
         return $response;
     }
+
     public function unitScripts($js)
     {
-        $stiles=\Session::get('custom.scripts', []);
-        $file='';
-        foreach ($stiles as $stile){
-            $file.=$stile;
+        $scriptPaths = \Session::get('custom.scripts', []);
+        $contentArray=[];
+        $content='';
+        foreach ($scriptPaths as $path) {
+            if(\File::exists($path)){
+                $file=\File::get($path);
+                $contentArray[md5($file)]= $file;
+            }
+
+        }
+        foreach ($contentArray as $script){
+            $content.="\r\n" .$script;
         }
         \Session::forget('custom.scripts');
-        $response = \Response::make($file);
-        $response->header('Content-Type', 'application/javascript',false);
-        $response->header('Cache-Control', 'max-age=31536000');
+        $response = \Response::make($content);
+        $response->header('Content-Type', 'application/javascript', false);
+    //    $response->header('Cache-Control', 'max-age=31536000');
 
         return $response;
     }
+
     public function unitImg($slug, $path)
     {
 
         $unit = ContentLayouts::find($slug);
-        if(!$unit) $unit = Units::find($slug);
-        if(!\File::exists($unit->getPath().DS.$path)) abort(500);
-        $file=\File::get($unit->getPath().DS.$path);
+        if (!$unit) $unit = Units::find($slug);
+        if (!\File::exists($unit->getPath() . DS . $path)) abort(500);
+        $file = \File::get($unit->getPath() . DS . $path);
         $response = \Response::make($file);
         $response->header('Cache-Control', 'max-age=31104000');
         return $response;

@@ -3,9 +3,9 @@
 namespace Sahakavatar\Cms\Helpers;
 
 
+use DB;
 use Illuminate\Http\JsonResponse;
-use DB,
-    Schema;
+use Schema;
 
 /**
  * Class dbhelper
@@ -247,7 +247,8 @@ class dbhelper
         $label = 'View',
         $link = "javascript:",
         $params = ['class' => 'btn btn-success btn-xs']
-    ) {
+    )
+    {
         $param_str = "";
         foreach ($params as $key => $val) {
 
@@ -301,8 +302,7 @@ class dbhelper
      */
     public function delBtnPost($link = "#", $id)
     {
-        return '<div class="pull-left m-r-10"><form method="post" action="' . $link . '"><input type="hidden" name="id" value="' . $id . '"/> <input type="hidden" name="_token" value="' . csrf_token(
-        ) . '"/> <button type="submit" class="btn btn-danger btn-primary btn-xs" onclick="return confirm(\'are you sure\')">&nbsp;<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>&nbsp;</button> </form></div>';
+        return '<div class="pull-left m-r-10"><form method="post" action="' . $link . '"><input type="hidden" name="id" value="' . $id . '"/> <input type="hidden" name="_token" value="' . csrf_token() . '"/> <button type="submit" class="btn btn-danger btn-primary btn-xs" onclick="return confirm(\'are you sure\')">&nbsp;<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>&nbsp;</button> </form></div>';
     }
 
     /**
@@ -425,7 +425,7 @@ class dbhelper
         $col_arr = [];
         $cols = \Schema::getColumnListing($table);
 
-        if(count($cols)){
+        if (count($cols)) {
             foreach ($cols as $key => $val) {
                 $col_arr[$val] = $val;
             }
@@ -434,10 +434,11 @@ class dbhelper
         return $col_arr;
     }
 
-    public function getDataWithTableAndCol($table,$column){
-        if(\Schema::hasTable($table)){
-            if(\Schema::hasColumn($table, $column)){
-               return DB::table($table)->select($column)->pluck($column,$column)->toArray();
+    public function getDataWithTableAndCol($table, $column)
+    {
+        if (\Schema::hasTable($table)) {
+            if (\Schema::hasColumn($table, $column)) {
+                return DB::table($table)->select($column)->pluck($column, $column)->toArray();
             }
         }
 

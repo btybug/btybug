@@ -1,7 +1,8 @@
+<!DOCTYPE html>
 @php
     $page = \Sahakavatar\Cms\Services\RenderService::getPageByURL();
 @endphp
-        <!DOCTYPE html>
+
 <!--[if IE 8]>
 <html lang="en" class="ie8 no-js"> <![endif]-->
 <!--[if IE 9]>
@@ -16,10 +17,11 @@
     <meta content="width=device-width, initial-scale=1" name="viewport"/>
     <meta content="" name="description"/>
     <meta content="" name="author"/>
-{!! BBactiveCss()  !!}
+{{--{!! HTML::style("css/bootstrap/css/bootstrap.css") !!}--}}
+
+{!! BBCss("backend")  !!}
 {!! HTML::style("/css/admin.css?v=0.392") !!}
-{!! HTML::style("css/builder-tool.css") !!}
-{!! HTML::style('custom/'.$page->slug.'.css') !!}
+{!! HTML::style('custom/css/'.str_replace(' ','-',$page->title).'.css') !!}
 @yield('CSS')
 @stack('css')
 
@@ -83,6 +85,7 @@
 <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
         integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
         crossorigin="anonymous"></script>
+{!! BBMainJS() !!}
 {!! HTML::script("/js/admin.js?v=6.0") !!}
 {!! HTML::script('custom/js/'.str_replace(' ','-',$page->title).'.js') !!}
 <script>

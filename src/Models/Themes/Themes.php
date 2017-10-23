@@ -2,7 +2,6 @@
 
 use File;
 use Sahakavatar\Cms\Models\ContentLayouts\autoinclude;
-use Sahakavatar\Cms\Models\Themes\ThemeVariations;
 
 class Themes
 {
@@ -62,21 +61,6 @@ class Themes
     }
 
     /**
-     * @param $id
-     * @return null
-     */
-    public static function findByVariation($id)
-    {
-        $slug = explode('.', $id);
-        $layout = self::find($slug[0]);
-        if ($layout) {
-            return $layout;
-        } else {
-            return null;
-        }
-    }
-
-    /**
      * @param $slug
      * @return mixed
      */
@@ -91,7 +75,7 @@ class Themes
         } else if (self::find($slug)) {
             $variation = new ThemeVariations();
             $tpl = self::find($slug);
-                $data['variation'] = $variation->createVariation($tpl, []);
+            $data['variation'] = $variation->createVariation($tpl, []);
             return self::find($slug)->renderSettings($data);
         }
     }
@@ -107,6 +91,21 @@ class Themes
         $tpl = self::find($slug[0]);
         if ($tpl) {
             return $variation->findVarition($tpl, $id);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * @param $id
+     * @return null
+     */
+    public static function findByVariation($id)
+    {
+        $slug = explode('.', $id);
+        $layout = self::find($slug[0]);
+        if ($layout) {
+            return $layout;
         } else {
             return null;
         }
@@ -131,10 +130,10 @@ class Themes
             ];
             if (!$existingVariation) {
                 $variation = new ContentLayoutVariations();
-                if($tpl->autoinclude){
-                    $variation = $tpl->makeAutoIncludeVariation(null,$dataToInsert);
+                if ($tpl->autoinclude) {
+                    $variation = $tpl->makeAutoIncludeVariation(null, $dataToInsert);
 
-                }else{
+                } else {
                     $variation = $variation->createVariation($tpl, $dataToInsert);
                 }
             } else {

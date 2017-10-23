@@ -9,19 +9,16 @@
 namespace Sahakavatar\Cms\Models;
 
 use Avatar\Avatar\Repositories\Plugins;
-use Sahakavatar\Cms\Models\ContentLayouts\ContentLayouts;
 use Sahakavatar\Console\Models\AdminPages;
-use PhpParser\Node\Stmt\Foreach_;
 use Sahakavatar\Console\Repository\AdminPagesRepository;
 
+/**
+ * Class Routes
+ * @package Sahakavatar\Cms\Models
+ */
 class Routes
 {
     public $array;
-
-    public static function getRoutes()
-    {
-        return \Route::getRoutes();
-    }
 
     public static function getModuleRoutes($method, $sub)
     {
@@ -56,6 +53,48 @@ class Routes
         $_this = new static();
         $_this->array = collect($routes[$method][$sub]);
         return $_this;
+    }
+
+    public static function keysort($array, $url, $count = 0)
+    {
+        foreach ($array as $key => $value) {
+            $count++;
+            if (self::is_child($url, $key)) {
+                $array[$url][$key] = [];
+                unset($array[$key]);
+            }
+        }
+        if (isset($array[$url]) and count($array[$url])) {
+            foreach ($array[$url] as $k => $v) {
+                $array[$url] = self::keysort($array[$url], $k);
+            }
+        }
+        return $array;
+    }
+
+    public static function is_child($parent, $child)
+    {
+        if ($parent == $child) return false;
+        $parent = self::clean_urls($parent);
+        $child = self::clean_urls($child);
+        return (self::array_sort_with_count($child, count($parent)) == $parent);
+    }
+
+    public static function clean_urls($url)
+    {
+        if (isset($url[0]) and $url[0] == '/') {
+            $url = substr($url, 1);
+        }
+        return explode('/', $url);
+    }
+
+    public static function array_sort_with_count(array $array, $count)
+    {
+        $cunk = array_chunk($array, $count);
+        if (count($cunk)) {
+            return $cunk[0];
+        }
+        return false;
     }
 
     public static function optimizePages()
@@ -119,22 +158,105 @@ class Routes
         dd($routeCollection, 'verj');
     }
 
-
-    public static function keysort($array, $url, $count = 0)
+    public static function getRoutes()
     {
-        foreach ($array as $key => $value) {
-            $count++;
-            if (self::is_child($url, $key)) {
-                $array[$url][$key] = [];
-                unset($array[$key]);
-            }
+        return \Route::getRoutes();
+    }
+
+    public static function registerPages($slug)
+    {
+
+        $package = new Plugins();
+        $adminPagesRepo = new AdminPagesRepository();
+        $package->plugins();
+        $module = $package->find($slug);
+        if (!$module) {
+            $package->modules();
+            $module = $package->find($slug);
         }
-        if (isset($array[$url]) and count($array[$url])) {
-            foreach ($array[$url] as $k => $v) {
-                $array[$url] = self::keysort($array[$url], $k);
+        if ($module) {
+            if ($module->type == 'plugin' or $module->type == 'module' or $module->type == 'addon' or $module->type=='package') {
+                $url = strtolower('admin/' . $module->route);
+            } else {
+                return false;
             }
+
+            $routes = self::getRoutesStratWith($url, "GET");
+            $message = [];
+//            $activeLayout = ContentLayouts::active()->activeVariation();
+            if (count($routes)) {
+                foreach ($routes as $key => $value) {
+                    if ($value[1] !== false) {
+                        if (!$value[0]) {
+                            $parent_id = 0;
+                            $pr_url = substr($value[1], 0, strrpos($value[1], "/"));
+                            if ($pr_url != 'admin' && $pr_url != '/admin') {
+                                $parent = $adminPagesRepo->getByUrl($pr_url);
+                                if ($parent) $parent_id = $parent->id;
+                            }
+
+                            $page = $adminPagesRepo->findBy('url', '/' . $key);
+                            if (!$page) {
+                                $exp = explode('/', $key);
+                                $title = end($exp);
+                                if (end($exp) == '{param}') {
+                                    $count = count($exp);
+                                    if ($count > 2) $title = $exp[$count - 2];
+                                }
+                                BBRegisterAdminPages($slug, $title, '/' . $key, null, $parent_id);
+                                $message['success'][$key] = end($exp);
+                            } else {
+                                $message['exist'][$key] = 'registred as ' . $page->title;
+                            }
+                        } else {
+                            $page = $adminPagesRepo->findBy('url', '/' . $key);
+                            if (!$page) {
+                                $parent = $adminPagesRepo->getByUrl($value[1]);
+                                if ($parent) {
+                                    $exp = explode('/', $key);
+                                    $title = end($exp);
+                                    if (end($exp) == '{param}') {
+                                        $count = count($exp);
+                                        if ($count > 2) $title = $exp[$count - 2];
+                                    }
+                                    BBRegisterAdminPages($slug, $title, '/' . $key, null, $parent->id);
+                                    $message['success'][$key] = end($exp);
+                                } else {
+                                    $message['warning'][$key] = 'invalid url created not following rules!!!';
+                                }
+                            } else {
+                                $message['exist'][$key] = 'registred as ' . $page->title;
+                            }
+                        }
+                    } else {
+                        $message['warning'][$key] = 'invalid url created not following rules!!!';
+                    }
+                }
+            }
+
+            return $message;
         }
-        return $array;
+        return false;
+    }
+
+    public static function getRoutesStratWith($start, $method)
+    {
+        $routes = array();
+        $routeCollection = self::getRoutes();
+        foreach ($routeCollection as $value) {
+            if (strpos($value->uri, $start) === 0) {
+                $routes[$value->uri] = $value->getPrefix();
+                $routes[$value->methods[0]][BBmakeUrlPermission($value->uri, '/')] = ($value->getPrefix() == $value->uri || $value->getPrefix() == ('/' . $value->uri)) ? [0, BBmakeUrlPermission($value->getPrefix(), '/')] : [1, BBmakeUrlPermission($value->getPrefix(), '/')];
+            }
+
+        }
+        return (isset($routes[$method])) ? $routes[$method] : $routes;
+    }
+
+    public static function test()
+    {
+        $test = AdminPages::find(4)->children;
+        dd($test);
     }
 
     public function html()
@@ -177,126 +299,6 @@ class Routes
         }
 
         return $html;
-    }
-
-    public static function is_child($parent, $child)
-    {
-        if ($parent == $child) return false;
-        $parent = self::clean_urls($parent);
-        $child = self::clean_urls($child);
-        return (self::array_sort_with_count($child, count($parent)) == $parent);
-    }
-
-    public static function clean_urls($url)
-    {
-        if (isset($url[0]) and $url[0] == '/') {
-            $url = substr($url, 1);
-        }
-        return explode('/', $url);
-    }
-
-    public static function array_sort_with_count(array $array, $count)
-    {
-        $cunk = array_chunk($array, $count);
-        if (count($cunk)) {
-            return $cunk[0];
-        }
-        return false;
-    }
-
-    public static function registerPages($slug)
-    {
-        $package = new Plugins();
-        $adminPagesRepo = new AdminPagesRepository();
-        $package->plugins();
-        $module = $package->find($slug);
-        if(! $module){
-            $package->modules();
-            $module = $package->find($slug);
-        }
-        if ($module) {
-            if ($module->type == 'plugin' or $module->type == 'module') {
-                $url = strtolower('admin/' . $module->route);
-            }else{
-                return false;
-            }
-
-            $routes = self::getRoutesStratWith($url, "GET");
-            $message = [];
-//            $activeLayout = ContentLayouts::active()->activeVariation();
-            if(count($routes)){
-                foreach ($routes as $key => $value) {
-                    if ($value[1] !== false) {
-                        if (!$value[0]) {
-                            $parent_id = 0;
-                            $pr_url = substr($value[1], 0, strrpos($value[1], "/"));
-                            if ($pr_url != 'admin' && $pr_url != '/admin') {
-                                $parent = $adminPagesRepo->getByUrl($pr_url);
-                                if ($parent) $parent_id = $parent->id;
-                            }
-
-                            $page = $adminPagesRepo->findBy('url', '/' . $key);
-                            if (!$page) {
-                                $exp = explode('/', $key);
-                                $title = end($exp);
-                                if(end($exp) == '{param}'){
-                                    $count = count($exp);
-                                    if($count > 2) $title = $exp[$count - 2];
-                                }
-                                BBRegisterAdminPages($slug, $title, '/' . $key, null, $parent_id);
-                                $message['success'][$key] = end($exp);
-                            } else {
-                                $message['exist'][$key] = 'registred as ' . $page->title;
-                            }
-                        } else {
-                            $page = $adminPagesRepo->findBy('url', '/' . $key);
-                            if (!$page) {
-                                $parent = $adminPagesRepo->getByUrl($value[1]);
-                                if ($parent) {
-                                    $exp = explode('/', $key);
-                                    $title = end($exp);
-                                    if(end($exp) == '{param}'){
-                                        $count = count($exp);
-                                        if($count > 2) $title = $exp[$count - 2];
-                                    }
-                                    BBRegisterAdminPages($slug, $title, '/' . $key, null, $parent->id);
-                                    $message['success'][$key] = end($exp);
-                                } else {
-                                    $message['warning'][$key] = 'invalid url created not following rules!!!';
-                                }
-                            } else {
-                                $message['exist'][$key] = 'registred as ' . $page->title;
-                            }
-                        }
-                    } else {
-                        $message['warning'][$key] = 'invalid url created not following rules!!!';
-                    }
-                }
-            }
-
-            return $message;
-        }
-        return false;
-    }
-
-    public static function getRoutesStratWith($start, $method)
-    {
-        $routes = array();
-        $routeCollection = self::getRoutes();
-        foreach ($routeCollection as $value) {
-            if (strpos($value->uri, $start) === 0) {
-                $routes[$value->uri] = $value->getPrefix();
-                $routes[$value->methods[0]][BBmakeUrlPermission($value->uri, '/')] = ($value->getPrefix() == $value->uri || $value->getPrefix() == ('/' . $value->uri)) ? [0, BBmakeUrlPermission($value->getPrefix(), '/')] : [1, BBmakeUrlPermission($value->getPrefix(), '/')];
-            }
-
-        }
-        return (isset($routes[$method])) ? $routes[$method] : $routes;
-    }
-
-    public static function test()
-    {
-        $test = AdminPages::find(4)->children;
-        dd($test);
     }
 
 }

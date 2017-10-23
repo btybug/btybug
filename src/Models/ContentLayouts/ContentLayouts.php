@@ -1,6 +1,7 @@
 <?php namespace Sahakavatar\Cms\Models\ContentLayouts;
 
 use File;
+use Sahakavatar\Cms\Models\Hook;
 use Sahakavatar\Settings\Repository\AdminsettingRepository;
 
 /**
@@ -108,15 +109,13 @@ class ContentLayouts
     public static function renderLivePreview($slug, $settings = [])
     {
         $variation = self::findVariation($slug);
-        $data['view'] = "settings::backend_theme.pages_layout_settings";
+        $data['view'] = "uploads::gears.page_sections.live_preview.settings";
         $data['request'] = $settings;
         if ($variation) {
             $data['variation'] = $variation;
             return self::findByVariation($slug)->renderSettings($data);
         } else if (self::find($slug)) {
-            $variation = new ContentLayoutVariations();
-            $tpl = self::find($slug);
-                $data['variation'] = $variation->createVariation($tpl, []);
+            $data['variation'] = $variation;
             return self::find($slug)->renderSettings($data);
         }
     }
@@ -156,15 +155,15 @@ class ContentLayouts
             ];
             if (!$existingVariation) {
                 $variation = new ContentLayoutVariations();
-                if($tpl->autoinclude){
-                    $variation = $tpl->makeAutoIncludeVariation(null,$dataToInsert);
+                if ($tpl->autoinclude) {
+                    $variation = $tpl->makeAutoIncludeVariation(null, $dataToInsert);
 
-                }else{
+                } else {
                     $variation = $variation->createVariation($tpl, $dataToInsert);
                 }
             } else {
-                $existingVariation->title = $title;
-                $existingVariation->settings = $dataToInsert['settings'];
+                $existingVariation->setAttributes('title', $title);
+                $existingVariation->setAttributes('settings', $dataToInsert['settings']);
                 $variation = $existingVariation;
             }
             if ($variation->save()) {
@@ -192,7 +191,7 @@ class ContentLayouts
             }
         }
         return collect($result);
-}
+    }
 
     /**
      * @return \Illuminate\Support\Collection
@@ -225,26 +224,23 @@ class ContentLayouts
      */
     public function delete()
     {
-        if (isset($this->autoload)) {
-            $autoloadClass = 'App\ExtraModules\\' . $this->namespace . '\\' . $this->autoload;
-
-            if (class_exists($autoloadClass)) {
-                $autoload = new $autoloadClass();
-                try {
-                    $autoload->down();
-                } catch (\Exception $e) {
-                    return ['message' => $e->getMessage(), 'code' => $e->getCode(), 'error' => true];
+        $mainConfigFilePath = storage_path('app' . DS  . 'page_sections.json');
+        if (\File::exists($mainConfigFilePath)) {
+            $mainConfigFile = \File::get(storage_path('app' . DS  . 'page_sections.json'));
+            $mainConfigFileDecoded = json_decode($mainConfigFile, true);
+            if ($mainConfigFileDecoded) {
+                if (array_key_exists($this->slug, $mainConfigFileDecoded)
+                    && isset($mainConfigFileDecoded[$this->slug]['slug'])
+                    && $mainConfigFileDecoded[$this->slug]['slug'] == $this->slug) {
+                    unset($mainConfigFileDecoded[$this->slug]);
+                    $editedMainConfigFileEncoded = json_encode($mainConfigFileDecoded);
+                    if (\File::put($mainConfigFilePath, $editedMainConfigFileEncoded)) {
+                        return \File::deleteDirectory($this->path);
+                    }
                 }
-
             }
         }
-
-        $forms = $this->forms;
-        if ($forms && !empty($forms)) {
-            PluginForms::removeRecursive($forms);
-        }
-
-        return File::deleteDirectory($this->path);
+        return false;
     }
 
     /**
@@ -353,15 +349,15 @@ class ContentLayouts
 
     public function addTag($tag)
     {
-        $this->tags[]=$tag;
+        $this->tags[] = $tag;
         return $this;
     }
 
     public function removeTag($tag)
     {
-        if(is_array($this->tags)){
-            $index=array_search($tag,$this->tags);
-            if($index){
+        if (is_array($this->tags)) {
+            $index = array_search($tag, $this->tags);
+            if ($index) {
                 unset($this->tags[$index]);
             }
         }
@@ -398,10 +394,15 @@ class ContentLayouts
     private function scopeRenderSettings(array $variables = [], array $data = [])
     {
         $variation = $variables['variation'];
-        $settings = $variation->toArray();
-        if (isset($variables['request'])) {
-            $settings = array_merge($variables['request'], $settings);
+        $settings = ($variation) ? $variation->toArray() : $variation;
+        if($settings){
+            if (isset($variables['request'])) {
+                $settings = array_merge($variables['request'], $settings['settings']);
+            } else {
+                $settings = $settings['settings'];
+            }
         }
+
         $slug = $this->folder;
         $layout = ($this->example) ? $this->example : $this->layout;
         $setting = isset($this->settings['file']) ? $this->settings['file'] : NULL;
@@ -424,7 +425,7 @@ class ContentLayouts
     {
         $slug = $this->folder;
         $layout = ($this->example) ? $this->example : $this->layout;
-        $html = \View::make("ContentLayouts.$slug.$layout")->with(['settings' => $variables])->render();
+        $html = \View::make("ContentLayouts.$slug.$layout")->with(['settings' => $variables,'_this'=>$this])->render();
         return $html;
     }
 
@@ -433,6 +434,15 @@ class ContentLayouts
         $slug = $this->folder;
         if ($this->autoinclude) return $this->getAutoInclude()->getRender($variables, "ContentLayouts.$slug");
         $html = \View::make("ContentLayouts.$slug.$this->layout")->with(['settings' => $variables, '_this' => $this])->render();
+        return $html;
+    }
+
+    private function scopeRenderPagePanel($page)
+    {
+        $slug = $this->folder;
+        if ($this->autoinclude) return $this->getAutoInclude()->getRender($page, "ContentLayouts.$slug");
+        if (!\View::exists("ContentLayouts.$slug.$this->panel")) return "View not found";
+        $html = \View::make("ContentLayouts.$slug.$this->panel")->with(['page' => $page, '_this' => $this])->render();
         return $html;
     }
 
@@ -530,23 +540,60 @@ class ContentLayouts
         return null;
     }
 
-    private function scopeGetPageLayoutPlaceholders($page)
+    private function scopeGetPageLayout($page, $hide_top = false)
     {
-
-        if (!$page->page_layout) return $this->getPagePlaceholders();
         $layout = self::findByVariation($page->page_layout);
-        if ($layout)
-            return $layout->getPagePlaceholders($page);
-        return $this->getPagePlaceholders();
+        if ($layout) {
+            return $layout->getPageLayoutWidget($page, $hide_top);
+        }
+        return $this->getPageLayoutWidget($page, $hide_top);
+
+    }
+    private function scopeGetPageLayoutPlaceholders($page, $hide_top = false)
+    {
+        $layout = self::findByVariation($page->page_layout);
+        if ($layout) {
+            return $layout->getPagePlaceholders($page, $hide_top);
+        }
+        return $this->getPagePlaceholders($page, $hide_top);
     }
 
-    protected function getPagePlaceholders($page = null)
+    protected function getPagePlaceholders($page, $hide_top = false)
+    {
+        $_this = $this;
+        return \View::make('cms::_partials.placeholders', compact(['_this', 'page', 'hide_top']))->render();
+    }
+    protected function getPageLayoutWidget($page, $hide_top = false)
     {
         $_this = null;
         if (isset($this->placeholders)) {
             $_this = $this;
         }
-        return \View::make('cms::_partials.placeholders', compact('_this', 'page'))->render();
+        return \View::make('cms::_partials.layout', compact(['_this', 'page', 'hide_top']))->render();
+    }
+
+    private function scopeGetDefaultLayoutPlaceholders($system)
+    {
+        if (!isset($system['page_layout'])) return $this->getDefaultPlaceholders();
+        $layout = self::findByVariation($system['page_layout']);
+        if ($layout) {
+            if (isset($system['placeholders'])) {
+                $system['placeholders'] = json_decode($system['placeholders'], true);
+            }
+//            dd($system);
+            return $layout->getDefaultPlaceholders($system);
+        }
+
+        return $this->getDefaultPlaceholders();
+    }
+
+    protected function getDefaultPlaceholders($system = null)
+    {
+        $_this = null;
+        if (isset($this->placeholders)) {
+            $_this = $this;
+        }
+        return \View::make('cms::_partials.default_placeholders', compact('_this', 'system'))->render();
     }
 
     private function scopeGetAdminPageLayoutPlaceholders($page)
@@ -558,12 +605,20 @@ class ContentLayouts
     {
         if ($page && $page->settings) {
             $_this = json_decode($page->settings);
-        }else{
+        } else {
             $settings = new AdminsettingRepository();
-            $_this =  $settings->getBackendSettings();
+            $_this = $settings->getBackendSettings();
         }
-
         return \View::make('cms::_partials.admin_placeholders', compact('_this', 'page'))->render();
+    }
+
+    public function scopeGetPageLayoutHooks($page)
+    {
+        $layout = self::findVariation($page->page_layout);
+        if ($layout) {
+                $html = \View::make('cms::_partials.page_hooks', compact('layout'));
+                return $html;
+        }
     }
 
 }

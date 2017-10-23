@@ -95,7 +95,7 @@ function BBRenderPageSections($variation_id, $source = [], $main_view = null)
                     array_filter($liveSettings, function ($value) {
                         return $value !== '';
                     });
-                    $settings = array_merge($liveSettings, $settings);
+                    $settings = array_merge($liveSettings, $settings['settings']);
                 }
                 $settings['main_view'] = $main_view;
                 return $section->render($settings);
@@ -104,6 +104,7 @@ function BBRenderPageSections($variation_id, $source = [], $main_view = null)
         return false;
     }
 }
+
 function BBRenderPageBody($slug, $data = [], $main_view = null)
 {
     $section = \Sahakavatar\Cms\Models\ContentLayouts\ContentLayouts::renderPageBody($slug, $data);
@@ -145,6 +146,44 @@ function BBdiv($key, $html, array $array = [])
     }
     $renderedUnit = BBRenderUnits($value);
     return '<div data-action="unit"' . ' data-key="' . $key . '" ' . $atributes . ' >' . (($renderedUnit) ? $renderedUnit : $html) . '</div><input class="bb-button-realted-hidden-input" type="hidden" ' . $array . ' value="' . $value . '" data-name="' . $key . '" name="' . $key . '">';
+}
+
+function BBDiv2($key, $tag, $html, $array = [])
+{
+    $atributes = ' ';
+    $value = '';
+    $array['class'] = $array['class'] . " BBdivs";
+    $array['data-type'] = $tag;
+    if (count($array)) {
+        foreach ($array as $k => $v) {
+            if ($k != 'model') {
+                $atributes .= "$k=\"$v\"";
+            }
+        }
+    }
+    if (isset($array['model'])) {
+        $model = $array['model'];
+        if (is_string($model)) {
+            $value = $model;
+        } else {
+            if (is_object($model)) {
+                $model = $model->toArray();
+            }
+
+            if (isset($model[$key])) {
+                $value = $model[$key];
+            }
+        }
+    }
+    $hiddenName = isset($array['data-name-prefix']) ? $array['data-name-prefix'] . '[' . $key . ']' : $key;
+    $array = '';
+    if (strpos($key, '[]')) {
+        $array = 'data-array="true"';
+    }
+    $data_key = str_replace('[]', '', $key);
+
+    $renderedUnit = BBRenderUnits($value);
+    return '<div data-action="unit"' . ' data-key="' . $data_key . '" ' . $atributes . ' >' . (($renderedUnit) ? $renderedUnit : $html) . '</div><input class="bb-button-realted-hidden-input" type="hidden" ' . $array . ' value="' . $value . '" data-name="' . $key . '" name="' . $key . '">';
 }
 
 function BBRenderSections($variation_id, $source = [])
@@ -217,16 +256,28 @@ function BBheaderBack()
 {
     $page = \Sahakavatar\Cms\Services\RenderService::getPageByURL();
     $data = [];
-    if($page->settings){
-        $data = json_decode($page->settings,true);
-    }else{
+    if ($page->settings) {
+        $data = json_decode($page->settings, true);
+    } else {
         $settingsRepo = new \Sahakavatar\Settings\Repository\AdminsettingRepository();
-        $settings = $settingsRepo->findBy('section','backend_settings');
-        if($settings && $settings->val) $data = json_decode($settings->val,true);
+        $settings = $settingsRepo->findBy('section', 'backend_settings');
+        if ($settings && $settings->val) $data = json_decode($settings->val, true);
     }
 
-    if(isset($data['header']) && $data['header'] && isset($data['header_unit'])){
+    if (isset($data['header']) && $data['header'] && isset($data['header_unit'])) {
         return BBRenderUnits($data['header_unit']);
+    }
+}
+
+function main_content()
+{
+    $page = \Sahakavatar\Cms\Services\RenderService::getFrontPageByURL();
+    if ($page) {
+        if ($page->content_type == "editor") {
+            echo $page->main_content;
+        } else {
+            return BBRenderUnits($page->template);
+        }
     }
 }
 
@@ -245,17 +296,17 @@ function BBgetPageLayout()
     }
     $page = \Sahakavatar\Cms\Services\RenderService::getPageByURL();
     $data = [];
-    if($page->settings){
-        $data = json_decode($page->settings,true);
-    }else{
+    if ($page->settings) {
+        $data = json_decode($page->settings, true);
+    } else {
         $settingsRepo = new \Sahakavatar\Settings\Repository\AdminsettingRepository();
-        $settings = $settingsRepo->findBy('section','backend_settings');
-        if($settings && $settings->val) $data = json_decode($settings->val,true);
+        $settings = $settingsRepo->findBy('section', 'backend_settings');
+        if ($settings && $settings->val) $data = json_decode($settings->val, true);
     }
-    if(isset($data['backend_page_section']) && $data['backend_page_section']){
+    if (isset($data['backend_page_section']) && $data['backend_page_section']) {
         $slug = explode('.', $data['backend_page_section']);
         $layout = \Sahakavatar\Cms\Models\ContentLayouts\ContentLayouts::find($slug[0]);
-        if($layout) return 'ContentLayouts.' . $layout->folder . '.' . $layout->layout;
+        if ($layout) return 'ContentLayouts.' . $layout->folder . '.' . $layout->layout;
     }
 }
 
@@ -283,17 +334,17 @@ function BBgetPageLayoutSettings()
 
     if ($page) {
         $data = [];
-        if($page->settings){
-            $data = json_decode($page->settings,true);
-        }else{
+        if ($page->settings) {
+            $data = json_decode($page->settings, true);
+        } else {
             $settingsRepo = new \Sahakavatar\Settings\Repository\AdminsettingRepository();
-            $settings = $settingsRepo->findBy('section','backend_settings');
-            if($settings && $settings->val) $data = json_decode($settings->val,true);
+            $settings = $settingsRepo->findBy('section', 'backend_settings');
+            if ($settings && $settings->val) $data = json_decode($settings->val, true);
         }
 
-        if(isset($data['backend_page_section']) && $data['backend_page_section']){
+        if (isset($data['backend_page_section']) && $data['backend_page_section']) {
             $layout = \Sahakavatar\Cms\Models\ContentLayouts\ContentLayouts::findVariation($data['backend_page_section']);
-            if($layout){
+            if ($layout) {
                 $mainSettings = array_merge($data, $layout->settings);
                 $json = '<input type="hidden" id="page_layout_settings_json" data-json=' . json_encode($mainSettings, true) . '>';
                 echo $json;
@@ -319,28 +370,6 @@ function BBscriptsHook()
 function BBFrameworkJs()
 {
     return \Sahakavatar\Framework\Models\Framework::activeJs();
-}
-
-//TODO transer in user package
-if (!function_exists('BBGetUserAvatar')) {
-    /**
-     * @param null $id
-     * @return mixed|null|string
-     */
-    function BBGetUserAvatar($id = null)
-    {
-        if ($id) {
-            if ($user = \App\User::find($id)) {
-                return ($user->profile->avatar) ? url($user->profile->avatar) : '/images/avatar.png';
-            }
-        } else {
-            if (Auth::check()) {
-                return (Auth::user()->profile->avatar) ? url(Auth::user()->profile->avatar) : '/images/avatar.png';
-            }
-        }
-
-        return null;
-    }
 }
 
 if (!function_exists('BBGetUserName')) {
@@ -441,7 +470,8 @@ function BBAdminMenuWalker($menu_array)
 
 function BBgetSiteLogo()
 {
-    $logo = \Sahakavatar\Settings\Models\Settings::where('section', 'setting_system')->where('settingkey', 'site_logo')->first();
+    $settingRepo = new \Sahakavatar\Settings\Repository\AdminsettingRepository();
+    $logo = $settingRepo->getSettings('setting_system', 'site_logo');
     if (!$logo) return '';
 
     return url('images/logo', $logo->val);
@@ -449,8 +479,8 @@ function BBgetSiteLogo()
 
 function BBgetSiteName()
 {
-    $name = \Sahakavatar\Settings\Models\Settings::where('section', 'setting_system')->where('settingkey', 'site_name')->first();
-
+    $settingRepo = new \Sahakavatar\Settings\Repository\AdminsettingRepository();
+    $name = $settingRepo->getSettings('setting_system', 'site_name');
     return $name->val;
 }
 
@@ -615,7 +645,9 @@ function BBbutton($action, $key, $text, array $array = [])
     $data_key = str_replace('[]', '', $key);
     return '<button type="button" data-action=' . $action . ' data-key="' . $data_key . '" ' . $atributes . ' >' . $text . '</button><input class="bb-button-realted-hidden-input" type="hidden" ' . $array . ' value="' . $value . '" data-name="' . $data_key . '" name="' . $hiddenName . '">';
 }
-function BBbutton2($type,$key,$tag,$text,$array=[]){
+
+function BBbutton2($type, $key, $tag, $text, $array = [])
+{
     $atributes = ' ';
     $value = '';
     $array['class'] = $array['class'] . " BBbuttons";
@@ -647,7 +679,8 @@ function BBbutton2($type,$key,$tag,$text,$array=[]){
         $array = 'data-array="true"';
     }
     $data_key = str_replace('[]', '', $key);
-    return '<button type="button" data-action=' . $type . ' data-key="' . $data_key . '" ' . $atributes . ' >' . $text . '</button><input class="bb-button-realted-hidden-input" type="hidden" ' . $array . ' value="' . $value . '" data-name="' . $data_key . '" name="' . $hiddenName . '">';
+    $html=View::make('cms::bbbutton',compact('type','data_key','atributes','text','array','value','hiddenName'))->render();
+    return $html;
 }
 
 function BBgetDateFormat($date, $format = null)
@@ -847,6 +880,23 @@ function BBGetUser($id = null, $column = 'username')
     return null;
 }
 
+function BBGetUserAvatar($id = null)
+{
+    if ($id) {
+        $userRepo = new \Sahakavatar\User\Repository\UserRepository();
+        $user = $userRepo->find($id);
+        if ($user) {
+            return ($user->profile->avatar) ? url($user->profile->avatar) : '/images/avatar.png';
+        }
+    } else {
+        if (Auth::check()) {
+            return (Auth::user()->profile->avatar) ? url(Auth::user()->profile->avatar) : '/images/avatar.png';
+        }
+    }
+
+    return null;
+}
+
 //TODO transver in Console
 function hierarchyAdminPagesListWithModuleName($data, $moduleCh = null, $icon = true, $roleSlug = null, $checkbox = false)
 {
@@ -973,9 +1023,9 @@ function hierarchyAdminPagesListPermissions($data, $parent = true, $icon = true,
         if ($role->id === 1) {
             $output .= '<span class="pull-right" style="color:#1fec7e;">All Access</span>';
         } else {
-            $permissionRepo = new \Sahakavatar\User\Repository\PermissionRoleRepository(\Sahakavatar\User\Repository\RoleRepository::class);
+            $permissionRepo = new \Sahakavatar\User\Repository\PermissionRoleRepository();
             if ($item->parent) {
-                $parentPerm = $item->parent_permission_role_with_role($role->id);
+                $parentPerm = \Sahakavatar\Console\Services\StructureService::AdminPagesParentPermissionWithRole($item->id, $role->id);
                 if ($parentPerm) {
                     $isChecked = $permissionRepo->getBackendPagesWithRoleAndPage($role->id, $item->id);
                     $output .= "<span class=\"pull-right\">" . Form::checkbox("permission[$role->id][$item->id]", 1, ($isChecked) ? "checked" : null, ['class' => 'show-child-perm', 'data-module' => $item->module_id, 'data-pageid' => $item->id, 'data-roleid' => $role->id, 'data-page-type' => 'back', 'style' => 'left:0;']) . "</span>";
@@ -1151,38 +1201,279 @@ function BBCheckLoginEnabled()
     return false;
 }
 
-function BBrenderPageContent($settings){
-    if($settings['content_type']=='template'){
+function BBrenderPageContent($settings)
+{
+    if (!isset($settings['content_type'])) return null;
+    if ($settings['content_type'] == 'template') {
         return BBRenderUnits($settings['template']);
     }
-    if($settings['content_type']=='editor'){
+    if ($settings['content_type'] == 'editor') {
         return $settings['main_content'];
     }
     return 'Main Content';
 }
- function BBstyle($path)
+
+function BBstyle($path)
 {
-
-    if(!\File::exists($path)) exit;
-    $styles=[];
-
-    if(\Session::has('custom.styles')){
-        $styles=\Session::get('custom.styles', []);
+    $styles = [];
+    if (\Session::has('custom.styles')) {
+        $styles = \Session::get('custom.styles', []);
     }
-    $content=\File::get($path);
-    $styles[md5($content)]="\r\n".\File::get($path);
-    \Session::put('custom.styles',$styles);
+    $styles[md5($path)] = $path;
+    \Session::put('custom.styles', $styles);
 }
 
 function BBscript($path)
 {
-    if(!\File::exists($this->path.DS.$path)) abort(500);
-    $styles=[];
-    if(\Session::has('custom.scripts')){
-        $styles=\Session::get('custom.scripts', []);
+    $scripts = [];
+    if (\Session::has('custom.scripts')) {
+        $scripts = \Session::get('custom.scripts', []);
     }
-    $slug=$this->slug;
-    $content=\File::get($path);
-    $styles[md5($content)]="\r\n".$content;
-    \Session::put('custom.scripts',$styles);
+    $scripts[md5($path)] = $path;
+    \Session::put('custom.scripts', $scripts);
+}
+
+function BBGiveMe($type, $data = null, $index = null)
+{
+    $type = strtolower($type);
+    switch ($type) {
+        case 'array':
+            return \Sahakavatar\Cms\Models\BBGiveMe::GiveArray($data);
+            break;
+        case 'string':
+            return \Sahakavatar\Cms\Models\BBGiveMe::GiveString($data);
+            break;
+        case 'int':
+            return \Sahakavatar\Cms\Models\BBGiveMe::GiveNumber($data, $index);
+            break;
+        default:
+            print "Enter valid argument!";
+
+    }
+}
+
+function BBGetMenu(
+    $id
+)
+{
+    $menuRepo = new \Sahakavatar\Cms\Repositories\MenuRepository();
+
+    $menu = $menuRepo->find($id);
+
+    if ($menu) return $menu->items;
+}
+
+
+function hierarchyFrontendPagesListWithModuleName($data, $moduleCh = null, $icon = true, $membershipSlug = null, $checkbox = false)
+{
+    $plugins = new \Avatar\Avatar\Repositories\Plugins();
+    $plugins->modules();
+    $modules = $plugins->getPlugins()->toArray();
+    $plugins->plugins();
+    $extras = $plugins->getPlugins()->toArray();
+    $modules = array_merge($extras, (array)$modules);
+
+    $output = "";
+    if (count($data)) {
+        foreach ($data as $module) {
+            if ($moduleCh == null or $moduleCh->slug == $module->module_id) {
+                $frontPageRepo = new \Sahakavatar\Console\Repository\FrontPagesRepository();
+                if (!$module->module_id) {
+                    if ($checkbox === true) {
+
+                        $output .= hierarchyFrontendPagesListPermissions($frontPageRepo->getMain(), true, $icon, $membershipSlug);
+                    } else {
+
+                        if ($membershipSlug == null) {
+                            $output .= hierarchyAdminPagesListFull($frontPageRepo->getMain(), true, $icon, 0);
+                        } else {
+                            $output .= hierarchyFrontPagesList($frontPageRepo->getMain(), true, $icon, 0, $membershipSlug);
+                        }
+                    }
+                } else {
+                    $plugins->modules();
+                    $value = $plugins->find($module->module_id);
+                    if (!$value) {
+                        $plugins->plugins();
+                        $value = $plugins->find($module->module_id);
+                    }
+                    if ($value) {
+                        if ($checkbox === true) {
+                            $output .= hierarchyFrontendPagesListPermissions($frontPageRepo->PagesByModulesParent($value), true, $icon, $roleSlug);
+                        } else {
+                            if ($membershipSlug == null) {
+                                $output .= hierarchyAdminPagesListFull($frontPageRepo->PagesByModulesParent($value), true, $icon, 0);
+                            } else {
+                                $output .= hierarchyFrontPagesList($frontPageRepo->PagesByModulesParent($value), true, $icon, 0, $membershipSlug);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return $output;
+}
+
+
+function hierarchyFrontPagesList($data, $parent = true, $icon = true, $id = 0, $roleSlug = null)
+{
+    $children = [];
+    $output = ' <ul id="accordion" class="panel-group" data-nav-drag="" role="tablist" aria-multiselectable="true">';
+    // Loop through items
+    foreach ($data as $item) {//dd($roleSlug);
+        if (\Sahakavatar\Manage\Services\FrontendPageService::checkAccess($item->id, $roleSlug)) {
+            if ($parent) {
+                $output .= '<li data-id="' . $item->id . '" data-drag="' . $item->title . '" id="headingOne' . $item->id . '" data-details=\'\' data-name="' . $item->title . '"  data-url=' . $item->url . ' ';
+
+                if (count($item->childs)) {
+                    $output .= 'data-child="' . $item->id . '" ';
+                }
+                $output .= 'class="panel panel-default page_col">';
+
+            } else {
+                $output .= '<li data-id="' . $item->id . '" data-details=\'\' data-name="' . $item->title . '" data-url=' . $item->url . ' class="panel panel-default list_items page_col">';
+            }
+
+            $output .= '<div class="panel-heading" role="tab" id="headingOne" >';
+            $output .= '<h4 class="panel-title">';
+            if (count($item->childs)) {
+                $output .= '<i class="childitem fa fa-object-group" data-drop="unit"></i>';
+            }
+            $output .= '<a data-toggle="collapse" data-pagecolid="' . $item->id . '" data-parent="#accordion' . $item->id . '" href="#collapseOne' . $item->id . '" aria-expanded="true" aria-controls="collapseOne" class="link_name collapsed">';
+            $output .= $item->title;
+            $output .= '</a>';
+            $output .= '</h4>';
+            $output .= '</div>';
+            /* Actions */
+            /* Actions END */
+            if (count($item->childs)) {
+                $output .= '<ul id="collapseOne' . $item->id . '" class="panel-collapse collapse"  role="tabpanel" aria-labelledby="headingOne' . $item->id . '">';
+                $output .= '<div class="panel-body">';
+                $children = $item->childs;
+                $output .= hierarchyFrontPagesList($children, false, $icon, 0, $roleSlug);
+                $output .= '</div>';
+                $output .= '</ul>';
+            }
+            $output .= '</li>';
+        }
+    }
+    $output .= '</ul>';
+    // Return data tree
+    return $output;
+}
+
+function hierarchyFrontendPagesListPermissions($data, $parent = true, $icon = true, $membership, $checkbox = false)
+{
+    $children = [];
+    $output = ' <ul class="panel-group" role="tablist" aria-multiselectable="true">';
+    // Loop through items
+    foreach ($data as $item) {//dd($roleSlug);
+        if ($parent) {
+            $output .= '<li data-id="' . $item->id . '" class="panel panel-default page_col">';
+        } else {
+            $output .= '<li data-id="' . $item->id . '" class="panel panel-default list_items page_col">';
+        }
+
+        $output .= '<div class="panel-heading" role="tab" id="headingOne" >';
+        $output .= '<h4 class="panel-title">';
+        $output .= '<a data-toggle="collapse" data-pagecolid="' . $item->id . '" data-parent="#accordion' . $item->id . '" href="#collapseOne' . $item->id . '" aria-expanded="true" aria-controls="collapseOne" class="link_name collapsed">';
+        $output .= $item->title;
+        $permissionRepo = new \Sahakavatar\User\Repository\PermissionRoleRepository();
+        if ($item->parent) {
+            $parentPerm = \Sahakavatar\Manage\Services\FrontendPageService::FrontPagesParentPermissionWithRole($item->id, $membership->id);
+            if ($parentPerm) {
+                $isChecked = $permissionRepo->getFrontPagesWithRoleAndPage($membership->id, $item->id);
+                $output .= "<span class=\"pull-right\">" . Form::checkbox("permission[$membership->id][$item->id]", 1, ($isChecked) ? "checked" : null, ['class' => 'show-child-perm', 'data-module' => $item->module_id, 'data-pageid' => $item->id, 'data-roleid' => $membership->id, 'data-page-type' => 'front', 'style' => 'left:0;']) . "</span>";
+            } else {
+                $output .= '<span class="pull-right" style="color:#ec0e0a;">No Access <i class="fa fa-minus-square"></i></span>';
+            }
+        } else {
+            $isChecked = $permissionRepo->getFrontPagesWithRoleAndPage($membership->id, $item->id);
+            $output .= "<span class=\"pull-right\">" . Form::checkbox("permission[$membership->id][$item->id]", 1, ($isChecked) ? "checked" : null, ['class' => 'show-child-perm', 'data-module' => $item->module_id, 'data-pageid' => $item->id, 'data-roleid' => $membership->id, 'data-page-type' => 'front', 'style' => 'left:0;']) . "</span>";
+        }
+
+        $output .= '</a>';
+        $output .= '</h4>';
+        $output .= '</div>';
+        /* Actions */
+        /* Actions END */
+
+        if (count($item->childs)) {
+            $output .= '<ul id="collapseOne' . $item->id . '" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">';
+            $output .= '<div class="panel-body">';
+            $children = $item->childs;
+            $output .= hierarchyFrontendPagesListPermissions($children, false, $icon, $membership);
+            $output .= '</div>';
+            $output .= '</ul>';
+        }
+
+        $output .= '</li>';
+        // If this is the top parent
+
+    }
+
+    $output .= '</ul>';
+
+    // Return data tree
+    return $output;
+}
+
+function BBRenderArea($settings, $key)
+{
+    if (isset($settings[$key]['content_type'])) {
+        if ($settings[$key]['content_type'] == 'template') {
+            return BBRenderUnits($settings[$key][$key]);
+        } else {
+            echo $settings[$key]['editor'];
+        }
+    }
+}
+
+$_PLUGIN_PROVIDERS = [];
+function addProvider($provider, $options = [], $force = false)
+{
+    global $_PLUGIN_PROVIDERS;
+    $providers = isset($_PLUGIN_PROVIDERS['pluginProviders']) ? $_PLUGIN_PROVIDERS['pluginProviders'] : [];
+    $providers[$provider] = compact('options', 'force');
+    $_PLUGIN_PROVIDERS['pluginProviders'] = $providers;
+}
+
+function BBrenderHook($id)
+{
+    $hookRepository = new \Sahakavatar\Cms\Repositories\HookRepository();
+    $html = $hookRepository->render($id);
+    return $html;
+}
+
+function has_setting($settings, $setting, $compare = false)
+{
+
+    if (!isset($settings[$setting])) return false;
+    if ($compare) {
+        if ($settings[$setting] != $compare) return false;
+    }
+
+    return true;
+}
+
+function get_settings($settings, $setting, $default = '')
+{
+
+    if (has_setting($settings, $setting)) {
+        return $settings[$setting];
+    }
+
+    return $default;
+}
+
+function form_render($attr)
+{
+    $formRepo = new \Sahakavatar\Console\Repository\FormsRepository();
+    $form = $formRepo->findByIdOrSlug($attr);
+
+    if ($form) {
+        return \Sahakavatar\Console\Services\FormService::renderFormBlade($form->slug);
+    }
 }

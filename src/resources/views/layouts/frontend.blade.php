@@ -1,7 +1,11 @@
+<!DOCTYPE html>
+
 @php
-    $page = \Sahakavatar\Cms\Services\RenderService::getFrontPageByURL();
+    if(!isset($page)){
+        $page = \Sahakavatar\Cms\Services\RenderService::getFrontPageByURL();
+    }
+
 @endphp
-        <!DOCTYPE html>
 <html lang="@yield('locale')">
 <head>
     <meta charset="utf-8">
@@ -11,7 +15,7 @@
     @yield('metas')
     <link type="image/x-icon" rel="icon" href="{{ asset('assets/favicon.ico') }}"/>
     <link type="image/x-icon" rel="shortcut icon" href="{{ asset('assets/favicon.ico') }}"/>
-    {!! BBactiveCss()  !!}
+    {!! BBCss()  !!}
     <link rel="stylesheet" href="{{ url("css/font-awesome/css/font-awesome.min.css") }}"/>
     <link rel="stylesheet" href="{{ url("js/jquery-ui/jquery-ui.min.css") }}"/>
     <link rel="apple-touch-icon" href="{{ asset('assets/apple-touch-icon.png') }}"/>
@@ -29,11 +33,10 @@
     <script src="{{ url("js/jquery-ui/jquery-ui.min.js") }}" type="text/javascript"></script>
     <script src="https://npmcdn.com/tether@1.2.4/dist/js/tether.min.js"></script>
     {!! HTML::script('custom/js/'.str_replace(' ','-',$page->title).'.js') !!}
-    <script src="{!! url('css/bootstrap/js/bootstrap.min.js') !!}"></script>
     {!! HTML::script("/js/tinymice/tinymce.min.js") !!}
     {!! HTML::script("/js/UiElements/bb_iframejs.js") !!}
 </head>
-<body>
+<body id="page-top" data-spy="scroll" data-target=".navbar-custom">
 @if (isset($errors) && count($errors) > 0)
     <div class="alert alert-danger" role="alert">
         <button type="button" class="close" data-dismiss="alert"
@@ -67,6 +70,8 @@
 @endif
 @yield('content')
 <!-- jQuery first, then Bootstrap JS. -->
+{!! BBJquery() !!}
+{!! BBMainFrontJS() !!}
 @yield('js')
 </body>
 </html>

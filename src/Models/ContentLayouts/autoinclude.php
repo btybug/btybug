@@ -18,6 +18,42 @@ trait autoinclude
 {
     /**
      * @return $this
+     */
+    public function makeAutoInclude()
+    {
+        if (File::exists($this->path . DS . 'auto_include.json') && File::isDirectory($this->path . DS . '_partials') && $this->autoinqlude) {
+            return $this;
+        }
+        $this->setAttributes('autoinclude', true);
+        $variation = $this->scopeMakeVariation();
+        $data = [$variation->id => 'auto_generated'];
+        $this->setAttributes('autoinclude_main', $variation->id);
+        File::put($this->path . DS . 'auto_include.json', json_encode($data, true));
+        if (!File::isDirectory($this->path . DS . '_partials')) {
+            File::makeDirectory($this->path . DS . '_partials');
+        }
+        File::put($this->path . DS . '_partials' . DS . 'auto_generated.blade.php', '<code>Example Autoinclud File</code>');
+        $variation->save();
+        $this->save();
+        return $this;
+    }
+
+    public function makeAutoIncludeVariation($name = null, $data = [], $content = null)
+    {
+
+        $auto_include_json = json_decode(File::get($this->path . DS . 'auto_include.json'), true);
+        if (!$content) {
+            $content = File::get($this->path . DS . '_partials' . DS . $auto_include_json[$this->autoinclude_main] . '.blade.php');
+        }
+        $variation = $this->scopeMakeVariation($data);
+        $auto_include_json[$variation->id] = $name ? $name : uniqid('auto_include');
+        File::put($this->path . DS . 'auto_include.json', json_encode($auto_include_json, true));
+        File::put($this->path . DS . '_partials' . DS . $auto_include_json[$variation->id] . '.blade.php', $content);
+        return $variation;
+    }
+
+    /**
+     * @return $this
      * @throws \Exception
      */
     protected function getAutoInclude()
@@ -54,41 +90,5 @@ trait autoinclude
             }
         }
         throw new \Exception('Missing variation id!!!', 404);
-    }
-
-    /**
-     * @return $this
-     */
-    public function makeAutoInclude()
-    {
-        if (File::exists($this->path . DS . 'auto_include.json') && File::isDirectory($this->path . DS . '_partials') && $this->autoinqlude) {
-            return $this;
-        }
-        $this->setAttributes('autoinclude', true);
-        $variation = $this->scopeMakeVariation();
-        $data = [$variation->id => 'auto_generated'];
-        $this->setAttributes('autoinclude_main', $variation->id);
-        File::put($this->path . DS . 'auto_include.json', json_encode($data, true));
-        if (!File::isDirectory($this->path . DS . '_partials')) {
-            File::makeDirectory($this->path . DS . '_partials');
-        }
-        File::put($this->path . DS . '_partials' . DS . 'auto_generated.blade.php', '<code>Example Autoinclud File</code>');
-        $variation->save();
-        $this->save();
-        return $this;
-    }
-
-    public function makeAutoIncludeVariation($name = null,$data=[], $content = null)
-    {
-
-        $auto_include_json = json_decode(File::get($this->path . DS . 'auto_include.json'), true);
-        if (!$content) {
-            $content = File::get($this->path . DS . '_partials' . DS . $auto_include_json[$this->autoinclude_main] . '.blade.php');
-        }
-        $variation = $this->scopeMakeVariation($data);
-        $auto_include_json[$variation->id] = $name ? $name : uniqid('auto_include');
-        File::put($this->path . DS . 'auto_include.json', json_encode($auto_include_json, true));
-        File::put($this->path . DS . '_partials' . DS . $auto_include_json[$variation->id] . '.blade.php', $content);
-        return $variation;
     }
 }

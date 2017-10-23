@@ -19,8 +19,11 @@
                 <ul class="formlisting">
                     @foreach($main->variations() as $item)
                         <li>
-                            <a href="javascript:void(0)" class="btn text-center item m-item" data-value="{!! $item->id !!}">
-                                <input type="hidden" data-action="main_body_modality" data-value="{!! $item->id !!}"/><img src="/resources/assets/images/form-list2.jpg"></a>
+                            <a href="javascript:void(0)" class="btn text-center item m-item"
+                               data-value="{!! $item->id !!}">
+                                <input type="hidden" data-action="main_body_modality"
+                                       data-value="{!! $item->id !!}"/><img
+                                        src="/resources/assets/images/form-list2.jpg"></a>
                             <span>{!! $item->title !!}</span>
                         </li>
                     @endforeach
@@ -30,7 +33,9 @@
                     @foreach($items as $item)
                         <li>
                             <a class="btn text-center item m-item" data-value="{!! $item->id !!}">
-                                <input type="hidden" data-action="main_body_modality" data-value="{!! $item->id !!}"/><img src="/resources/assets/images/form-list2.jpg"> </a>
+                                <input type="hidden" data-action="main_body_modality"
+                                       data-value="{!! $item->id !!}"/><img
+                                        src="/resources/assets/images/form-list2.jpg"> </a>
                             <span>{!! $item->title !!}</span>
                         </li>
                     @endforeach

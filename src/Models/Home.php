@@ -9,9 +9,8 @@
 namespace Sahakavatar\Cms\Models;
 
 //use Sahakavatar\Cms\Helpers\helpers;
-use Sahakavatar\Manage\Models\FrontendPage;
 use Assets;
-use Auth;
+use Sahakavatar\Manage\Models\FrontendPage;
 
 /**
  * @property Page page
@@ -45,22 +44,15 @@ class Home
                 if (BBCheckMemberAccessEnabled() && $page->url != "/") {
 
                     return view('frontend.login', compact('page', 'settings'));
-                } else {
-                    if (Auth::check()) {
-                        $user = Auth::user();
-                        if (!$user->membership || FrontendPage::checkAccess($page, $user->membership->slug)) {
-                            abort(403, 'Unauthorized action.');
-                        }
-                    }
                 }
-                if(is_array($page->page_layout_settings)){
-                    $settings= array_merge($settings,$page->page_layout_settings);
+                if (is_array($page->page_layout_settings)) {
+                    $settings = array_merge($settings, $page->page_layout_settings);
                 }
-                $page_settings=json_decode($page->settings,true);
-                if(!is_array($page_settings)){
-                    $page_settings=[];
+                $page_settings = json_decode($page->settings, true);
+                if (!is_array($page_settings)) {
+                    $page_settings = [];
                 }
-                $settings=array_merge($settings,$page_settings);
+                $settings = array_merge($settings, $page_settings);
             }
             $settings['main_content'] = $page->main_content;
             $settings['content_type'] = $page->content_type;
@@ -68,6 +60,6 @@ class Home
             return view('cms::front_pages', compact('page', 'settings'));
         }
 
-        return abort(404);
+        abort(404);
     }
 }

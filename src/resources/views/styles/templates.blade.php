@@ -20,7 +20,7 @@
                         <li class="">
                             <a class="btn item" href="javascript:void(0)">
                                 <input type="hidden" data-action="templates" data-value="{!! $item->id !!}"/>
-                                <img src="/resources/assets/images/form-list2.jpg" />
+                                <img src="/resources/assets/images/form-list2.jpg"/>
                             </a>
                             <span>
                                 {!! $item->title !!}

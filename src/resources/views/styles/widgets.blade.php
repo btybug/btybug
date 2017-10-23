@@ -19,13 +19,16 @@
                     @foreach($templates[0]->variations() as $item)
                         <li class="">
 
-                        <a class="btn item" href="javascript:void(0)">
-                            <input type="hidden" data-action="widgets" data-actiontype="{{ @$templates[0]->main_type }}" data-value="{!! $item->id !!}"/>
-                            <img src="/resources/assets/images/form-list2.jpg" />
-                        </a>
-                        <span>
+                            <a class="btn item" href="javascript:void(0)">
+                                <input type="hidden" data-action="widgets"
+                                       data-actiontype="{{ @$templates[0]->main_type }}"
+                                       data-value="{!! $item->id !!}"/>
+                                <img src="/resources/assets/images/form-list2.jpg"/>
+                            </a>
+                            <span>
                             {!! $item->title !!}
-                            <a href="{!! url('admin/resources/widgets/settings-live',$item->id) !!}"  target="_blank">
+                                <a href="{!! url('admin/resources/widgets/settings-live',$item->id) !!}"
+                                   target="_blank">
                                 <i class="fa fa-pencil pull-right" aria-hidden="true"></i>
                             </a>
                         </span>
@@ -37,11 +40,13 @@
                     @foreach($items as $item)
                         <li class="">
                             <a class="btn item" href="javascript:void(0)">
-                                <input type="hidden" data-action="widgets" data-actiontype="{{ $tpl->main_type }}" data-value="{!! $item->id !!}"/> <img
+                                <input type="hidden" data-action="widgets" data-actiontype="{{ $tpl->main_type }}"
+                                       data-value="{!! $item->id !!}"/> <img
                                         src="/resources/assets/images/form-list2.jpg"></a>
                             <span>
                                 {!! $item->title !!}
-                                <a href="{!! url('admin/resources/widgets/settings-live',$item->id) !!}" target="_blank">
+                                <a href="{!! url('admin/resources/widgets/settings-live',$item->id) !!}"
+                                   target="_blank">
                                     <i class="fa fa-pencil pull-right" aria-hidden="true"></i>
                                 </a>
                             </span>

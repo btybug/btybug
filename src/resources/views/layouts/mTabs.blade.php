@@ -11,25 +11,26 @@
                         if ($section->just_text_in_quotes($value['url'])) {
                             $var = $section->just_text_in_quotes($value['url']);
                             $variable = $var[1];
-                            if(!isset($$variable)){
-                                $$variable=null;
+                            if (!isset($$variable)) {
+                                $$variable = null;
                             }
                             try {
-                                $value['url'] = str_replace($var[0], isset($$variable)?$$variable:null, $value['url']);
+                                $value['url'] = str_replace($var[0], isset($$variable) ? $$variable : null, $value['url']);
                             } catch (Exception $e) {
                                 $var[1] = null;
                                 $value['url'] = str_replace('/' . $var[0], $var[1], $value['url']);
                             }
 
                         };
-                        if (isset($variable) && isset($$variable)){
-                            $param=$$variable;
-                        }else{
-                            $param=null;
+                        if (isset($variable) && isset($$variable)) {
+                            $param = $$variable;
+                        } else {
+                            $param = null;
                         }
                         ?>
 
-                        <li role="presentation" class="{!! $value["item_class"] or null !!} @if(Request::getPathInfo()==$value['url'] || (Request::getPathInfo().'/'.$param)==$value['url']) active @endif ">
+                        <li role="presentation"
+                            class="{!! $value["item_class"] or null !!} @if(Request::getPathInfo()==$value['url'] || (Request::getPathInfo().'/'.$param)==$value['url']) active @endif ">
 
                             <a href='{!! url($value["url"])!!}'>
                                 @if(isset($value["icon"]))
@@ -48,5 +49,5 @@
 @stop
 
 @push('css')
-{!! HTML::style('css/tabs/tab-styles.css?v=0.1') !!}
+    {!! HTML::style('css/tabs/tab-styles.css?v=0.1') !!}
 @endpush

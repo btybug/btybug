@@ -39,7 +39,6 @@ Route::get('migrate', function () {
 });
 
 
-
 Route::get('register', '\App\Modules\Users\Http\Controllers\Auth\AuthController@getRegister')->middleware('guest');
 Route::post('register', '\App\Modules\Users\Http\Controllers\Auth\AuthController@postRegister')->middleware('guest');
 Route::get('activate/{username}/{token}', '\App\Modules\Users\Http\Controllers\Auth\AuthController@activate')->middleware('guest');
@@ -47,10 +46,10 @@ Route::group(
     ['domain' => env('DOMAIN')],
     function () {
 
-        Route::get('form-test', function (){
+        Route::get('form-test', function () {
             return view('test-form');
         });
-        Route::post('save-form', function (){
+        Route::post('save-form', function () {
 
         });
 //        Route::get('/', 'HomeController@pages');
@@ -99,18 +98,22 @@ Route::group(
         //ignore Routes For Common Pages
 //        $ignores = config('ignoreroutes');//D:\wamp\www\avatar\appdata\config\ignoreroutes.php
         if (\Illuminate\Support\Facades\Schema::hasTable('frontend_pages')) {
-        $url = \Request::server('REQUEST_URI'); //$_SERVER['REQUEST_URI'];
-        if (!starts_with($url, '/admin')) {
-            $pages = Sahakavatar\Manage\Models\FrontendPage::pluck('id', 'url')->all();
-            foreach ($pages as $key => $value) {
-                Route::get($key, function () use ($key) {
-                    $home = new Sahakavatar\Cms\Models\Home();
-                    return $home->render($key, Request::all());
-                });
+            $url = \Request::server('REQUEST_URI'); //$_SERVER['REQUEST_URI'];
+            if (!starts_with($url, '/admin')) {
+                $pages = Sahakavatar\Manage\Models\FrontendPage::pluck('id', 'url')->all();
+                    Route::group(['middleware' => 'frontPermissions'], function () use ($pages) {
+                        foreach ($pages as $key => $value) {
+                            Route::get($key, function () use ($key) {
+                                $home = new Sahakavatar\Cms\Models\Home();
+                                return $home->render($key, Request::all());
+                            });
+                        }
+                    });
+
+
+                Route::any('{all}', 'HomeController@pages')->where('all', '.*');
             }
-            Route::any('{all}', 'HomeController@pages')->where('all', '.*');
         }
-    }
     }
 );
 

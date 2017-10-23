@@ -2,10 +2,10 @@
 
 namespace Sahakavatar\Cms\Http;
 
+use Illuminate\Http\Request;
 use Sahakavatar\Cms\Models\ContentLayouts\ContentLayouts;
 use Sahakavatar\Cms\Models\Home;
 use Sahakavatar\Cms\Models\Templates\Units;
-use Illuminate\Http\Request;
 
 /**
  * Class HomeController
@@ -53,20 +53,21 @@ class HomeController extends Controller
     public function unitStyles($model, $slug, $path)
     {
         $unit = ContentLayouts::find($slug);
-        if(!$unit) $unit = Units::find($slug);
-        $file=\File::get($unit->getPath().DS.$path);
+        if (!$unit) $unit = Units::find($slug);
+        $file = \File::get($unit->getPath() . DS . $path);
         $response = \Response::make($file);
         $response->header('Content-Type', 'text/css');
         return $response;
     }
+
     public function unitScripts($model, $slug, $path)
     {
         $unit = ContentLayouts::find($slug);
-        if(!$unit) $unit = Units::find($slug);
-        $file=\File::get($unit->getPath().DS.$path);
+        if (!$unit) $unit = Units::find($slug);
+        $file = \File::get($unit->getPath() . DS . $path);
         $response = \Response::make($file);
 
-        $response->header('Content-Type', 'application/javascript',false);
+        $response->header('Content-Type', 'application/javascript', false);
         return $response;
     }
 }
