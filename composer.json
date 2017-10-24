@@ -1,36 +1,34 @@
 {
-    "name": "sahak.avatar/cms",
-    "authors": [
-        {
-            "name": "Sahak",
-            "email": "hakobyan.sahak88@gmail.com"
-        }
-    ],
-    "type": "module",
-    "route": "cms",
-    "require": {
-
-        "sahak.avatar/console":"dev-master",
-        "sahak.avatar/avatar":"dev-master",
-        "sahak.avatar/framework":"dev-master",
-        "sahak.avatar/manage":"dev-master",
-        "sahak.avatar/resources":"dev-master",
-        "sahak.avatar/settings":"dev-master",
-        "sahak.avatar/uploads":"dev-master",
-        "sahak.avatar/modules":"dev-master",
-        "sahak.avatar/media":"dev-master",
-        "sahak.avatar/user":"dev-master",
-        "sahak.avatar/studios": "dev-master"
-
-    },
-    "require-dev": {
-
-    },
-	"autoload": {
-        "psr-4": {
-            "Sahakavatar\\Cms\\": "src/"
-        },"files": [
-            "src/Helpers/api.php"
-        ]
+  "name": "sahak.avatar/cms",
+  "authors": [
+    {
+      "name": "Sahak",
+      "email": "hakobyan.sahak88@gmail.com"
     }
+  ],
+  "type": "module",
+  "route": "cms",
+  "require": {
+    "sahak.avatar/hook": "dev-master",
+    "sahak.avatar/console": "dev-master",
+    "sahak.avatar/avatar": "dev-master",
+    "sahak.avatar/framework": "dev-master",
+    "sahak.avatar/manage": "dev-master",
+    "sahak.avatar/resources": "dev-master",
+    "sahak.avatar/settings": "dev-master",
+    "sahak.avatar/uploads": "dev-master",
+    "sahak.avatar/modules": "dev-master",
+    "sahak.avatar/media": "dev-master",
+    "sahak.avatar/user": "dev-master"
+  },
+  "require-dev": {
+  },
+  "autoload": {
+    "psr-4": {
+      "Sahakavatar\\Cms\\": "src/"
+    },
+    "files": [
+      "src/Helpers/api.php"
+    ]
+  }
 }

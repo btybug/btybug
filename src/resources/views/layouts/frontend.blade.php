@@ -72,6 +72,7 @@
 <!-- jQuery first, then Bootstrap JS. -->
 {!! BBJquery() !!}
 {!! BBMainFrontJS() !!}
+{!! BBJs() !!}
 @yield('js')
 </body>
 </html>

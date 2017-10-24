@@ -86,6 +86,7 @@
         integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
         crossorigin="anonymous"></script>
 {!! BBMainJS() !!}
+{!! BBJs("backend") !!}
 {!! HTML::script("/js/admin.js?v=6.0") !!}
 {!! HTML::script('custom/js/'.str_replace(' ','-',$page->title).'.js') !!}
 <script>
