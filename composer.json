@@ -19,7 +19,8 @@
     "sahak.avatar/uploads": "dev-master",
     "sahak.avatar/modules": "dev-master",
     "sahak.avatar/media": "dev-master",
-    "sahak.avatar/user": "dev-master"
+    "sahak.avatar/user": "dev-master",
+    "sahak.avatar/studios": "dev-master"
   },
   "require-dev": {
   },
