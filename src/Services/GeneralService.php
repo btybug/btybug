@@ -7,7 +7,7 @@
  * Time: 6:41 PM
  */
 
-namespace Sahakavatar\Cms\Services;
+namespace Btybug\btybug\Services;
 
 abstract class GeneralService
 {

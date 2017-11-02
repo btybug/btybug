@@ -7,7 +7,7 @@
  * Vestibulum commodo. Ut rhoncus gravida arcu.
  */
 
-namespace Sahakavatar\Cms\Models;
+namespace Btybug\btybug\Models;
 
 class BBGiveMe
 {

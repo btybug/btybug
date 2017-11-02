@@ -6,9 +6,9 @@
  * Time: 10:43 AM
  */
 
-namespace Sahakavatar\Cms\Models;
+namespace Btybug\btybug\Models;
 
-//use Sahakavatar\Cms\Helpers\helpers;
+//use Btybug\btybug\Helpers\helpers;
 use Assets;
 use Sahakavatar\Manage\Models\FrontendPage;
 
@@ -37,6 +37,7 @@ class Home
     public function render($url, $settings = [])
     {
         $page = FrontendPage::where('url', $url)->orWhere('url', "/" . $url)->first();
+        if($page->content_type=='special') return view('cms::app', compact('page'));
         if ($page) {
             if (!isset($settings['pl_live_settings'])) {
                 if ($page->status == 'draft')

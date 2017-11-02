@@ -7,11 +7,11 @@
  * Vestibulum commodo. Ut rhoncus gravida arcu.
  */
 
-namespace Sahakavatar\Cms\Middleware;
+namespace Btybug\btybug\Middleware;
 
 use Closure;
 use Response;
-use Sahakavatar\Cms\Helpers\helpers;
+use Btybug\btybug\Helpers\helpers;
 use Sahakavatar\Console\Repository\FormEntriesRepository;
 use Sahakavatar\Console\Repository\FormsRepository;
 use Sahakavatar\Console\Services\FormService;

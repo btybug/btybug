@@ -6,10 +6,10 @@
  * Time: 5:24 PM
  */
 
-namespace Sahakavatar\Cms\Models;
+namespace Btybug\btybug\Models;
 
 use File;
-use Sahakavatar\Cms\Models\Templates\Eloquent\Abstractions\TplVariations as variations;
+use Btybug\btybug\Models\Templates\Eloquent\Abstractions\TplVariations as variations;
 
 class SectionVariations extends variations
 {

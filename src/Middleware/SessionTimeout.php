@@ -1,10 +1,10 @@
-<?php namespace Sahakavatar\Cms\Middleware;
+<?php namespace Btybug\btybug\Middleware;
 
 use Closure;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Session\Store;
 
-//use Sahakavatar\Cms\Helpers\helpers;
+//use Btybug\btybug\Helpers\helpers;
 //use Sahakavatar\Settings\Repository\AdminsettingRepository as Settings;
 //TODO Clean or remove
 class SessionTimeout

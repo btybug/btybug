@@ -1,10 +1,10 @@
 <?php
 
-namespace Sahakavatar\Cms\Middleware;
+namespace Btybug\btybug\Middleware;
 
 use Closure;
 use Illuminate\Contracts\Auth\Guard;
-use Sahakavatar\Cms\Services\RenderService;
+use Btybug\btybug\Services\RenderService;
 use Sahakavatar\Console\Repository\FrontPagesRepository;
 use Sahakavatar\Manage\Services\FrontendPageService;
 

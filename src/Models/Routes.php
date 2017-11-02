@@ -6,7 +6,7 @@
  * Time: 11:01 AM
  */
 
-namespace Sahakavatar\Cms\Models;
+namespace Btybug\btybug\Models;
 
 use Avatar\Avatar\Repositories\Plugins;
 use Sahakavatar\Console\Models\AdminPages;
@@ -14,7 +14,7 @@ use Sahakavatar\Console\Repository\AdminPagesRepository;
 
 /**
  * Class Routes
- * @package Sahakavatar\Cms\Models
+ * @package Btybug\btybug\Models
  */
 class Routes
 {
@@ -174,15 +174,20 @@ class Routes
             $package->modules();
             $module = $package->find($slug);
         }
+        if(! $module) {
+            $package->appPlugins();
+            $module = $package->find($slug);
+        }
+
         if ($module) {
-            if ($module->type == 'plugin' or $module->type == 'module' or $module->type == 'addon' or $module->type=='package') {
+            if ($module->type == 'app-plugin' || $module->type == 'plugin' || $module->type == 'module' || $module->type == 'addon' || $module->type=='package') {
                 $url = strtolower('admin/' . $module->route);
             } else {
                 return false;
             }
-
             $routes = self::getRoutesStratWith($url, "GET");
             $message = [];
+
 //            $activeLayout = ContentLayouts::active()->activeVariation();
             if (count($routes)) {
                 foreach ($routes as $key => $value) {

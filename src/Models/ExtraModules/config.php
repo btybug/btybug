@@ -6,7 +6,7 @@
  * Time: 1:54 PM
  */
 
-namespace Sahakavatar\Cms\Models\ExtraModules;
+namespace Btybug\btybug\Models\ExtraModules;
 
 use File;
 

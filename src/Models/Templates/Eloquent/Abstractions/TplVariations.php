@@ -6,13 +6,13 @@
  * Time: 8:12 PM
  */
 
-namespace Sahakavatar\Cms\Models\Templates\Eloquent\Abstractions;
+namespace Btybug\btybug\Models\Templates\Eloquent\Abstractions;
 
 use File;
 
 /**
  * Class TplVariations
- * @package Sahakavatar\Cms\Models\Eloquent\Abstractions
+ * @package Btybug\btybug\Models\Eloquent\Abstractions
  */
 abstract class TplVariations
 {

@@ -5,8 +5,9 @@
  * Date: 7/18/17
  * Time: 5:23 PM
  */
-
-
+function module_path($path=''){
+    return app()->basePath().(DS.'vendor'.DS.'sahak.avatar').($path ? DS.$path : $path);
+}
 function BBaddShortcode($key, $function)
 {
     $codes = \Config::get('shortcode.extra', []);
@@ -59,7 +60,7 @@ function BBRenderTpl($variation_id, $on_empty = null)
     if (isset($slug[0]) && isset($slug[1])) {
         $widget_id = $slug[0];
         $variationID = $slug[1];
-        $widget = \Sahakavatar\Cms\Models\Templates\Units::find($widget_id);
+        $widget = \Btybug\btybug\Models\Templates\Units::find($widget_id);
         if (!is_null($widget)) {
             $variation = $widget->findVariation($variation_id);
             if (!is_null($variation)) {
@@ -82,7 +83,7 @@ function BBRenderPageSections($variation_id, $source = [], $main_view = null)
     $slug = explode('.', $variation_id);
     if (isset($slug[0]) && isset($slug[1])) {
         $content_layout = $slug[0];
-        $section = \Sahakavatar\Cms\Models\ContentLayouts\ContentLayouts::find($content_layout);
+        $section = \Btybug\btybug\Models\ContentLayouts\ContentLayouts::find($content_layout);
         if (!is_null($section)) {
             $variation = $section->findVariation($variation_id);
             if (!is_null($variation)) {
@@ -107,7 +108,7 @@ function BBRenderPageSections($variation_id, $source = [], $main_view = null)
 
 function BBRenderPageBody($slug, $data = [], $main_view = null)
 {
-    $section = \Sahakavatar\Cms\Models\ContentLayouts\ContentLayouts::renderPageBody($slug, $data);
+    $section = \Btybug\btybug\Models\ContentLayouts\ContentLayouts::renderPageBody($slug, $data);
     return $section;
 }
 
@@ -194,7 +195,7 @@ function BBRenderSections($variation_id, $source = [])
     $slug = explode('.', $variation_id);
     if (isset($slug[0]) && isset($slug[1])) {
         $section_id = $slug[0];
-        $section = \Sahakavatar\Cms\Models\Templates\Sections::find($section_id);
+        $section = \Btybug\btybug\Models\Templates\Sections::find($section_id);
         if (!is_null($section)) {
             $variation = $section->findVariation($variation_id);
             if (!is_null($variation)) {
@@ -224,7 +225,7 @@ function BBRenderBackTpl($variation_id, $on_empty = null)
         $widget_id = $slug[0];
         $variationID = $slug[1];
 
-        $widget = \Sahakavatar\Cms\Models\Templates\Units::find($widget_id);
+        $widget = \Btybug\btybug\Models\Templates\Units::find($widget_id);
         if (!is_null($widget)) {
             $variation = $widget->findVariation($variation_id);
             if (!is_null($variation)) {
@@ -254,7 +255,7 @@ function BBleftBar()
 
 function BBheaderBack()
 {
-    $page = \Sahakavatar\Cms\Services\RenderService::getPageByURL();
+    $page = \Btybug\btybug\Services\RenderService::getPageByURL();
     $data = [];
     if ($page->settings) {
         $data = json_decode($page->settings, true);
@@ -271,7 +272,7 @@ function BBheaderBack()
 
 function main_content()
 {
-    $page = \Sahakavatar\Cms\Services\RenderService::getFrontPageByURL();
+    $page = \Btybug\btybug\Services\RenderService::getFrontPageByURL();
     if ($page) {
         if ($page->content_type == "editor") {
             echo $page->main_content;
@@ -287,14 +288,14 @@ function BBgetPageLayout()
     if ($route) {
         if (isset($_GET['pl_live_settings']) && $_GET['pl_live_settings'] == 'page_live') {
             $layoutID = $_GET['pl'];
-            $layout = \Sahakavatar\Cms\Models\ContentLayouts\ContentLayouts::findVariation($layoutID);
-            if (!$layout) return \Sahakavatar\Cms\Models\ContentLayouts\ContentLayouts::defaultPageSection();
+            $layout = \Btybug\btybug\Models\ContentLayouts\ContentLayouts::findVariation($layoutID);
+            if (!$layout) return \Btybug\btybug\Models\ContentLayouts\ContentLayouts::defaultPageSection();
             $data = explode('.', $layoutID);
-            $layout = \Sahakavatar\Cms\Models\ContentLayouts\ContentLayouts::find($data[0]);
+            $layout = \Btybug\btybug\Models\ContentLayouts\ContentLayouts::find($data[0]);
             return 'ContentLayouts.' . $layout->folder . '.' . $layout->layout;
         }
     }
-    $page = \Sahakavatar\Cms\Services\RenderService::getPageByURL();
+    $page = \Btybug\btybug\Services\RenderService::getPageByURL();
     $data = [];
     if ($page->settings) {
         $data = json_decode($page->settings, true);
@@ -305,14 +306,14 @@ function BBgetPageLayout()
     }
     if (isset($data['backend_page_section']) && $data['backend_page_section']) {
         $slug = explode('.', $data['backend_page_section']);
-        $layout = \Sahakavatar\Cms\Models\ContentLayouts\ContentLayouts::find($slug[0]);
+        $layout = \Btybug\btybug\Models\ContentLayouts\ContentLayouts::find($slug[0]);
         if ($layout) return 'ContentLayouts.' . $layout->folder . '.' . $layout->layout;
     }
 }
 
 function BBgetPageLayoutSettings()
 {
-    $page = \Sahakavatar\Cms\Services\RenderService::getPageByURL();
+    $page = \Btybug\btybug\Services\RenderService::getPageByURL();
     if (isset($_GET['pl_live_settings']) && $_GET['pl_live_settings'] == 'page_live') {
         $data = $_GET;
         $AdminPagesRepo = new \Sahakavatar\Console\Repository\AdminPagesRepository();
@@ -322,11 +323,11 @@ function BBgetPageLayoutSettings()
                 $page_settings = json_decode($live_page->settings, true);
                 if (!empty($page_settings)) $data = array_merge($page_settings, $data);
             } else {
-                $layout = \Sahakavatar\Cms\Models\ContentLayouts\ContentLayouts::findVariation($data['pl']);
+                $layout = \Btybug\btybug\Models\ContentLayouts\ContentLayouts::findVariation($data['pl']);
                 if ($layout) $data = array_merge($layout->settings, $data);
             }
         } else {
-            $layout = \Sahakavatar\Cms\Models\ContentLayouts\ContentLayouts::findVariation($data['pl']);
+            $layout = \Btybug\btybug\Models\ContentLayouts\ContentLayouts::findVariation($data['pl']);
             if ($layout) $data = array_merge($layout->settings, $data);
         }
         return $data;
@@ -343,7 +344,7 @@ function BBgetPageLayoutSettings()
         }
 
         if (isset($data['backend_page_section']) && $data['backend_page_section']) {
-            $layout = \Sahakavatar\Cms\Models\ContentLayouts\ContentLayouts::findVariation($data['backend_page_section']);
+            $layout = \Btybug\btybug\Models\ContentLayouts\ContentLayouts::findVariation($data['backend_page_section']);
             if ($layout) {
                 $mainSettings = array_merge($data, $layout->settings);
                 $json = '<input type="hidden" id="page_layout_settings_json" data-json=' . json_encode($mainSettings, true) . '>';
@@ -494,7 +495,7 @@ function BBRenderUnits($variation_id, $source = [], $data = NULL)
         $widget_id = $slug[0];
         $variationID = $slug[1];
 
-        $unit = \Sahakavatar\Cms\Models\Templates\Units::find($widget_id);
+        $unit = \Btybug\btybug\Models\Templates\Units::find($widget_id);
         if (!is_null($unit)) {
             $variation = $unit->findVariation($variation_id);
 
@@ -538,7 +539,14 @@ function hierarchyAdminPagesListFull($data, $parent = true, $icon = true, $id = 
             $output .= '<li data-id="' . $item->id . '">';
             $output .= '<div class="listinginfo">';
             $output .= '<div class="lsitingbutton">';
-            $output .= '<a href="' . url('/admin/manage/frontend/pages/settings', $item->id) . '" class="btn"><i class="fa fa-pencil"></i></a>';
+            if($item->content_type == "special"){
+                $settings = json_decode($item->settings,true);
+
+                $output .= '<a href="' . url($settings['edit_url']) . '" class="btn"><i class="fa fa-cog fa-spin"></i></a>';
+            }else{
+                $output .= '<a href="' . url('/admin/manage/frontend/pages/settings', $item->id) . '" class="btn"><i class="fa fa-pencil"></i></a>';
+            }
+
             if ($item->type == 'custom') {
                 $output .= '<a href="' . url('/admin/manage/frontend/pages/new', $item->id) . '" class="btn"><i class="fa fa-plus"></i></a>';
                 $output .= '<a data-href="' . url('/admin/manage/frontend/pages/delete') . '" data-key="' . $item->id . '" data-type="Page ' . $item->title . '"  class="delete-button btn trashBtn"><i class="fa fa-trash"></i></a>';
@@ -750,10 +758,10 @@ function BBField($data)
                     $defaultFieldHtml = \DB::table('settings')->where('section', 'setting_system')
                         ->where('settingkey', 'default_field_html')->first();
                     $variationId = $defaultFieldHtml->val;
-                    $field_html = \Sahakavatar\Cms\Models\Templates\Units::findByVariation($variationId);
+                    $field_html = \Btybug\btybug\Models\Templates\Units::findByVariation($variationId);
                     break;
                 case 'custom':
-                    $field_html = \Sahakavatar\Cms\Models\Templates\Units::findByVariation($field->custom_html);
+                    $field_html = \Btybug\btybug\Models\Templates\Units::findByVariation($field->custom_html);
                     break;
             }
 
@@ -1107,7 +1115,7 @@ function hierarchyAdminPagesListHierarchy($data, $parent = true, $icon = true, $
 
 //function BBlinkFonts()
 //{
-//    $helper = new \Sahakavatar\Cms\Helpers\helpers();
+//    $helper = new \Btybug\btybug\Helpers\helpers();
 //    $fonts = $helper->getFontList();
 //    $links = '';
 //    if (count($fonts)) {
@@ -1122,7 +1130,7 @@ function hierarchyAdminPagesListHierarchy($data, $parent = true, $icon = true, $
 //TODO:find the right direction for this function
 function BBgetUnitAttr($id, $key)
 {
-    $section = \Sahakavatar\Cms\Models\Templates\Units::findByVariation($id);
+    $section = \Btybug\btybug\Models\Templates\Units::findByVariation($id);
     if ($section) return $section->{$key};
     return false;
 
@@ -1130,7 +1138,7 @@ function BBgetUnitAttr($id, $key)
 
 function BBgetLayoutAttr($id, $key)
 {
-    $section = \Sahakavatar\Cms\Models\ContentLayouts\ContentLayouts::findByVariation($id);
+    $section = \Btybug\btybug\Models\ContentLayouts\ContentLayouts::findByVariation($id);
     if ($section) return $section->{$key};
     return false;
 
@@ -1238,13 +1246,13 @@ function BBGiveMe($type, $data = null, $index = null)
     $type = strtolower($type);
     switch ($type) {
         case 'array':
-            return \Sahakavatar\Cms\Models\BBGiveMe::GiveArray($data);
+            return \Btybug\btybug\Models\BBGiveMe::GiveArray($data);
             break;
         case 'string':
-            return \Sahakavatar\Cms\Models\BBGiveMe::GiveString($data);
+            return \Btybug\btybug\Models\BBGiveMe::GiveString($data);
             break;
         case 'int':
-            return \Sahakavatar\Cms\Models\BBGiveMe::GiveNumber($data, $index);
+            return \Btybug\btybug\Models\BBGiveMe::GiveNumber($data, $index);
             break;
         default:
             print "Enter valid argument!";
@@ -1256,7 +1264,7 @@ function BBGetMenu(
     $id
 )
 {
-    $menuRepo = new \Sahakavatar\Cms\Repositories\MenuRepository();
+    $menuRepo = new \Btybug\btybug\Repositories\MenuRepository();
 
     $menu = $menuRepo->find($id);
 
@@ -1442,7 +1450,7 @@ function addProvider($provider, $options = [], $force = false)
 
 function BBrenderHook($id)
 {
-    $hookRepository = new \Sahakavatar\Cms\Repositories\HookRepository();
+    $hookRepository = new \Btybug\btybug\Repositories\HookRepository();
     $html = $hookRepository->render($id);
     return $html;
 }
@@ -1476,4 +1484,10 @@ function form_render($attr)
     if ($form) {
         return \Sahakavatar\Console\Services\FormService::renderFormBlade($form->slug);
     }
+}
+
+function generate_special_page(array $data){
+    return \Sahakavatar\Manage\Services\FrontendPageService::generateSpecialPage(
+        $data
+    );
 }

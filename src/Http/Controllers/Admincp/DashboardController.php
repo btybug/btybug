@@ -1,4 +1,4 @@
-<?php namespace Sahakavatar\Cms\Http\Controllers\Admincp;
+<?php namespace Btybug\btybug\Http\Controllers\Admincp;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests;

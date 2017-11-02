@@ -14,7 +14,7 @@
  * Time: 1:24 PM
  */
 
-namespace Sahakavatar\Cms\Models;
+namespace Btybug\btybug\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -80,7 +80,7 @@ class Menu extends Model
 
     public function items()
     {
-        return $this->hasMany('Sahakavatar\Cms\Models\MenuItems', 'menu_id', 'id');
+        return $this->hasMany('Btybug\btybug\Models\MenuItems', 'menu_id', 'id');
     }
 
     /**
@@ -88,7 +88,7 @@ class Menu extends Model
      */
     public function parent()
     {
-        return $this->belongsTo('Sahakavatar\Cms\Models\MenuItems', 'parent_id');
+        return $this->belongsTo('Btybug\btybug\Models\MenuItems', 'parent_id');
     }
 
     /**
@@ -96,6 +96,6 @@ class Menu extends Model
      */
     public function childs()
     {
-        return $this->hasMany('Sahakavatar\Cms\Models\MenuItems', 'parent_id');
+        return $this->hasMany('Btybug\btybug\Models\MenuItems', 'parent_id');
     }
 }

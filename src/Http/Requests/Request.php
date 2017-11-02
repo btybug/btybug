@@ -7,7 +7,7 @@
  * Time: 3:08 PM
  */
 
-namespace Sahakavatar\Cms\Http\Requests;
+namespace Btybug\btybug\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 

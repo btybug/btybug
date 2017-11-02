@@ -1,12 +1,12 @@
-<?php namespace Sahakavatar\Cms\Models\ContentLayouts;
+<?php namespace Btybug\btybug\Models\ContentLayouts;
 
 use File;
-use Sahakavatar\Cms\Models\Hook;
+use Btybug\btybug\Models\Hook;
 use Sahakavatar\Settings\Repository\AdminsettingRepository;
 
 /**
  * Class ContentLayouts
- * @package Sahakavatar\Cms\Models\ContentLayouts
+ * @package Btybug\btybug\Models\ContentLayouts
  */
 class ContentLayouts
 {

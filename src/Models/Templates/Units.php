@@ -1,9 +1,9 @@
-<?php namespace Sahakavatar\Cms\Models\Templates;
+<?php namespace Btybug\btybug\Models\Templates;
 
 use Avatar\Avatar\Repositories\Plugins;
-use Sahakavatar\Cms\Models\ContentLayouts\autoinclude;
-use Sahakavatar\Cms\Models\ContentLayouts\ContentLayouts;
-use Sahakavatar\Cms\Models\Templates\Eloquent\Abstractions\TplModel;
+use Btybug\btybug\Models\ContentLayouts\autoinclude;
+use Btybug\btybug\Models\ContentLayouts\ContentLayouts;
+use Btybug\btybug\Models\Templates\Eloquent\Abstractions\TplModel;
 
 class Units extends TplModel
 {

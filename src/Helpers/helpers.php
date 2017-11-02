@@ -1,11 +1,11 @@
 <?php
 
-namespace Sahakavatar\Cms\Helpers;
+namespace Btybug\btybug\Helpers;
 
 use Auth;
 use DB;
 use File;
-use Sahakavatar\Cms\Models\Urlmanager;
+use Btybug\btybug\Models\Urlmanager;
 use Sahakavatar\User\Models\Roles;
 use Session;
 

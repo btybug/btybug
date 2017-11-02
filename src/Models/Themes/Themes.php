@@ -1,7 +1,7 @@
-<?php namespace Sahakavatar\Cms\Models\Themes;
+<?php namespace Btybug\btybug\Models\Themes;
 
 use File;
-use Sahakavatar\Cms\Models\ContentLayouts\autoinclude;
+use Btybug\btybug\Models\ContentLayouts\autoinclude;
 
 class Themes
 {

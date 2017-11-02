@@ -1,7 +1,7 @@
-<?php namespace Sahakavatar\Cms\Models\Themes;
+<?php namespace Btybug\btybug\Models\Themes;
 
 use File;
-use Sahakavatar\Cms\Models\Templates\Eloquent\Abstractions\TplVariations;
+use Btybug\btybug\Models\Templates\Eloquent\Abstractions\TplVariations;
 
 class ThemeVariations extends TplVariations
 {

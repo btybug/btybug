@@ -1,11 +1,11 @@
 <?php
 
-namespace Sahakavatar\Cms\Http;
+namespace Btybug\btybug\Http;
 
 use Illuminate\Http\Request;
-use Sahakavatar\Cms\Models\ContentLayouts\ContentLayouts;
-use Sahakavatar\Cms\Models\Home;
-use Sahakavatar\Cms\Models\Templates\Units;
+use Btybug\btybug\Models\ContentLayouts\ContentLayouts;
+use Btybug\btybug\Models\Home;
+use Btybug\btybug\Models\Templates\Units;
 
 /**
  * Class HomeController

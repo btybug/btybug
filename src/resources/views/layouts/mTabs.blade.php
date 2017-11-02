@@ -4,7 +4,7 @@
     <div class="row" style="margin: 0 -5px;">
         <div class="box box-default color-palette-box">
             <div class="box-body">
-                @inject('section','Sahakavatar\Cms\Helpers\Tabs')
+                @inject('section','Btybug\btybug\Helpers\Tabs')
                 <ul class="nav nav-tabs uiTabs" role="tablist">
                     @foreach($section->getTabs($index) as $value)
                         <?php

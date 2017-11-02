@@ -7,7 +7,7 @@
  * Time: 5:45 PM
  */
 
-namespace Sahakavatar\Cms\Repositories;
+namespace Btybug\btybug\Repositories;
 
 abstract class GeneralRepository implements RepositoryInterface
 {

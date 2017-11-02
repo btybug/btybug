@@ -1,5 +1,5 @@
 {
-  "name": "sahak.avatar/cms",
+  "name": "btybug/btybug",
   "authors": [
     {
       "name": "Sahak",
@@ -7,26 +7,26 @@
     }
   ],
   "type": "module",
-  "route": "cms",
+  "route": "btybug",
   "require": {
-    "sahak.avatar/hook": "dev-master",
-    "sahak.avatar/console": "dev-master",
-    "sahak.avatar/avatar": "dev-master",
-    "sahak.avatar/framework": "dev-master",
-    "sahak.avatar/manage": "dev-master",
-    "sahak.avatar/resources": "dev-master",
-    "sahak.avatar/settings": "dev-master",
-    "sahak.avatar/uploads": "dev-master",
-    "sahak.avatar/modules": "dev-master",
-    "sahak.avatar/media": "dev-master",
-    "sahak.avatar/user": "dev-master",
-    "sahak.avatar/studios": "dev-master"
+    "btybug/hook": "dev-master",
+    "btybug/console": "dev-master",
+    "btybug/avatar": "dev-master",
+    "btybug/framework": "dev-master",
+    "btybug/manage": "dev-master",
+    "btybug/resources": "dev-master",
+    "btybug/settings": "dev-master",
+    "btybug/uploads": "dev-master",
+    "btybug/modules": "dev-master",
+    "btybug/media": "dev-master",
+    "btybug/user": "dev-master",
+    "btybug/studios": "dev-master"
   },
   "require-dev": {
   },
   "autoload": {
     "psr-4": {
-      "Sahakavatar\\Cms\\": "src/"
+      "Btybug\\btybug\\": "src/"
     },
     "files": [
       "src/Helpers/api.php"

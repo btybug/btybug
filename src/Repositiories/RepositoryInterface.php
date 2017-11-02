@@ -7,7 +7,7 @@
  * Time: 5:48 PM
  */
 
-namespace Sahakavatar\Cms\Repositories;
+namespace Btybug\btybug\Repositories;
 
 interface RepositoryInterface
 {

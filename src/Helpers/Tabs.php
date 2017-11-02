@@ -1,6 +1,6 @@
 <?php
 
-namespace Sahakavatar\Cms\Helpers;
+namespace Btybug\btybug\Helpers;
 
 use Auth;
 use View;

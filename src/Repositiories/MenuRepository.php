@@ -1,8 +1,8 @@
 <?php
 
-namespace Sahakavatar\Cms\Repositories;
+namespace Btybug\btybug\Repositories;
 
-use Sahakavatar\Cms\Models\Menu;
+use Btybug\btybug\Models\Menu;
 
 
 class MenuRepository extends GeneralRepository

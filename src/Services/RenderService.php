@@ -6,7 +6,7 @@
  * Time: 15:13
  */
 
-namespace Sahakavatar\Cms\Services;
+namespace Btybug\btybug\Services;
 
 
 use Sahakavatar\Console\Repository\AdminPagesRepository;

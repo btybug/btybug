@@ -1,6 +1,6 @@
 <?php
 
-namespace Sahakavatar\Cms\Http;
+namespace Btybug\btybug\Http;
 
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;

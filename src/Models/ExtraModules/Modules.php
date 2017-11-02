@@ -1,6 +1,6 @@
 <?php
 
-namespace Sahakavatar\Cms\Models\ExtraModules;
+namespace Btybug\btybug\Models\ExtraModules;
 
 /**
  * User: Sahak

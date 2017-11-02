@@ -3,12 +3,12 @@
         if($value){
             switch ($type){
                 case 'layouts':
-                $obj=Sahakavatar\Cms\Models\ContentLayouts\ContentLayouts::findByVariation($value);
-                $variation=Sahakavatar\Cms\Models\ContentLayouts\ContentLayouts::findVariation($value);
+                $obj=Btybug\btybug\Models\ContentLayouts\ContentLayouts::findByVariation($value);
+                $variation=Btybug\btybug\Models\ContentLayouts\ContentLayouts::findVariation($value);
                 break;
                 case 'unit':
-                $obj=\Sahakavatar\Cms\Models\Templates\Units::findByVariation($value);
-                $variation=\Sahakavatar\Cms\Models\Templates\Units::findVariation($value);
+                $obj=\Btybug\btybug\Models\Templates\Units::findByVariation($value);
+                $variation=\Btybug\btybug\Models\Templates\Units::findVariation($value);
                 break;
             }
         }

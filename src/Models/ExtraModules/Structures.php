@@ -6,7 +6,7 @@
  * Time: 1:42 PM
  */
 
-namespace Sahakavatar\Cms\Models\ExtraModules;
+namespace Btybug\btybug\Models\ExtraModules;
 
 /**
  * Class Structures

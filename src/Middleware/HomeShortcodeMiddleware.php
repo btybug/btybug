@@ -1,6 +1,6 @@
 <?php
 
-namespace Sahakavatar\Cms\Middleware;
+namespace Btybug\btybug\Middleware;
 
 use Closure;
 

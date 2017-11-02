@@ -7,11 +7,11 @@
  * Vestibulum commodo. Ut rhoncus gravida arcu.
  */
 
-namespace Sahakavatar\Cms\Services;
+namespace Btybug\btybug\Services;
 
-use Sahakavatar\Cms\Models\ContentLayouts\ContentLayouts;
-use Sahakavatar\Cms\Repositories\HookRepository;
-use Sahakavatar\Cms\Services\GeneralService;
+use Btybug\btybug\Models\ContentLayouts\ContentLayouts;
+use Btybug\btybug\Repositories\HookRepository;
+use Btybug\btybug\Services\GeneralService;
 
 /**
  * Class HookService

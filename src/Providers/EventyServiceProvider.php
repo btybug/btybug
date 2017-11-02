@@ -1,6 +1,6 @@
 <?php
 
-namespace Sahakavatar\Cms\Providers;
+namespace Btybug\btybug\Providers;
 
 //use TorMorten\Eventy;
 

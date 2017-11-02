@@ -104,7 +104,7 @@ Route::group(
                     Route::group(['middleware' => 'frontPermissions'], function () use ($pages) {
                         foreach ($pages as $key => $value) {
                             Route::get($key, function () use ($key) {
-                                $home = new Sahakavatar\Cms\Models\Home();
+                                $home = new Btybug\btybug\Models\Home();
                                 return $home->render($key, Request::all());
                             });
                         }

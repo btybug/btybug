@@ -6,14 +6,14 @@
  * Time: 3:24 PM
  */
 
-namespace Sahakavatar\Cms\Models\ContentLayouts;
+namespace Btybug\btybug\Models\ContentLayouts;
 
 use File;
-use Sahakavatar\Cms\Models\Templates\Eloquent\Abstractions\TplVariations;
+use Btybug\btybug\Models\Templates\Eloquent\Abstractions\TplVariations;
 
 /**
  * Class ContentLayoutVariations
- * @package Sahakavatar\Cms\Models\ContentLayouts
+ * @package Btybug\btybug\Models\ContentLayouts
  */
 class ContentLayoutVariations extends TplVariations
 {

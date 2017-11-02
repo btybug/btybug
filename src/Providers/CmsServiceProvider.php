@@ -1,6 +1,6 @@
 <?php
 
-namespace Sahakavatar\Cms\Providers;
+namespace Btybug\btybug\Providers;
 
 use Illuminate\Support\ServiceProvider;
 
@@ -25,6 +25,7 @@ class CmsServiceProvider extends ServiceProvider
         $this->app->register('Sahakavatar\Settings\Providers\ModuleServiceProvider');
         $this->app->register('Sahakavatar\Uploads\Providers\ModuleServiceProvider');
         $this->app->register('Sahakavatar\Modules\Providers\ModuleServiceProvider');
+        $this->app->register('Sahakavatar\Studios\Providers\ModuleServiceProvider');
         $this->app->register('Avatar\Avatar\Providers\AvatarServiceProvider');
     }
 

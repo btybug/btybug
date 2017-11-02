@@ -1,14 +1,14 @@
 <?php
 
-namespace Sahakavatar\Cms\Repositories;
+namespace Btybug\btybug\Repositories;
 
-use Sahakavatar\Cms\Models\Hook;
-use Sahakavatar\Cms\Models\Templates\Units;
+use Btybug\btybug\Models\Hook;
+use Btybug\btybug\Models\Templates\Units;
 
 
 /**
  * Class HookRepository
- * @package Sahakavatar\Cms\Repositories
+ * @package Btybug\btybug\Repositories
  */
 class HookRepository extends GeneralRepository
 {

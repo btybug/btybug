@@ -6,7 +6,7 @@
  * Time: 5:50 PM
  */
 
-namespace Sahakavatar\Cms\Services;
+namespace Btybug\btybug\Services;
 
 use File;
 

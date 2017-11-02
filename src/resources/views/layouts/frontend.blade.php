@@ -2,7 +2,7 @@
 
 @php
     if(!isset($page)){
-        $page = \Sahakavatar\Cms\Services\RenderService::getFrontPageByURL();
+        $page = \Btybug\btybug\Services\RenderService::getFrontPageByURL();
     }
 
 @endphp

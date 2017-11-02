@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 @php
-    $page = \Sahakavatar\Cms\Services\RenderService::getPageByURL();
+    $page = \Btybug\btybug\Services\RenderService::getPageByURL();
 @endphp
 
 <!--[if IE 8]>
@@ -60,7 +60,7 @@
                 @endif
 
                 @if(Session::has('message'))
-                    <div class="m-t-10 alert {{ Session::get('alert-class', 'alert-info') }} alert-dismissible"
+                    <div style="position: absolute; width: 60%;left: 27%; z-index: 999999999;" class="m-t-10 alert {{ Session::get('alert-class', 'alert-info') }} alert-dismissible"
                          role="alert">
                         <button type="button" class="close" data-dismiss="alert"
                                 aria-label="Close"><span aria-hidden="true">&times;</span>
@@ -82,9 +82,6 @@
 {!! HTML::script("/js/jquery-2.1.4.min.js") !!}
 {!! HTML::script("/js/jquery-ui/jquery-ui.min.js") !!}
 <script src="https://npmcdn.com/tether@1.2.4/dist/js/tether.min.js"></script>
-<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
-        integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
-        crossorigin="anonymous"></script>
 {!! BBMainJS() !!}
 {!! BBJs("backend") !!}
 {!! HTML::script("/js/admin.js?v=6.0") !!}

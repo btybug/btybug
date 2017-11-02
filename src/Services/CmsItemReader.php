@@ -6,11 +6,11 @@
  * Time: 5:36 PM
  */
 
-namespace Sahakavatar\Cms\Services;
+namespace Btybug\btybug\Services;
 
 use File;
-use Sahakavatar\Cms\Models\Templates\Eloquent\Abstractions\TplModel;
-use Sahakavatar\Cms\Models\Templates\UnitsVariations;
+use Btybug\btybug\Models\Templates\Eloquent\Abstractions\TplModel;
+use Btybug\btybug\Models\Templates\UnitsVariations;
 
 class CmsItemReader extends TplModel
 {

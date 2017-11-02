@@ -1,11 +1,11 @@
 <?php
 
-namespace Sahakavatar\Cms\Models;
+namespace Btybug\btybug\Models;
 
 use Illuminate\Database\Eloquent\Model;
 /**
  * Class Hook
- * @package Sahakavatar\Cms\Models
+ * @package Btybug\btybug\Models
  */
 class Hook extends Model
 {

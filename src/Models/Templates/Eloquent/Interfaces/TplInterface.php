@@ -6,7 +6,7 @@
  * Time: 1:05 AM
  */
 
-namespace Sahakavatar\Cms\Models\Templates\Eloquent\Interfaces;
+namespace Btybug\btybug\Models\Templates\Eloquent\Interfaces;
 
 
 interface TplInterface

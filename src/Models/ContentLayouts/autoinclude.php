@@ -6,13 +6,13 @@
  * Time: 9:46 PM
  */
 
-namespace Sahakavatar\Cms\Models\ContentLayouts;
+namespace Btybug\btybug\Models\ContentLayouts;
 
 use File;
 
 /**
  * Trait autoinclude
- * @package Sahakavatar\Cms\Models\ContentLayouts
+ * @package Btybug\btybug\Models\ContentLayouts
  */
 trait autoinclude
 {

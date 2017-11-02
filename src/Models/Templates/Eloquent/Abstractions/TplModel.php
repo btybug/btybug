@@ -6,12 +6,12 @@
  * Time: 8:55 PM
  */
 
-namespace Sahakavatar\Cms\Models\Templates\Eloquent\Abstractions;
+namespace Btybug\btybug\Models\Templates\Eloquent\Abstractions;
 
 use File;
 use HTML;
 use Illuminate\Contracts\Support\Arrayable;
-use Sahakavatar\Cms\Models\Templates\Eloquent\Interfaces\TplInterface;
+use Btybug\btybug\Models\Templates\Eloquent\Interfaces\TplInterface;
 use View;
 
 /**

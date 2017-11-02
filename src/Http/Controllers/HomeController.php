@@ -1,11 +1,11 @@
 <?php
 
-namespace Sahakavatar\Cms\Http\Controllers;
+namespace Btybug\btybug\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Sahakavatar\Cms\Models\ContentLayouts\ContentLayouts;
-use Sahakavatar\Cms\Models\Home;
-use Sahakavatar\Cms\Models\Templates\Units;
+use Btybug\btybug\Models\ContentLayouts\ContentLayouts;
+use Btybug\btybug\Models\Home;
+use Btybug\btybug\Models\Templates\Units;
 
 /**
  * Class HomeController
@@ -68,7 +68,7 @@ class HomeController extends Controller
         session()->forget('custom.styles');
         $response = \Response::make($content);
         $response->header('Content-Type', 'text/css');
-    //   $response->header('Cache-Control', 'max-age=31104000');
+        //   $response->header('Cache-Control', 'max-age=31104000');
         return $response;
     }
 
@@ -77,20 +77,23 @@ class HomeController extends Controller
         $scriptPaths = \Session::get('custom.scripts', []);
         $contentArray=[];
         $content='';
+//        $notFound="\r\n".'/*'."\r\n";
         foreach ($scriptPaths as $path) {
             if(\File::exists($path)){
                 $file=\File::get($path);
-                $contentArray[md5($file)]= $file;
+                $key=md5($file);
+                $contentArray[$key]= $file;
+                $content.=$contentArray[$key];
+            }else{
+              //  $notFound.=$path."\r\n";
             }
+        }
+//        $notFound.='*/';
 
-        }
-        foreach ($contentArray as $script){
-            $content.="\r\n" .$script;
-        }
         \Session::forget('custom.scripts');
         $response = \Response::make($content);
         $response->header('Content-Type', 'application/javascript', false);
-    //    $response->header('Cache-Control', 'max-age=31536000');
+        //    $response->header('Cache-Control', 'max-age=31536000');
 
         return $response;
     }
