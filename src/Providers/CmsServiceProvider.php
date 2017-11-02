@@ -17,16 +17,15 @@ class CmsServiceProvider extends ServiceProvider
         $this->loadTranslationsFrom(__DIR__ . '/../resources/Lang', 'cms');
         $this->loadViewsFrom(__DIR__ . '/../resources/views', 'cms');
 
-        $this->app->register("Sahakavatar\User\Providers\ModuleServiceProvider");
-        $this->app->register('Sahakavatar\Console\Providers\ModuleServiceProvider');
-        $this->app->register('Sahakavatar\Framework\Providers\ModuleServiceProvider');
-        $this->app->register('Sahakavatar\Manage\Providers\ModuleServiceProvider');
-        $this->app->register('Sahakavatar\Resources\Providers\ModuleServiceProvider');
-        $this->app->register('Sahakavatar\Settings\Providers\ModuleServiceProvider');
-        $this->app->register('Sahakavatar\Uploads\Providers\ModuleServiceProvider');
-        $this->app->register('Sahakavatar\Modules\Providers\ModuleServiceProvider');
-        $this->app->register('Sahakavatar\Studios\Providers\ModuleServiceProvider');
-        $this->app->register('Avatar\Avatar\Providers\AvatarServiceProvider');
+        $this->app->register("Btybug\User\Providers\ModuleServiceProvider");
+        $this->app->register('Btybug\Console\Providers\ModuleServiceProvider');
+        $this->app->register('Btybug\Framework\Providers\ModuleServiceProvider');
+        $this->app->register('Btybug\Manage\Providers\ModuleServiceProvider');
+        $this->app->register('Btybug\Resources\Providers\ModuleServiceProvider');
+        $this->app->register('Btybug\Settings\Providers\ModuleServiceProvider');
+        $this->app->register('Btybug\Uploads\Providers\ModuleServiceProvider');
+        $this->app->register('Btybug\Modules\Providers\ModuleServiceProvider');
+        $this->app->register('Btybug\Installer\Providers\AvatarServiceProvider');
     }
 
     /**

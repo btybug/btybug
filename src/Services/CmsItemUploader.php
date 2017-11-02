@@ -15,7 +15,7 @@ use Btybug\btybug\Models\ContentLayouts\ContentLayouts;
 use Btybug\btybug\Models\Templates\TplVariations;
 use Btybug\btybug\Models\Templates\Units;
 use Btybug\btybug\Models\Templates\UnitsVariations;
-use Sahakavatar\Modules\Models\Fields;
+use Btybug\Modules\Models\Fields;
 use Zipper;
 
 /**

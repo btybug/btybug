@@ -8,9 +8,9 @@
 
 namespace Btybug\btybug\Models;
 
-use Avatar\Avatar\Repositories\Plugins;
-use Sahakavatar\Console\Models\AdminPages;
-use Sahakavatar\Console\Repository\AdminPagesRepository;
+use Btybug\Installer\Repositories\Plugins;
+use Btybug\Console\Models\AdminPages;
+use Btybug\Console\Repository\AdminPagesRepository;
 
 /**
  * Class Routes

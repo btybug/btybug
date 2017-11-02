@@ -1,6 +1,6 @@
 <?php namespace Btybug\btybug\Models\Templates;
 
-use Avatar\Avatar\Repositories\Plugins;
+use Btybug\Installer\Repositories\Plugins;
 use Btybug\btybug\Models\ContentLayouts\autoinclude;
 use Btybug\btybug\Models\ContentLayouts\ContentLayouts;
 use Btybug\btybug\Models\Templates\Eloquent\Abstractions\TplModel;

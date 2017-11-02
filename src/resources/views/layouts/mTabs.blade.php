@@ -1,4 +1,4 @@
-@extends('cms::layouts.admin')
+@extends('btybug::layouts.admin')
 @section('content')
     @yield('parag')
     <div class="row" style="margin: 0 -5px;">

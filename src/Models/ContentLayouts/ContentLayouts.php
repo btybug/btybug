@@ -2,7 +2,7 @@
 
 use File;
 use Btybug\btybug\Models\Hook;
-use Sahakavatar\Settings\Repository\AdminsettingRepository;
+use Btybug\Settings\Repository\AdminsettingRepository;
 
 /**
  * Class ContentLayouts

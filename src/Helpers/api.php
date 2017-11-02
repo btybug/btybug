@@ -17,7 +17,7 @@ function BBaddShortcode($key, $function)
 
 function BBGetAdminLoginUrl()
 {
-    $adminPagesReopsitory = new \Sahakavatar\Console\Repository\AdminPagesRepository();
+    $adminPagesReopsitory = new \Btybug\Console\Repository\AdminPagesRepository();
     $adminLoginPage = $adminPagesReopsitory->findBy('slug', 'admin-login');
     return $adminLoginPage ? $adminLoginPage->url : '/admin/login';
 
@@ -28,7 +28,7 @@ function BBCheckMemberAccessEnabled()
 {
     $reg = BBCheckRegistrationEnabled();
     if ($reg) {
-        $settings = \Sahakavatar\Settings\Models\Settings::where('settingkey', 'enable_member_access')->first();
+        $settings = \Btybug\Settings\Models\Settings::where('settingkey', 'enable_member_access')->first();
         if ($settings) {
             return ($settings->val == "1");
         }
@@ -38,7 +38,7 @@ function BBCheckMemberAccessEnabled()
 
 function BBCheckRegistrationEnabled()
 {
-    $settings = \Sahakavatar\Settings\Models\Settings::where('settingkey', 'enable_registration')->first();
+    $settings = \Btybug\Settings\Models\Settings::where('settingkey', 'enable_registration')->first();
     if ($settings) {
         return ($settings->val) ? true : false;
     }
@@ -48,7 +48,7 @@ function BBCheckRegistrationEnabled()
 
 function BBheader()
 {
-    $tpl = \Sahakavatar\Settings\Models\Settings::where('section', 'setting_system')->where('settingkey', 'header_tpl')->first();
+    $tpl = \Btybug\Settings\Models\Settings::where('section', 'setting_system')->where('settingkey', 'header_tpl')->first();
     if ($tpl and !empty($tpl->val)) {
         return BBRenderTpl($tpl->val);
     }
@@ -212,7 +212,7 @@ function BBRenderSections($variation_id, $source = [])
 
 function BBfooter()
 {
-    $tpl = \Sahakavatar\Settings\Models\Settings::where('section', 'setting_system')->where('settingkey', 'footer_tpl')->first();
+    $tpl = \Btybug\Settings\Models\Settings::where('section', 'setting_system')->where('settingkey', 'footer_tpl')->first();
     if ($tpl and !empty($tpl->val)) {
         return BBRenderTpl($tpl->val);
     }
@@ -246,7 +246,7 @@ function BBRenderBackTpl($variation_id, $on_empty = null)
 
 function BBleftBar()
 {
-    $tpl = \Sahakavatar\Settings\Models\Settings::where('section', 'setting_system')->where('settingkey', 'backend_left_bar')->first();
+    $tpl = \Btybug\Settings\Models\Settings::where('section', 'setting_system')->where('settingkey', 'backend_left_bar')->first();
 //    dd($tpl);
     if ($tpl and !empty($tpl->val)) {
         return BBRenderBackTpl($tpl->val);
@@ -260,7 +260,7 @@ function BBheaderBack()
     if ($page->settings) {
         $data = json_decode($page->settings, true);
     } else {
-        $settingsRepo = new \Sahakavatar\Settings\Repository\AdminsettingRepository();
+        $settingsRepo = new \Btybug\Settings\Repository\AdminsettingRepository();
         $settings = $settingsRepo->findBy('section', 'backend_settings');
         if ($settings && $settings->val) $data = json_decode($settings->val, true);
     }
@@ -300,7 +300,7 @@ function BBgetPageLayout()
     if ($page->settings) {
         $data = json_decode($page->settings, true);
     } else {
-        $settingsRepo = new \Sahakavatar\Settings\Repository\AdminsettingRepository();
+        $settingsRepo = new \Btybug\Settings\Repository\AdminsettingRepository();
         $settings = $settingsRepo->findBy('section', 'backend_settings');
         if ($settings && $settings->val) $data = json_decode($settings->val, true);
     }
@@ -316,7 +316,7 @@ function BBgetPageLayoutSettings()
     $page = \Btybug\btybug\Services\RenderService::getPageByURL();
     if (isset($_GET['pl_live_settings']) && $_GET['pl_live_settings'] == 'page_live') {
         $data = $_GET;
-        $AdminPagesRepo = new \Sahakavatar\Console\Repository\AdminPagesRepository();
+        $AdminPagesRepo = new \Btybug\Console\Repository\AdminPagesRepository();
         $live_page = $AdminPagesRepo->find($data['page_id']);
         if ($live_page) {
             if ($live_page->settings && isset($_GET['variation'])) {
@@ -338,7 +338,7 @@ function BBgetPageLayoutSettings()
         if ($page->settings) {
             $data = json_decode($page->settings, true);
         } else {
-            $settingsRepo = new \Sahakavatar\Settings\Repository\AdminsettingRepository();
+            $settingsRepo = new \Btybug\Settings\Repository\AdminsettingRepository();
             $settings = $settingsRepo->findBy('section', 'backend_settings');
             if ($settings && $settings->val) $data = json_decode($settings->val, true);
         }
@@ -370,7 +370,7 @@ function BBscriptsHook()
 //TODO Transver in Framework api.php
 function BBFrameworkJs()
 {
-    return \Sahakavatar\Framework\Models\Framework::activeJs();
+    return \Btybug\Framework\Models\Framework::activeJs();
 }
 
 if (!function_exists('BBGetUserName')) {
@@ -471,7 +471,7 @@ function BBAdminMenuWalker($menu_array)
 
 function BBgetSiteLogo()
 {
-    $settingRepo = new \Sahakavatar\Settings\Repository\AdminsettingRepository();
+    $settingRepo = new \Btybug\Settings\Repository\AdminsettingRepository();
     $logo = $settingRepo->getSettings('setting_system', 'site_logo');
     if (!$logo) return '';
 
@@ -480,7 +480,7 @@ function BBgetSiteLogo()
 
 function BBgetSiteName()
 {
-    $settingRepo = new \Sahakavatar\Settings\Repository\AdminsettingRepository();
+    $settingRepo = new \Btybug\Settings\Repository\AdminsettingRepository();
     $name = $settingRepo->getSettings('setting_system', 'site_name');
     return $name->val;
 }
@@ -614,7 +614,7 @@ function BBbutton($action, $key, $text, array $array = [])
     $route = Request::route();
     if ($action == 'main_body' && $route->uri() == "admin/manage/frontend/pages/page-preview/{id}") {
         $param = $route->parameter('id');
-        $page = \Sahakavatar\Manage\Models\FrontendPage::find($param);
+        $page = \Btybug\Manage\Models\FrontendPage::find($param);
         if ($page) {
             if ($page->type != "custom" && $page->type != "tags")
                 return false;
@@ -749,7 +749,7 @@ function BBField($data)
 {
     $fieldHtml = '';
     if (isset($data['slug'])) {
-        $fieldRepo = new \Sahakavatar\Console\Repository\FieldsRepository();
+        $fieldRepo = new \Btybug\Console\Repository\FieldsRepository();
         $field = $fieldRepo->findBy('slug', $data['slug']);
         if ($field) {
             $field_html = null;
@@ -784,7 +784,7 @@ function BBFieldHidden($data)
 {
     $fieldHtml = '';
     if (isset($data['slug'])) {
-        $fieldRepo = new \Sahakavatar\Console\Repository\FieldsRepository();
+        $fieldRepo = new \Btybug\Console\Repository\FieldsRepository();
         $field = $fieldRepo->findBy('slug', $data['slug']);
         if ($field) {
             $name = $field->table_name . "_" . $field->column_name;
@@ -797,7 +797,7 @@ function BBFieldHidden($data)
 
 function BBMasterFormsList()
 {
-    $forms = new \Sahakavatar\Console\Repository\FormsRepository();
+    $forms = new \Btybug\Console\Repository\FormsRepository();
     return $forms->getByTypeNewPluck()->toArray();
 }
 
@@ -808,7 +808,7 @@ function BBMasterFormsList()
 function BBGetUserCover($id = null)
 {
     if ($id) {
-        $userRepository = new \Sahakavatar\User\Repository\UserRepository();
+        $userRepository = new \Btybug\User\Repository\UserRepository();
         if ($user = $userRepository->find($id)) {
             return ($user->profile->cover) ? url($user->profile->cover) : '/resources/assets/images/profile.jpg';
         }
@@ -825,7 +825,7 @@ function BBGetUserCover($id = null)
 function BBGetUserRole($id = null)
 {
     if ($id) {
-        $userRepository = new \Sahakavatar\User\Repository\UserRepository();
+        $userRepository = new \Btybug\User\Repository\UserRepository();
         if ($user = $userRepository->find($id)) {
             return ($user->role->name);
         }
@@ -864,7 +864,7 @@ function issetReturn($array, $item, $default = null)
 function BBGetUser($id = null, $column = 'username')
 {
     if ($id) {
-        $userRepo = new \Sahakavatar\User\Repository\UserRepository();
+        $userRepo = new \Btybug\User\Repository\UserRepository();
         $user = $userRepo->find($id);
         if ($user) {
             if (isset($user->$column)) {
@@ -891,7 +891,7 @@ function BBGetUser($id = null, $column = 'username')
 function BBGetUserAvatar($id = null)
 {
     if ($id) {
-        $userRepo = new \Sahakavatar\User\Repository\UserRepository();
+        $userRepo = new \Btybug\User\Repository\UserRepository();
         $user = $userRepo->find($id);
         if ($user) {
             return ($user->profile->avatar) ? url($user->profile->avatar) : '/images/avatar.png';
@@ -908,13 +908,13 @@ function BBGetUserAvatar($id = null)
 //TODO transver in Console
 function hierarchyAdminPagesListWithModuleName($data, $moduleCh = null, $icon = true, $roleSlug = null, $checkbox = false)
 {
-    $plugins = new \Avatar\Avatar\Repositories\Plugins();
+    $plugins = new \Btybug\Installer\Repositories\Plugins();
     $plugins->modules();
     $modules = $plugins->getPlugins()->toArray();
     $plugins->plugins();
     $extras = $plugins->getPlugins()->toArray();
     $modules = array_merge($extras, (array)$modules);
-    $adminRepo = new \Sahakavatar\Console\Repository\AdminPagesRepository();
+    $adminRepo = new \Btybug\Console\Repository\AdminPagesRepository();
     $output = "";
     if (count($data)) {
         foreach ($data as $module) {
@@ -963,7 +963,7 @@ function hierarchyAdminPagesList($data, $parent = true, $icon = true, $id = 0, $
 
     // Loop through items
     foreach ($data as $item) {//dd($roleSlug);
-        if (\Sahakavatar\Console\Services\StructureService::checkAccess($item->id, $roleSlug)) {
+        if (\Btybug\Console\Services\StructureService::checkAccess($item->id, $roleSlug)) {
             if ($parent) {
                 $output .= '<li data-id="' . $item->id . '" data-drag="' . $item->title . '" id="headingOne' . $item->id . '" data-details=\'\' data-name="' . $item->title . '"  data-url=' . $item->url . ' ';
 
@@ -1031,9 +1031,9 @@ function hierarchyAdminPagesListPermissions($data, $parent = true, $icon = true,
         if ($role->id === 1) {
             $output .= '<span class="pull-right" style="color:#1fec7e;">All Access</span>';
         } else {
-            $permissionRepo = new \Sahakavatar\User\Repository\PermissionRoleRepository();
+            $permissionRepo = new \Btybug\User\Repository\PermissionRoleRepository();
             if ($item->parent) {
-                $parentPerm = \Sahakavatar\Console\Services\StructureService::AdminPagesParentPermissionWithRole($item->id, $role->id);
+                $parentPerm = \Btybug\Console\Services\StructureService::AdminPagesParentPermissionWithRole($item->id, $role->id);
                 if ($parentPerm) {
                     $isChecked = $permissionRepo->getBackendPagesWithRoleAndPage($role->id, $item->id);
                     $output .= "<span class=\"pull-right\">" . Form::checkbox("permission[$role->id][$item->id]", 1, ($isChecked) ? "checked" : null, ['class' => 'show-child-perm', 'data-module' => $item->module_id, 'data-pageid' => $item->id, 'data-roleid' => $role->id, 'data-page-type' => 'back', 'style' => 'left:0;']) . "</span>";
@@ -1148,7 +1148,7 @@ function BBgetLayoutAttr($id, $key)
 function BBRegisterAdminPages($module, $title = null, $url, $layout = null, $parent = 0)
 {
 
-    $adminPagesRepo = new \Sahakavatar\Console\Repository\AdminPagesRepository();
+    $adminPagesRepo = new \Btybug\Console\Repository\AdminPagesRepository();
     if (!$title) $title = $module . ' page title';
 
     if (substr($url, 0, 6) != "/admin" && substr($url, 0, 5) != "admin") {
@@ -1202,7 +1202,7 @@ function modules_path($path = '')
 
 function BBCheckLoginEnabled()
 {
-    $settings = \Sahakavatar\Settings\Models\Settings::where('settingkey', 'enable_login')->first();
+    $settings = \Btybug\Settings\Models\Settings::where('settingkey', 'enable_login')->first();
     if ($settings) {
         return ($settings->val) ? true : false;
     }
@@ -1274,7 +1274,7 @@ function BBGetMenu(
 
 function hierarchyFrontendPagesListWithModuleName($data, $moduleCh = null, $icon = true, $membershipSlug = null, $checkbox = false)
 {
-    $plugins = new \Avatar\Avatar\Repositories\Plugins();
+    $plugins = new \Btybug\Installer\Repositories\Plugins();
     $plugins->modules();
     $modules = $plugins->getPlugins()->toArray();
     $plugins->plugins();
@@ -1285,7 +1285,7 @@ function hierarchyFrontendPagesListWithModuleName($data, $moduleCh = null, $icon
     if (count($data)) {
         foreach ($data as $module) {
             if ($moduleCh == null or $moduleCh->slug == $module->module_id) {
-                $frontPageRepo = new \Sahakavatar\Console\Repository\FrontPagesRepository();
+                $frontPageRepo = new \Btybug\Console\Repository\FrontPagesRepository();
                 if (!$module->module_id) {
                     if ($checkbox === true) {
 
@@ -1331,7 +1331,7 @@ function hierarchyFrontPagesList($data, $parent = true, $icon = true, $id = 0, $
     $output = ' <ul id="accordion" class="panel-group" data-nav-drag="" role="tablist" aria-multiselectable="true">';
     // Loop through items
     foreach ($data as $item) {//dd($roleSlug);
-        if (\Sahakavatar\Manage\Services\FrontendPageService::checkAccess($item->id, $roleSlug)) {
+        if (\Btybug\Manage\Services\FrontendPageService::checkAccess($item->id, $roleSlug)) {
             if ($parent) {
                 $output .= '<li data-id="' . $item->id . '" data-drag="' . $item->title . '" id="headingOne' . $item->id . '" data-details=\'\' data-name="' . $item->title . '"  data-url=' . $item->url . ' ';
 
@@ -1388,9 +1388,9 @@ function hierarchyFrontendPagesListPermissions($data, $parent = true, $icon = tr
         $output .= '<h4 class="panel-title">';
         $output .= '<a data-toggle="collapse" data-pagecolid="' . $item->id . '" data-parent="#accordion' . $item->id . '" href="#collapseOne' . $item->id . '" aria-expanded="true" aria-controls="collapseOne" class="link_name collapsed">';
         $output .= $item->title;
-        $permissionRepo = new \Sahakavatar\User\Repository\PermissionRoleRepository();
+        $permissionRepo = new \Btybug\User\Repository\PermissionRoleRepository();
         if ($item->parent) {
-            $parentPerm = \Sahakavatar\Manage\Services\FrontendPageService::FrontPagesParentPermissionWithRole($item->id, $membership->id);
+            $parentPerm = \Btybug\Manage\Services\FrontendPageService::FrontPagesParentPermissionWithRole($item->id, $membership->id);
             if ($parentPerm) {
                 $isChecked = $permissionRepo->getFrontPagesWithRoleAndPage($membership->id, $item->id);
                 $output .= "<span class=\"pull-right\">" . Form::checkbox("permission[$membership->id][$item->id]", 1, ($isChecked) ? "checked" : null, ['class' => 'show-child-perm', 'data-module' => $item->module_id, 'data-pageid' => $item->id, 'data-roleid' => $membership->id, 'data-page-type' => 'front', 'style' => 'left:0;']) . "</span>";
@@ -1478,16 +1478,16 @@ function get_settings($settings, $setting, $default = '')
 
 function form_render($attr)
 {
-    $formRepo = new \Sahakavatar\Console\Repository\FormsRepository();
+    $formRepo = new \Btybug\Console\Repository\FormsRepository();
     $form = $formRepo->findByIdOrSlug($attr);
 
     if ($form) {
-        return \Sahakavatar\Console\Services\FormService::renderFormBlade($form->slug);
+        return \Btybug\Console\Services\FormService::renderFormBlade($form->slug);
     }
 }
 
 function generate_special_page(array $data){
-    return \Sahakavatar\Manage\Services\FrontendPageService::generateSpecialPage(
+    return \Btybug\Manage\Services\FrontendPageService::generateSpecialPage(
         $data
     );
 }

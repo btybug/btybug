@@ -1,4 +1,4 @@
-@extends('cms::layouts.frontend')
+@extends('btybug::layouts.frontend')
 @section('content')
     @if(isset($settings['pl']) && isset($settings['pl_live_settings']))
         <textarea data-pagejson="setting" class="hide">{!! json_encode($settings,true) !!}</textarea>

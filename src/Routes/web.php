@@ -54,11 +54,11 @@ Route::group(
         });
 //        Route::get('/', 'HomeController@pages');
         //deletable
-        Route::get('login', '\Sahakavatar\User\Http\Controllers\Auth\AuthController@getLogin')->middleware('guest');
-        Route::post('login', '\Sahakavatar\User\Http\Controllers\Auth\AuthController@postLogin')->middleware('guest');
-        //        Route::get(BBGetAdminLoginUrl(), '\Sahakavatar\Modules\Users\Http\Controllers\Auth\AuthController@getAdminLogin')->middleware('guest');
-        //        Route::post(BBGetAdminLoginUrl(), '\Sahakavatar\Modules\Users\Http\Controllers\Auth\AuthController@postAdminLogin')->middleware('guest');
-        Route::get('logout', '\Sahakavatar\User\Http\Controllers\Auth\AuthController@getLogout')->middleware('auth');
+        Route::get('login', '\Btybug\User\Http\Controllers\Auth\AuthController@getLogin')->middleware('guest');
+        Route::post('login', '\Btybug\User\Http\Controllers\Auth\AuthController@postLogin')->middleware('guest');
+        //        Route::get(BBGetAdminLoginUrl(), '\Btybug\Modules\Users\Http\Controllers\Auth\AuthController@getAdminLogin')->middleware('guest');
+        //        Route::post(BBGetAdminLoginUrl(), '\Btybug\Modules\Users\Http\Controllers\Auth\AuthController@postAdminLogin')->middleware('guest');
+        Route::get('logout', '\Btybug\User\Http\Controllers\Auth\AuthController@getLogout')->middleware('auth');
         Route::post('/modality/settings-live', 'Admincp\ModalityController@postSettingsLive');
         Route::post('/modality/styles/options', 'Admincp\ModalityController@psotStylesOptions');
         Route::post('/modality/widgets/options', 'Admincp\ModalityController@psotWidgetsOptions');
@@ -100,7 +100,7 @@ Route::group(
         if (\Illuminate\Support\Facades\Schema::hasTable('frontend_pages')) {
             $url = \Request::server('REQUEST_URI'); //$_SERVER['REQUEST_URI'];
             if (!starts_with($url, '/admin')) {
-                $pages = Sahakavatar\Manage\Models\FrontendPage::pluck('id', 'url')->all();
+                $pages = Btybug\Manage\Models\FrontendPage::pluck('id', 'url')->all();
                     Route::group(['middleware' => 'frontPermissions'], function () use ($pages) {
                         foreach ($pages as $key => $value) {
                             Route::get($key, function () use ($key) {

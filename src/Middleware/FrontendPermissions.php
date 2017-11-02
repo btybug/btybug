@@ -5,8 +5,8 @@ namespace Btybug\btybug\Middleware;
 use Closure;
 use Illuminate\Contracts\Auth\Guard;
 use Btybug\btybug\Services\RenderService;
-use Sahakavatar\Console\Repository\FrontPagesRepository;
-use Sahakavatar\Manage\Services\FrontendPageService;
+use Btybug\Console\Repository\FrontPagesRepository;
+use Btybug\Manage\Services\FrontendPageService;
 
 class FrontendPermissions
 {

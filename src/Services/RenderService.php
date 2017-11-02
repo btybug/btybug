@@ -9,9 +9,9 @@
 namespace Btybug\btybug\Services;
 
 
-use Sahakavatar\Console\Repository\AdminPagesRepository;
-use Sahakavatar\Console\Repository\FrontPagesRepository;
-use Sahakavatar\User\Repository\RoleRepository;
+use Btybug\Console\Repository\AdminPagesRepository;
+use Btybug\Console\Repository\FrontPagesRepository;
+use Btybug\User\Repository\RoleRepository;
 
 class RenderService extends GeneralService
 {
