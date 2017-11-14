@@ -105,7 +105,7 @@ class ModalityController extends Controller
 
         if (!count($templates)) return \Response::json(['error' => true]);
 
-        $html = View::make('cms::styles.templates', compact('templates'))->render();
+        $html = View::make('btybug::styles.templates', compact('templates'))->render();
 
         return \Response::json(['error' => false, 'html' => $html]);
     }
@@ -123,7 +123,7 @@ class ModalityController extends Controller
 
         if (!count($menus)) return \Response::json(['error' => true]);
 
-        $html = View::make('cms::styles.menus', compact('menus'))->render();
+        $html = View::make('btybug::styles.menus', compact('menus'))->render();
 
         return \Response::json(['error' => false, 'html' => $html]);
     }
@@ -139,9 +139,9 @@ class ModalityController extends Controller
 
         if (!count($units)) return \Response::json(['error' => true]);
         if(isset($data['multiple']) && $data['multiple'] == true){
-            $html = View::make('cms::styles.multiple-units', compact('units', 'data'))->render();
+            $html = View::make('btybug::styles.multiple-units', compact('units', 'data'))->render();
         }else{
-            $html = View::make('cms::styles.units', compact('units', 'data'))->render();
+            $html = View::make('btybug::styles.units', compact('units', 'data'))->render();
         }
 
         return \Response::json(['error' => false, 'html' => $html]);
@@ -192,7 +192,7 @@ class ModalityController extends Controller
             }
         }
         if (!count($units)) return \Response::json(['error' => true]);
-        $html = View::make('cms::styles.units', compact('units', 'data'))->render();
+        $html = View::make('btybug::styles.units', compact('units', 'data'))->render();
         return \Response::json(['error' => false, 'html' => $html]);
     }
 
@@ -205,7 +205,7 @@ class ModalityController extends Controller
 
         if (!count($files)) return \Response::json(['error' => true]);
 
-        $html = View::make('cms::styles.units_files', compact('files'))->render();
+        $html = View::make('btybug::styles.units_files', compact('files'))->render();
 
         return \Response::json(['error' => false, 'html' => $html]);
     }
@@ -234,7 +234,7 @@ class ModalityController extends Controller
 
         if (!count($templates)) return \Response::json(['error' => true]);
 
-        $html = View::make('cms::styles.widgets', compact('templates'))->render();
+        $html = View::make('btybug::styles.widgets', compact('templates'))->render();
 
         return \Response::json(['error' => false, 'html' => $html]);
     }
@@ -246,7 +246,7 @@ class ModalityController extends Controller
     public function getTheme($data)
     {
         $layouts = Themes::active()->layouts();
-        $html = View::make('cms::styles.theme', compact('layouts'))->render();
+        $html = View::make('btybug::styles.theme', compact('layouts'))->render();
 
         return \Response::json(['error' => false, 'html' => $html]);
     }
@@ -260,7 +260,7 @@ class ModalityController extends Controller
         $fonts = $this->helpers->getFontList();
         if (!count($fonts)) return \Response::json(['error' => true]);
         //dd($fonts);
-        $html = View::make('cms::styles.icons', compact('fonts'))->render();
+        $html = View::make('btybug::styles.icons', compact('fonts'))->render();
 
         return \Response::json(['error' => false, 'html' => $html]);
     }
@@ -280,7 +280,7 @@ class ModalityController extends Controller
         if (!count($styles)) return \Response::json(['error' => true]);
         $items = Style::where('type', $type)->where('sub', key($styles))->get();
 
-        $html = View::make('cms::styles.styles', compact('styles', 'items', 'type'))->render();
+        $html = View::make('btybug::styles.styles', compact('styles', 'items', 'type'))->render();
 
         return \Response::json(['error' => false, 'html' => $html]);
     }
@@ -293,7 +293,7 @@ class ModalityController extends Controller
             ->where('place', $type)
             ->run();
         if (!count($layouts)) return \Response::json(['error' => true]);
-        $html = View::make('cms::styles.page_sections', compact('layouts'))->render();
+        $html = View::make('btybug::styles.page_sections', compact('layouts'))->render();
         return \Response::json(['error' => false, 'html' => $html]);
     }
 
@@ -308,7 +308,7 @@ class ModalityController extends Controller
             ->where('type', $type)
             ->run();
         if (!count($sections)) return \Response::json(['error' => true]);
-        $html = View::make('cms::styles.sections', compact('sections'))->render();
+        $html = View::make('btybug::styles.sections', compact('sections'))->render();
 
         return \Response::json(['error' => false, 'html' => $html]);
     }
@@ -328,7 +328,7 @@ class ModalityController extends Controller
 
         if (!count($main_body)) return \Response::json(['error' => true]);
 
-        $html = View::make('cms::styles.main_body', compact('main_body'))->render();
+        $html = View::make('btybug::styles.main_body', compact('main_body'))->render();
 
         return \Response::json(['error' => false, 'html' => $html]);
     }
@@ -344,7 +344,7 @@ class ModalityController extends Controller
         if (!$layout) return \Response::json(['error' => true]);
         $items = $layout->variations();
         $ajax = true;
-        $html = View::make('cms::styles.page_sections', compact(['items', 'ajax']))->render();
+        $html = View::make('btybug::styles.page_sections', compact(['items', 'ajax']))->render();
 
         return \Response::json(['error' => false, 'html' => $html]);
     }
@@ -360,7 +360,7 @@ class ModalityController extends Controller
         if (!$section) return \Response::json(['error' => true]);
         $items = $section->variations();
         $ajax = true;
-        $html = View::make('cms::styles.sections', compact(['items', 'ajax']))->render();
+        $html = View::make('btybug::styles.sections', compact(['items', 'ajax']))->render();
 
         return \Response::json(['error' => false, 'html' => $html]);
     }
@@ -379,7 +379,7 @@ class ModalityController extends Controller
         if (!$main_body) return \Response::json(['error' => true]);
         $items = $main_body->variations();
         $ajax = true;
-        $html = View::make('cms::styles.main_body', compact(['items', 'ajax']))->render();
+        $html = View::make('btybug::styles.main_body', compact(['items', 'ajax']))->render();
 
         return \Response::json(['error' => false, 'html' => $html]);
     }
@@ -395,7 +395,7 @@ class ModalityController extends Controller
 
         $items = Style::where('type', $type)->where('sub', $sub)->get();
         $ajax = true;
-        $html = View::make('cms::styles.styles', compact(['items', 'ajax']))->render();
+        $html = View::make('btybug::styles.styles', compact(['items', 'ajax']))->render();
 
         return \Response::json(['error' => false, 'html' => $html]);
     }
@@ -415,7 +415,7 @@ class ModalityController extends Controller
         if (!$tpl) return \Response::json(['error' => true]);
         $items = $tpl->variations();
         $ajax = true;
-        $html = View::make('cms::styles.templates', compact(['items', 'ajax']))->render();
+        $html = View::make('btybug::styles.templates', compact(['items', 'ajax']))->render();
 
         return \Response::json(['error' => false, 'html' => $html]);
     }
@@ -432,7 +432,7 @@ class ModalityController extends Controller
         if (!$unit) return \Response::json(['error' => true]);
         $items = $unit->variations();
         $ajax = true;
-        $html = View::make('cms::styles.units', compact(['items', 'ajax', 'key']))->render();
+        $html = View::make('btybug::styles.units', compact(['items', 'ajax', 'key']))->render();
 
         return \Response::json(['error' => false, 'html' => $html]);
     }
@@ -450,7 +450,7 @@ class ModalityController extends Controller
         if (!$tpl) return \Response::json(['error' => true]);
         $items = $tpl->variations();
         $ajax = true;
-        $html = View::make('cms::styles.widgets', compact(['items', 'ajax', 'tpl']))->render();
+        $html = View::make('btybug::styles.widgets', compact(['items', 'ajax', 'tpl']))->render();
 
         return \Response::json(['error' => false, 'html' => $html]);
     }
@@ -475,7 +475,7 @@ class ModalityController extends Controller
         $tag = $data['type'];
         $layouts = ContentLayouts::sortByTag($tag);
         if (!count($layouts)) return \Response::json(['error' => true]);
-        $html = View::make('cms::styles.page_sections', compact('layouts'))->render();
+        $html = View::make('btybug::styles.page_sections', compact('layouts'))->render();
         return \Response::json(['error' => false, 'html' => $html]);
     }
 
