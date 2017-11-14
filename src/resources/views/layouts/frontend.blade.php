@@ -16,10 +16,10 @@
     <link type="image/x-icon" rel="icon" href="{{ asset('assets/favicon.ico') }}"/>
     <link type="image/x-icon" rel="shortcut icon" href="{{ asset('assets/favicon.ico') }}"/>
     {!! BBCss()  !!}
-    <link rel="stylesheet" href="{{ url("css/font-awesome/css/font-awesome.min.css") }}"/>
-    <link rel="stylesheet" href="{{ url("js/jquery-ui/jquery-ui.min.css") }}"/>
+    <link rel="stylesheet" href="{{ url("public/css/font-awesome/css/font-awesome.min.css") }}"/>
+    <link rel="stylesheet" href="{{ url("public/js/jquery-ui/jquery-ui.min.css") }}"/>
     <link rel="apple-touch-icon" href="{{ asset('assets/apple-touch-icon.png') }}"/>
-    {!! HTML::style('custom/css/'.str_replace(' ','-',$page->title).'.css') !!}
+    {!! HTML::style('public-x/custom/css/'.str_replace(' ','-',$page->title).'.css') !!}
     {{--<link rel="stylesheet" href="{{ asset("resources/assets/css/bootstrap.css?v=1.1") }}" />--}}
     @yield('css')
     @stack('CSS')
@@ -29,12 +29,12 @@
     <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
     <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
-    {!! HTML::script("/js/jquery-2.1.4.min.js") !!}
-    <script src="{{ url("js/jquery-ui/jquery-ui.min.js") }}" type="text/javascript"></script>
+    {!! HTML::script("public/js/jquery-2.1.4.min.js") !!}
+    <script src="{{ url("public/js/jquery-ui/jquery-ui.min.js") }}" type="text/javascript"></script>
     <script src="https://npmcdn.com/tether@1.2.4/dist/js/tether.min.js"></script>
-    {!! HTML::script('custom/js/'.str_replace(' ','-',$page->title).'.js') !!}
-    {!! HTML::script("/js/tinymice/tinymce.min.js") !!}
-    {!! HTML::script("/js/UiElements/bb_iframejs.js") !!}
+    {!! HTML::script('public-x/custom/js/'.str_replace(' ','-',$page->title).'.js') !!}
+    {!! HTML::script("public/js/tinymice/tinymce.min.js") !!}
+    {!! HTML::script("public/js/UiElements/bb_iframejs.js") !!}
 </head>
 <body id="page-top" data-spy="scroll" data-target=".navbar-custom">
 @if (isset($errors) && count($errors) > 0)

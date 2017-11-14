@@ -15,7 +15,7 @@ use Btybug\btybug\Services\GeneralService;
 
 /**
  * Class HookService
- * @package Btybug\Console\Services
+ * @package Sahakavatar\Console\Services
  */
 class HookService extends GeneralService
 {

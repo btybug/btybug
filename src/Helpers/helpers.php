@@ -6,7 +6,7 @@ use Auth;
 use DB;
 use File;
 use Btybug\btybug\Models\Urlmanager;
-use Btybug\User\Models\Roles;
+use Sahakavatar\User\Models\Roles;
 use Session;
 
 class helpers

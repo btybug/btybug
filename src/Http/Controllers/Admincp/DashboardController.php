@@ -40,7 +40,7 @@ class DashboardController extends Controller
      */
     public function getIndex()
     {
-        return view('cms::admin.dashboard');
+        return view('btybug::admin.dashboard');
     }
 
     /**

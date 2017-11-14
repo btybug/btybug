@@ -2,7 +2,7 @@
 
 use File;
 use Btybug\btybug\Models\Hook;
-use Btybug\Settings\Repository\AdminsettingRepository;
+use Sahakavatar\Settings\Repository\AdminsettingRepository;
 
 /**
  * Class ContentLayouts
@@ -549,6 +549,17 @@ class ContentLayouts
         return $this->getPageLayoutWidget($page, $hide_top);
 
     }
+
+    private function scopeGetAdminPageLayout($page, $hide_top = false)
+    {
+        $layout = self::findByVariation($page->layout_id);
+        if ($layout) {
+            return $layout->getAdminPageLayoutWidget($page, $hide_top);
+        }
+        return $this->getAdminPageLayoutWidget($page, $hide_top);
+
+    }
+
     private function scopeGetPageLayoutPlaceholders($page, $hide_top = false)
     {
         $layout = self::findByVariation($page->page_layout);
@@ -561,7 +572,7 @@ class ContentLayouts
     protected function getPagePlaceholders($page, $hide_top = false)
     {
         $_this = $this;
-        return \View::make('cms::_partials.placeholders', compact(['_this', 'page', 'hide_top']))->render();
+        return \View::make('btybug::_partials.placeholders', compact(['_this', 'page', 'hide_top']))->render();
     }
     protected function getPageLayoutWidget($page, $hide_top = false)
     {
@@ -569,7 +580,16 @@ class ContentLayouts
         if (isset($this->placeholders)) {
             $_this = $this;
         }
-        return \View::make('cms::_partials.layout', compact(['_this', 'page', 'hide_top']))->render();
+        return \View::make('btybug::_partials.layout', compact(['_this', 'page', 'hide_top']))->render();
+    }
+
+    protected function getAdminPageLayoutWidget($page, $hide_top = false)
+    {
+        $_this = null;
+        if (isset($this->placeholders)) {
+            $_this = $this;
+        }
+        return \View::make('btybug::_partials.core_layout', compact(['_this', 'page', 'hide_top']))->render();
     }
 
     private function scopeGetDefaultLayoutPlaceholders($system)
@@ -593,30 +613,49 @@ class ContentLayouts
         if (isset($this->placeholders)) {
             $_this = $this;
         }
-        return \View::make('cms::_partials.default_placeholders', compact('_this', 'system'))->render();
+        return \View::make('btybug::_partials.default_placeholders', compact('_this', 'system'))->render();
     }
 
-    private function scopeGetAdminPageLayoutPlaceholders($page)
+    private function scopeGetBackendDefaultLayoutPlaceholders($system)
     {
-        return $this->getAdminPagePlaceholders($page);
+        if (!isset($system['backend_page_section'])) return $this->getBackendDefaultPlaceholders();
+        $layout = self::findByVariation($system['backend_page_section']);
+        if ($layout) {
+            return $layout->getBackendDefaultPlaceholders($system);
+        }
+
+        return $this->getBackendDefaultPlaceholders();
+    }
+
+    protected function getBackendDefaultPlaceholders($system = null)
+    {
+        $_this = null;
+        if (isset($this->placeholders)) {
+            $_this = $this;
+        }
+        return \View::make('btybug::_partials.backend_default_placeholders', compact('_this', 'system'))->render();
+    }
+
+    private function scopeGetAdminPageLayoutPlaceholders($page,$hide_top = false)
+    {
+        $layout = self::findByVariation($page->layout_id);
+        if ($layout) {
+            return $layout->getAdminPagePlaceholders($page, $hide_top);
+        }
+        return $this->getAdminPagePlaceholders($page, $hide_top);
     }
 
     protected function getAdminPagePlaceholders($page = null)
     {
-        if ($page && $page->settings) {
-            $_this = json_decode($page->settings);
-        } else {
-            $settings = new AdminsettingRepository();
-            $_this = $settings->getBackendSettings();
-        }
-        return \View::make('cms::_partials.admin_placeholders', compact('_this', 'page'))->render();
+        $_this = $this;
+        return \View::make('btybug::_partials.admin_placeholders', compact(['_this', 'page', 'hide_top']))->render();
     }
 
     public function scopeGetPageLayoutHooks($page)
     {
         $layout = self::findVariation($page->page_layout);
         if ($layout) {
-                $html = \View::make('cms::_partials.page_hooks', compact('layout'));
+                $html = \View::make('btybug::_partials.page_hooks', compact('layout'));
                 return $html;
         }
     }

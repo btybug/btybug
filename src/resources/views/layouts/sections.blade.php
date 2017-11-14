@@ -16,8 +16,9 @@
     <meta content="" name="description"/>
     <meta content="" name="author"/>
     {!! BBCss() !!}
-    {!! HTML::style('/js/jquery-ui/jquery-ui.min.css') !!}
-    {!! HTML::style('/css/cms.css') !!}
+    {!! HTML::script("public/js/jquery-2.1.4.min.js") !!}
+    {!! HTML::style('public/js/jquery-ui/jquery-ui.min.css') !!}
+    {!! HTML::style('public/css/cms.css') !!}
     @if(isset($model)) {!! HTML::style('custom/css/'.str_replace(' ','-',$model->slug).'.css') !!} @endif
     @yield('CSS')
     @stack('css')
@@ -55,7 +56,7 @@
     </div>
 </div>
 <header class="hide">
-    @include('cms::header')
+    @include('btybug::header')
 </header>
 
 <div class="modal fade" id="magic-settings" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -92,12 +93,11 @@
 <input name="token" type="hidden" value="{{ csrf_token() }}" id="token"/>
 
 </body>
-{{--{!! HTML::script("/js/UiElements/bb_styles.js?v.5") !!}--}}
-{{--{!! HTML::script("/js/UiElements/ui-preview-setting.js") !!}--}}
-{!! HTML::script("/js/jquery-2.1.4.min.js") !!}
-{!! HTML::script("/js/jquery-ui/jquery-ui.min.js") !!}
-{!! HTML::script("/css/bootstrap/js/bootstrap.min.js") !!}
-{!! HTML::script("/js/tinymice/tinymce.min.js") !!}
+{{--{!! HTML::script("public/js/UiElements/bb_styles.js?v.5") !!}--}}
+{{--{!! HTML::script("public/js/UiElements/ui-preview-setting.js") !!}--}}
+{!! HTML::script("public/js/jquery-ui/jquery-ui.min.js") !!}
+{!! HTML::script("public/css/bootstrap/js/bootstrap.min.js") !!}
+{!! HTML::script("public/js/tinymice/tinymce.min.js") !!}
 @if(isset($model))
     {!! HTML::script('custom/js/'.str_replace(' ','-',$model->slug).'.js') !!}
 @endif

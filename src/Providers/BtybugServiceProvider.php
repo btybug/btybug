@@ -5,7 +5,7 @@ namespace Btybug\btybug\Providers;
 use Illuminate\Support\ServiceProvider;
 
 
-class CmsServiceProvider extends ServiceProvider
+class BtybugServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap any application services.
@@ -14,8 +14,8 @@ class CmsServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->loadTranslationsFrom(__DIR__ . '/../resources/Lang', 'cms');
-        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'cms');
+        $this->loadTranslationsFrom(__DIR__ . '/../resources/Lang', 'btybug');
+        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'btybug');
 
         $this->app->register("Btybug\User\Providers\ModuleServiceProvider");
         $this->app->register('Btybug\Console\Providers\ModuleServiceProvider');
@@ -25,7 +25,8 @@ class CmsServiceProvider extends ServiceProvider
         $this->app->register('Btybug\Settings\Providers\ModuleServiceProvider');
         $this->app->register('Btybug\Uploads\Providers\ModuleServiceProvider');
         $this->app->register('Btybug\Modules\Providers\ModuleServiceProvider');
-        $this->app->register('Btybug\Installer\Providers\AvatarServiceProvider');
+        $this->app->register('Btybug\Studios\Providers\ModuleServiceProvider');
+        $this->app->register('Avatar\Avatar\Providers\AvatarServiceProvider');
     }
 
     /**

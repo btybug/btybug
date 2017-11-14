@@ -10,7 +10,7 @@ namespace Btybug\btybug\Models;
 
 //use Btybug\btybug\Helpers\helpers;
 use Assets;
-use Btybug\Manage\Models\FrontendPage;
+use Sahakavatar\Manage\Models\FrontendPage;
 
 /**
  * @property Page page
@@ -37,7 +37,7 @@ class Home
     public function render($url, $settings = [])
     {
         $page = FrontendPage::where('url', $url)->orWhere('url', "/" . $url)->first();
-        if($page->content_type=='special') return view('cms::app', compact('page'));
+        if($page->content_type=='special') return view('btybug::app', compact('page'));
         if ($page) {
             if (!isset($settings['pl_live_settings'])) {
                 if ($page->status == 'draft')
@@ -58,7 +58,7 @@ class Home
             $settings['main_content'] = $page->main_content;
             $settings['content_type'] = $page->content_type;
             $settings['template'] = $page->template;
-            return view('cms::front_pages', compact('page', 'settings'));
+            return view('btybug::front_pages', compact('page', 'settings'));
         }
 
         abort(404);

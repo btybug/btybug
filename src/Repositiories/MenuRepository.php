@@ -13,6 +13,11 @@ class MenuRepository extends GeneralRepository
         return new Menu();
     }
 
+    public function getFrontend()
+    {
+        return $this->model->where('place','frontend')->get();
+    }
+
     public function getWhereNotPlugins()
     {
         return $this->model->where('type', '!=', 'plugin')->get();

@@ -1,6 +1,6 @@
 <?php namespace Btybug\btybug\Models\Templates;
 
-use Btybug\Installer\Repositories\Plugins;
+use Avatar\Avatar\Repositories\Plugins;
 use Btybug\btybug\Models\ContentLayouts\autoinclude;
 use Btybug\btybug\Models\ContentLayouts\ContentLayouts;
 use Btybug\btybug\Models\Templates\Eloquent\Abstractions\TplModel;
@@ -50,12 +50,8 @@ class Units extends TplModel
         }
         $variation = self::findVariation($slug);
         $settings = (isset($variation->settings) && $variation->settings) ? $variation->settings : [];
-        $body = url('/admin/console/backend/units/settings-iframe', $slug);
-        $dataSettings = url('/admin/console/backend/units/settings-iframe', $slug) . '/settings';
-        if ($type = 'frontend') {
-            $body = url('/admin/uploads/gears/units/settings-iframe', $slug);
-            $dataSettings = url('/admin/uploads/gears/units/settings-iframe', $slug) . '/settings';
-        }
+        $body = url('/admin/uploads/gears/settings-iframe', $slug);
+        $dataSettings = url('/admin/uploads/gears/settings-iframe', $slug) . '/settings';
         $data['body'] = $body;
         $data['settings'] = $dataSettings;
         return view('console::backend.gears.units.preview', compact(['model',"ui", 'id', 'data', 'settings', 'variation']));

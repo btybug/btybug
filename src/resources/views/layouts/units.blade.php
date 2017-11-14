@@ -15,10 +15,10 @@
     <meta content="width=device-width, initial-scale=1" name="viewport"/>
     <meta content="" name="description"/>
     <meta content="" name="author"/>
-
+    {!! HTML::script("public/js/jquery-2.1.4.min.js") !!}
     {!! BBCss() !!}
-    {!! HTML::style('/js/jquery-ui/jquery-ui.min.css') !!}
-    {!! HTML::style('/css/cms.css') !!}
+    {!! HTML::style('public/js/jquery-ui/jquery-ui.min.css') !!}
+    {!! HTML::style('public/css/cms.css') !!}
     @yield('CSS')
     @stack('css')
 </head>
@@ -55,7 +55,7 @@
     </div>
 </div>
 <header class="hide">
-    @include('cms::header')
+    @include('btybug::header')
 </header>
 
 <div class="modal fade" id="magic-settings" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -92,12 +92,12 @@
 <input name="token" type="hidden" value="{{ csrf_token() }}" id="token"/>
 
 </body>
-{{--{!! HTML::script("/js/UiElements/bb_styles.js?v.5") !!}--}}
-{{--{!! HTML::script("/js/UiElements/ui-preview-setting.js") !!}--}}
-{!! BBJquery() !!}
+{{--{!! HTML::script("public/js/UiElements/bb_styles.js?v.5") !!}--}}
+{{--{!! HTML::script("public/js/UiElements/ui-preview-setting.js") !!}--}}
+{{--{!! BBJquery() !!}--}}
 {!! BBMainFrontJS() !!}
-{!! HTML::script("/js/jquery-ui/jquery-ui.min.js") !!}
-{!! HTML::script("/js/tinymice/tinymce.min.js") !!}
+{!! HTML::script("public/js/jquery-ui/jquery-ui.min.js") !!}
+{!! HTML::script("public/js/tinymice/tinymce.min.js") !!}
 
 @yield('JS')
 @stack('javascript')

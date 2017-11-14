@@ -12,10 +12,10 @@ namespace Btybug\btybug\Middleware;
 use Closure;
 use Response;
 use Btybug\btybug\Helpers\helpers;
-use Btybug\Console\Repository\FormEntriesRepository;
-use Btybug\Console\Repository\FormsRepository;
-use Btybug\Console\Services\FormService;
-use Btybug\User\Repository\UserRepository;
+use Sahakavatar\Console\Repository\FormEntriesRepository;
+use Sahakavatar\Console\Repository\FormsRepository;
+use Sahakavatar\Console\Services\FormService;
+use Sahakavatar\User\Repository\UserRepository;
 use Session;
 
 /**
