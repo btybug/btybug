@@ -11,16 +11,12 @@
   "require": {
     "btybug/hook": "dev-master",
     "btybug/console": "dev-master",
-    "btybug/avatar": "dev-master",
     "btybug/framework": "dev-master",
-    "btybug/manage": "dev-master",
+    "btybug/frontsite": "dev-master",
     "btybug/resources": "dev-master",
-    "btybug/settings": "dev-master",
     "btybug/uploads": "dev-master",
-    "btybug/modules": "dev-master",
     "btybug/media": "dev-master",
-    "btybug/user": "dev-master",
-    "btybug/studios": "dev-master"
+    "btybug/user": "dev-master"
   },
   "require-dev": {
   },
