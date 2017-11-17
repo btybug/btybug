@@ -54,7 +54,7 @@ class Units extends TplModel
         $dataSettings = url('/admin/uploads/gears/settings-iframe', $slug) . '/settings';
         $data['body'] = $body;
         $data['settings'] = $dataSettings;
-        return view('console::backend.gears.units.preview', compact(['model',"ui", 'id', 'data', 'settings', 'variation']));
+        return view('uploads::gears.units.preview', compact(['model',"ui", 'id', 'data', 'settings', 'variation']));
     }
 
     public static function findUnit($slug)
