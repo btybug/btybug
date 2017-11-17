@@ -6,7 +6,7 @@ namespace Btybug\btybug\Providers;
 
 use App\User;
 use Illuminate\Support\ServiceProvider;
-use Sahakavatar\Console\Models\BackendTh;
+use Btybug\Console\Models\BackendTh;
 
 
 class EventyServiceProvider extends ServiceProvider

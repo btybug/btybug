@@ -15,7 +15,7 @@ use Btybug\btybug\Models\ContentLayouts\ContentLayouts;
 use Btybug\btybug\Models\Templates\TplVariations;
 use Btybug\btybug\Models\Templates\Units;
 use Btybug\btybug\Models\Templates\UnitsVariations;
-use Sahakavatar\Modules\Models\Fields;
+use Btybug\Modules\Models\Fields;
 use Zipper;
 
 /**
@@ -123,8 +123,8 @@ class CmsItemUploader
         $gearsArray = [
             'units' => [
                 'path' => config('paths.units_uplaod'),
-                'model' => "Sahakavatar\\Cms\\Models\\Templates\\Units",
-                'variation' => "Sahakavatar\\Cms\\Models\\Templates\\UnitsVariations",
+                'model' => "Btybug\\Cms\\Models\\Templates\\Units",
+                'variation' => "Btybug\\Cms\\Models\\Templates\\UnitsVariations",
                 'self_type' => 'units',
                 'required_keys' => [
                     'title' => true,
@@ -136,8 +136,8 @@ class CmsItemUploader
             ],
             'page_sections' => [
                 'path' => 'resources' . DS . 'views' . DS . 'ContentLayouts' . DS,
-                'model' => "Sahakavatar\\Cms\\Models\\ContentLayouts\\ContentLayouts",
-                'variation' => "Sahakavatar\\Cms\\Models\\ContentLayouts\\ContentLayoutVariations",
+                'model' => "Btybug\\Cms\\Models\\ContentLayouts\\ContentLayouts",
+                'variation' => "Btybug\\Cms\\Models\\ContentLayouts\\ContentLayoutVariations",
                 'self_type' => 'page_sections',
                 'required_keys' => [
                     'self_type' => true,

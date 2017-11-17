@@ -2,6 +2,7 @@
 
 namespace Btybug\btybug\Http\Controllers;
 
+use Btybug\btybug\Models\Routes;
 use Illuminate\Http\Request;
 use Btybug\btybug\Models\ContentLayouts\ContentLayouts;
 use Btybug\btybug\Models\Home;
@@ -25,7 +26,7 @@ class HomeController extends Controller
      *
      * @param page $page
      */
-    public function __construct(Home $homemodel)
+    public function __construct (Home $homemodel)
     {
         $this->homemodel = $homemodel;
     }
@@ -35,57 +36,60 @@ class HomeController extends Controller
      * @param Request $request
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function pages(Request $request)
+    public function pages (Request $request)
     {
         $url = $request->path();
         $settings = $request->all();
+
         //TODO: settings if live preview pass as argument  settings = $request->all()
         return $this->homemodel->render($url, $settings);
     }
 
-    public function blog_pages(Request $request)
+    public function blog_pages (Request $request)
     {
         $settings = [];
         $url = $request->route()->uri();
+
         return $this->homemodel->render($url, $settings);
     }
 
 //    public function unitStyles($slug, $path)
-    public function unitStyles($css)
+    public function unitStyles ($css)
     {
         $stylePaths = session()->get('custom.styles', []);
-        $contentArray=[];
-        $content='';
+        $contentArray = [];
+        $content = '';
         foreach ($stylePaths as $path) {
-            if(\File::exists($path)){
-                $file=\File::get($path);
-                $contentArray[md5($file)]= $file;
+            if (\File::exists($path)) {
+                $file = \File::get($path);
+                $contentArray[md5($file)] = $file;
             }
         }
-        foreach ($contentArray as $style){
-            $content.="\r\n" .$style;
+        foreach ($contentArray as $style) {
+            $content .= "\r\n" . $style;
         }
         session()->forget('custom.styles');
         $response = \Response::make($content);
         $response->header('Content-Type', 'text/css');
+
         //   $response->header('Cache-Control', 'max-age=31104000');
         return $response;
     }
 
-    public function unitScripts($js)
+    public function unitScripts ($js)
     {
         $scriptPaths = \Session::get('custom.scripts', []);
-        $contentArray=[];
-        $content='';
+        $contentArray = [];
+        $content = '';
 //        $notFound="\r\n".'/*'."\r\n";
         foreach ($scriptPaths as $path) {
-            if(\File::exists($path)){
-                $file=\File::get($path);
-                $key=md5($file);
-                $contentArray[$key]= $file;
-                $content.=$contentArray[$key];
-            }else{
-              //  $notFound.=$path."\r\n";
+            if (\File::exists($path)) {
+                $file = \File::get($path);
+                $key = md5($file);
+                $contentArray[$key] = $file;
+                $content .= $contentArray[$key];
+            } else {
+                //  $notFound.=$path."\r\n";
             }
         }
 //        $notFound.='*/';
@@ -93,20 +97,43 @@ class HomeController extends Controller
         \Session::forget('custom.scripts');
         $response = \Response::make($content);
         $response->header('Content-Type', 'application/javascript', false);
+
         //    $response->header('Cache-Control', 'max-age=31536000');
 
         return $response;
     }
 
-    public function unitImg($slug, $path)
+    public function unitImg ($slug, $path)
     {
 
         $unit = ContentLayouts::find($slug);
-        if (!$unit) $unit = Units::find($slug);
-        if (!\File::exists($unit->getPath() . DS . $path)) abort(500);
+        if (! $unit) $unit = Units::find($slug);
+        if (! \File::exists($unit->getPath() . DS . $path)) abort(500);
         $file = \File::get($unit->getPath() . DS . $path);
         $response = \Response::make($file);
         $response->header('Cache-Control', 'max-age=31104000');
+
         return $response;
+    }
+
+    public function pagesOptimize ()
+    {
+        //        $package = new Plugins();
+        //        $package->modules();
+        //        $plugins = $package->getPlugins();
+
+        $plugins = [
+            'btybug/uploads',
+            'btybug/console',
+            'btybug/user',
+            'btybug/frontsite',
+            'btybug/framework'
+        ];
+
+//        dd($plugins);
+        foreach ($plugins as $slug) {
+            $t = Routes::registerPages($slug);
+            var_dump($t);
+        }
     }
 }

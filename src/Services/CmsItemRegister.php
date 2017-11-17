@@ -12,7 +12,7 @@ use File;
 
 /**
  * Class CmsItemRegistrator
- * @package Sahakavatar\Modules\Models\Models
+ * @package Btybug\Modules\Models\Models
  */
 class CmsItemRegister
 {

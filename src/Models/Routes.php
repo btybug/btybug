@@ -8,9 +8,9 @@
 
 namespace Btybug\btybug\Models;
 
-use Avatar\Avatar\Repositories\Plugins;
-use Sahakavatar\Console\Models\AdminPages;
-use Sahakavatar\Console\Repository\AdminPagesRepository;
+use Btybug\Uploads\Repository\Plugins;
+use Btybug\Console\Models\AdminPages;
+use Btybug\Console\Repository\AdminPagesRepository;
 
 /**
  * Class Routes
@@ -26,17 +26,13 @@ class Routes
         $new_array = [];
         $routeCollection = \Route::getRoutes();
         foreach ($routeCollection as $value) {
-            if ($value->getPrefix() != $value->getPath() and $value->getPrefix() != '/' . $value->getPath()) {
-
-                $routes[$value->getMethods()[0]][$value->getPath()] = [];
-                if (!isset($routes[$value->getMethods()[0]][$value->getPrefix()])) {
-                    $routes[$value->getMethods()[0]][$value->getPrefix()] = [];
-                }
+            $routes[$value->methods()[0]][$value->uri()] = [];
+            if (!isset($routes[$value->methods()[0]][$value->getPrefix()])) {
+                $routes[$value->methods()[0]][$value->getPrefix()] = [];
             }
-
         }
         foreach ($routes[$method] as $key => $val) {
-            if (isset($key[0]) and $key[0] == '/') {
+            if (isset($key[0]) && $key[0] == '/') {
                 $key = substr($key, 1);
             }
             $routes[$method][$key] = $val;
@@ -51,7 +47,9 @@ class Routes
         ksort($routes[$method]);
         $routes[$method] = (self::keysort($routes[$method], $sub));
         $_this = new static();
-        $_this->array = collect($routes[$method][$sub]);
+        if(isset($routes[$method][$sub]))
+            $_this->array = collect($routes[$method][$sub]);
+
         return $_this;
     }
 
@@ -64,7 +62,7 @@ class Routes
                 unset($array[$key]);
             }
         }
-        if (isset($array[$url]) and count($array[$url])) {
+        if (isset($array[$url]) && count($array[$url])) {
             foreach ($array[$url] as $k => $v) {
                 $array[$url] = self::keysort($array[$url], $k);
             }
@@ -82,7 +80,7 @@ class Routes
 
     public static function clean_urls($url)
     {
-        if (isset($url[0]) and $url[0] == '/') {
+        if (isset($url[0]) && $url[0] == '/') {
             $url = substr($url, 1);
         }
         return explode('/', $url);
@@ -160,7 +158,7 @@ class Routes
 
     public static function getRoutes()
     {
-        return \Route::getRoutes();
+        return Route::getRegisteredRoutes();
     }
 
     public static function registerPages($slug)
@@ -267,7 +265,8 @@ class Routes
     public function html()
     {
         $array = $this->array;
-        return $this->keysort_html($array->toArray());
+        if($array)
+        return $this->keysort_html($array->toArray()).'</ul>';
     }
 
     protected function keysort_html($array, $count = 0, $url = null)
@@ -293,8 +292,9 @@ class Routes
                 $dropmenu = 'false';
             }
 
-            $html .= '<li data-name="' . $url . '" data-icon="glyphicon glyphicon-arrow-right" data-id="' . uniqid() . '" data-url="' . $url . '" data-child="' . $dropmenu . '" data-jstree=\'{"icon":"glyphicon glyphicon-arrow-right"}\'>';
-            $html .= '<span class="arrowicon"><i class="fa fa-plus" aria-hidden="true"></i></span><span class="jstree-anchor">' . $url . '</span>';
+            $html .= '<li>';
+            $html .= $url;
+//            $html .= '</li>';
             if (count($array[$url])) {
                 $html .= $this->keysort_html($array[$url]);
                 $html .= '</ul>';
@@ -302,7 +302,6 @@ class Routes
             $html .= '</li>';
             $html .= $this->keysort_html($array, $count, $url);
         }
-
         return $html;
     }
 

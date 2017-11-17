@@ -70,12 +70,12 @@ class Menu extends Model
 
     public function adminPage()
     {
-        return $this->belongsTo('Sahakavatar\Console\Models\AdminPages');
+        return $this->belongsTo('Btybug\Console\Models\AdminPages');
     }
 
     public function creator()
     {
-        return $this->belongsTo('Sahakavatar\User\User', 'creator_id', 'id');
+        return $this->belongsTo('Btybug\User\User', 'creator_id', 'id');
     }
 
     public function items()

@@ -10,7 +10,7 @@ namespace Btybug\btybug\Models;
 
 //use Btybug\btybug\Helpers\helpers;
 use Assets;
-use Sahakavatar\Manage\Models\FrontendPage;
+use Btybug\FrontSite\Models\FrontendPage;
 
 /**
  * @property Page page

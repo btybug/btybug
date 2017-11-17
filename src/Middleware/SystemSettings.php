@@ -5,7 +5,7 @@ use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Session\Store;
 
 //use Btybug\btybug\Helpers\helpers;
-//use Sahakavatar\Settings\Repository\AdminsettingRepository as Settings;
+//use Btybug\btybug\Repositories\AdminsettingRepository as Settings;
 //TODO Clean or remove
 class SystemSettings
 {
