@@ -5,8 +5,8 @@ namespace Btybug\btybug\Providers;
 //use TorMorten\Eventy;
 
 use App\User;
-use Illuminate\Support\ServiceProvider;
 use Btybug\Console\Models\BackendTh;
+use Illuminate\Support\ServiceProvider;
 
 
 class EventyServiceProvider extends ServiceProvider
@@ -52,16 +52,7 @@ class EventyServiceProvider extends ServiceProvider
 //        });
 
         \Eventy::addAction('admin.menus', function ($what) {
-            if (!(\Config::get('admin_menus'))) {
-                if (\File::exists(base_path('resources/menus/admin/1.json'))) {
-                    $menu_json_file = \File::get(base_path('resources/menus/admin/1.json'));
-                    $menu_array = json_decode($menu_json_file, true);
-                    \Config::set('admin_menus', $menu_array);
-                }
-
-            } else {
-                $menu_array = \Config::get('admin_menus');
-            }
+            $menu_array = \Config::get('admin_menus',[]);
             $sub = true;
             foreach ($menu_array as $key => $value) {
                 if ($value['title'] == $what['title']) {

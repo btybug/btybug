@@ -5,9 +5,11 @@
  * Date: 7/18/17
  * Time: 5:23 PM
  */
-function module_path($path=''){
-    return app()->basePath().(DS.'vendor'.DS.'sahak.avatar').($path ? DS.$path : $path);
+function module_path($path = '')
+{
+    return app()->basePath() . (DS . 'vendor' . DS . 'sahak.avatar') . ($path ? DS . $path : $path);
 }
+
 function BBaddShortcode($key, $function)
 {
     $codes = \Config::get('shortcode.extra', []);
@@ -257,12 +259,12 @@ function BBheaderBack()
 {
     $page = \Btybug\btybug\Services\RenderService::getPageByURL();
 
-    if($page && $page->header){
+    if ($page) {
         $settingsRepo = new \Btybug\btybug\Repositories\AdminsettingRepository();
-        $settings = $settingsRepo->findBy('section', 'backend_settings');
+        $settings = $settingsRepo->findBy('section', 'backend_site_settings');
         if ($settings && $settings->val) $data = json_decode($settings->val, true);
 
-        if(isset($data['header_unit']))
+        if (isset($data['header_unit']))
             return BBRenderUnits($data['header_unit']);
     }
 }
@@ -271,12 +273,12 @@ function BBfooterBack()
 {
     $page = \Btybug\btybug\Services\RenderService::getPageByURL();
 
-    if($page && $page->footer){
+    if ($page && $page->footer) {
         $settingsRepo = new \Btybug\btybug\Repositories\AdminsettingRepository();
-        $settings = $settingsRepo->findBy('section', 'backend_settings');
+        $settings = $settingsRepo->findBy('section', 'backend_site_settings');
         if ($settings && $settings->val) $data = json_decode($settings->val, true);
 
-        if(isset($data['footer_unit']))
+        if (isset($data['footer_unit']))
             return BBRenderUnits($data['footer_unit']);
     }
 }
@@ -309,12 +311,12 @@ function BBgetPageLayout()
     $page = \Btybug\btybug\Services\RenderService::getPageByURL();
     $data = [];
     if ($page->layout_id) {
-        $slug = explode('.',$page->layout_id);
+        $slug = explode('.', $page->layout_id);
         $layout = \Btybug\btybug\Models\ContentLayouts\ContentLayouts::find($slug[0]);
         if ($layout) return 'ContentLayouts.' . $layout->folder . '.' . $layout->layout;
     } else {
         $settingsRepo = new \Btybug\btybug\Repositories\AdminsettingRepository();
-        $settings = $settingsRepo->findBy('section', 'backend_settings');
+        $settings = $settingsRepo->findBy('section', 'backend_site_settings');
         if ($settings && $settings->val) $data = json_decode($settings->val, true);
 
         if (isset($data['backend_page_section']) && $data['backend_page_section']) {
@@ -559,19 +561,31 @@ function hierarchyAdminPagesListFull($data, $parent = true, $icon = true, $id = 
 
             $output .= ' <ol class="pagelisting">';
             $output .= '<li data-id="' . $item->id . '">';
-            $output .= '<div class="listinginfo">';
-            $output .= '<div class="lsitingbutton">';
-            if($item->content_type == "special"){
-                $settings = json_decode($item->settings,true);
+            $title = 'core';
+            switch ($item->type) {
+                case  "custom" :
+                    $title = 'custom';
+                    $output .= '<div class="listinginfo" style="background: #36e0a0;">';
+                    break;
+                case  "plugin" :
+                    $title = 'plugin';
+                    $output .= '<div class="listinginfo" style="background: #e0223c;">';
+                    break;
+                default:
+                    $output .= '<div class="listinginfo">';
+                    break;
+            }
 
+            $output .= '<div class="lsitingbutton">';
+            if ($item->content_type == "special") {
+                $settings = json_decode($item->settings, true);
                 $output .= '<a href="' . url($settings['edit_url']) . '" class="btn"><i class="fa fa-cog fa-spin"></i></a>';
-            }else{
-                $output .= '<a href="' . url('/admin/manage/structure/front-pages/settings', $item->id) . '" class="btn"><i class="fa fa-pencil"></i></a>';
+            } else {
+                $output .= '<a href="' . url('/admin/front-site/structure/front-pages/settings', $item->id) . '" class="btn"><i class="fa fa-pencil"></i></a>';
             }
 
             if ($item->type == 'custom') {
-                $output .= '<a href="' . url('/admin/manage/structure/front-pages/new', $item->id) . '" class="btn"><i class="fa fa-plus"></i></a>';
-                $output .= '<a data-href="' . url('/admin/manage/structure/front-pages/delete') . '" data-key="' . $item->id . '" data-type="Page ' . $item->title . '"  class="delete-button btn trashBtn"><i class="fa fa-trash"></i></a>';
+                $output .= '<a data-href="' . url('/admin/front-site/structure/front-pages/delete') . '" data-key="' . $item->id . '" data-type="Page ' . $item->title . '"  class="delete-button btn trashBtn"><i class="fa fa-trash"></i></a>';
             }
 //        $output .= '<a data-toggle="collapse" data-pagecolid="' . $item->id . '" data-parent="#accordion' . $item->id . '" href="#collapseOne' . $item->id . '" aria-expanded="true" aria-controls="collapseOne" class="link_name collapsed">';
 //        $output .= $item->title;
@@ -583,7 +597,7 @@ function hierarchyAdminPagesListFull($data, $parent = true, $icon = true, $id = 
             }
             $output .= '</button>';
 
-            $output .= '<span class="listingtitle">' . $item->title . '</span>';
+            $output .= '<span class="listingtitle">' . $item->title . ' - ' . $title . '</span>';
             $output .= '</div>';
             /* Actions */
             /* Actions END */
@@ -709,7 +723,7 @@ function BBbutton2($type, $key, $tag, $text, $array = [])
         $array = 'data-array="true"';
     }
     $data_key = str_replace('[]', '', $key);
-    $html=View::make('btybug::bbbutton',compact('type','data_key','atributes','text','array','value','hiddenName'))->render();
+    $html = View::make('btybug::bbbutton', compact('type', 'data_key', 'atributes', 'text', 'array', 'value', 'hiddenName'))->render();
     return $html;
 }
 
@@ -1219,7 +1233,7 @@ function parametazor($url)
 
 function modules_path($path = '')
 {
-    return app()->basePath('vendor' . DS . 'sahak.avatar') . ($path ? DS . $path : $path);
+    return app()->basePath('vendor' . DS . 'btybug') . ($path ? DS . $path : $path);
 }
 
 function BBCheckLoginEnabled()
@@ -1296,7 +1310,7 @@ function BBGetMenu(
 
 function hierarchyFrontendPagesListWithModuleName($data, $moduleCh = null, $icon = true, $membershipSlug = null, $checkbox = false)
 {
-    $plugins = new \Avatar\Avatar\Repositories\Plugins();
+    $plugins = new \Btybug\Uploads\Repository\Plugins();
     $plugins->modules();
     $modules = $plugins->getPlugins()->toArray();
     $plugins->plugins();
@@ -1508,8 +1522,279 @@ function form_render($attr)
     }
 }
 
-function generate_special_page(array $data){
+function generate_special_page(array $data)
+{
     return \Btybug\FrontSite\Services\FrontendPageService::generateSpecialPage(
         $data
     );
+}
+
+function renderPagesInMenu($data, $parent = true, $i = 0, $children = true)
+{
+    $roles = new \Btybug\User\Repository\RoleRepository();
+    $output = '';
+    // Loop through items
+    foreach ($data as $item) {
+        if ($parent) {
+            $output .= '<li data-id="' . $item->module_id . '" id="menu-item-front" class="no-nest">';
+            $output .= '<div class="panel panel-default">';
+            $output .= '<div class="bb-menu-item-title">';
+            $output .= '<i></i>';
+            $output .= '<strong>' . ucfirst($item->title) . ' Module Pages</strong>';
+            $output .= '<div class="bb-menu-actions pull-right">';
+            $output .= '<a href="javascript:" class="bb-menu-delete"> <i class="fa fa-close"></i></a>';
+            $output .= '<a href="javascript:" class="bb-menu-collapse expand group-expander"> <i class="fa fa-caret-up"></i></a>';
+            $output .= '</div>';
+            $output .= '</div>';
+            $output .= '<div class="panel-body bb-menu-group-body">';
+            $output .= '<ol class="bb-sortable-static">';
+        } else {
+            if ($item->parent->parent == null) $i = 0;
+
+            $output .= '<li data-id="' . $item->id . '" id="menu-item-' . $item->id . '" class="level-' . $i . '">';
+            $output .= '<div class="bb-menu-item">';
+            $output .= '<div class="bb-menu-item-title">';
+            $output .= '<i></i><span>' . $item->title . '</span>';
+            $output .= '<div class="bb-menu-actions pull-right">';
+            $output .= '<a href="javascript:" class="bb-menu-delete"><i class="fa fa-close"></i></a>';
+            $output .= '<a href="javascript:" class="bb-menu-collapse"><i class="fa fa-caret-down"></i></a>';
+            $output .= '</div>';
+            $output .= '</div>';
+            $output .= '<div class="bb-menu-item-body">';
+            $output .= '<div class="bb-menu-form">';
+            $output .= '<div class="row">';
+            $output .= '<div class="col-md-4">';
+            $output .= '<div class="form-group">';
+            $output .= '<label>Icon</label>';
+            $output .= '<input type="text" data-placement="right" class="form-control input-sm icp readonly">';
+            $output .= '</div>';
+            $output .= '</div>';
+            $output .= '<div class="col-md-8">';
+            $output .= '<div class="form-group">';
+            $output .= '<label>Item Title</label>';
+            $output .= '<input type="text" value="' . $item->title . '" class="form-control input-sm menu-item-title">';
+            $output .= '</div>';
+            $output .= '</div>';
+            $output .= '</div>';
+            $output .= '<div class="row">';
+            $output .= '<div class="col-md-6">';
+            $output .= '<div class="form-group">';
+            $output .= '<label>Item URL</label>';
+            $output .= '<input type="text" value="' . $item->url . '" class="form-control input-sm item-url" readonly>';
+            $output .= '</div>';
+            $output .= '</div>';
+            $output .= '<div class="col-md-6">';
+            $output .= '<div class="form-group">';
+            $output .= '<label>Display Roles</label>';
+            $output .= '<select name="display_roles" class="form-control input-sm">';
+            $output .= '<option value="">All Visitors</option>';
+            $output .= '<option value="">Members Only</option>';
+            $output .= '<option value="">Guests Only</option>';
+            $output .= '<option value="specific">Specific Roles</option>';
+            $output .= '</select>';
+            $output .= '</div>';
+            $output .= '</div>';
+            $output .= '</div>';
+            $output .= '<div class="form-group specific hide">';
+            $output .= '<label>Select Roles</label>';
+            $output .= Form::select('roles[]', $roles->pluck('slug', 'name'), null, ['multiple' => true, 'class' => 'form-control input-sm']);
+            $output .= '</div>';
+            $output .= '</div>';
+            $output .= '</div>';
+            $output .= '</div>';
+            $output .= '</li>';
+        }
+
+        if (count($item->childs)) {
+            $output .= renderPagesInMenu($item->childs, false, $i = $i + 1, $children);
+        }
+
+        if ($parent) {
+            $output .= '</div>';
+            $output .= '</div>';
+            $output .= '</li>';
+        }
+    }
+    // Return data tree
+    return $output;
+}
+
+function get_pages_menu_array($data, $i = 0, $array = [])
+{
+    $array[$i]['title'] = $data[$i]['title'];
+    $array[$i]['custom-link'] = $data[$i]['url'];
+    $array[$i]['icon'] = $data[$i]['page_icon'];
+    $children = $data[$i]->childs;
+    if (count($children)) {
+        $array[$i]['children'] = get_pages_menu_array($children);
+    }
+    $i++;
+    if (isset($data[$i])) {
+        $array = get_pages_menu_array($data, $i, $array);
+    }
+    return $array;
+}
+
+function renderSavedPagesInMenu($data, $parent = true, $i = 0)
+{
+    $roles = new \Btybug\User\Repository\RoleRepository();
+    $output = '';
+//    dd($data);
+    // Loop through items
+    foreach ($data as $item) {
+        if ($parent) {
+            $output .= '<li data-id="' . $item->module_id . '" id="menu-item-front" class="no-nest">';
+            $output .= '<div class="panel panel-default">';
+            $output .= '<div class="bb-menu-item-title">';
+            $output .= '<i></i>';
+            $output .= '<strong>' . ucfirst($item->title) . ' Module Pages</strong>';
+            $output .= '<div class="bb-menu-actions pull-right">';
+            $output .= '<a href="javascript:" class="bb-menu-delete"> <i class="fa fa-close"></i></a>';
+            $output .= '<a href="javascript:" class="bb-menu-collapse expand group-expander"> <i class="fa fa-caret-up"></i></a>';
+            $output .= '</div>';
+            $output .= '</div>';
+            $output .= '<div class="panel-body bb-menu-group-body">';
+            $output .= '<ol class="bb-sortable-static">';
+        } else {
+//            if($item->parent->parent == null) $i = 0;
+
+            $output .= '<li data-id="' . $item['id'] . '" id="menu-item-' . $item['id'] . '" class="level-' . $i . '">';
+            $output .= '<div class="bb-menu-item">';
+            $output .= '<div class="bb-menu-item-title">';
+            $output .= '<i></i><span>' . $item['title'] . '</span>';
+            $output .= '<div class="bb-menu-actions pull-right">';
+            $output .= '<a href="javascript:" class="bb-menu-delete"><i class="fa fa-close"></i></a>';
+            $output .= '<a href="javascript:" class="bb-menu-collapse"><i class="fa fa-caret-down"></i></a>';
+            $output .= '</div>';
+            $output .= '</div>';
+            $output .= '<div class="bb-menu-item-body">';
+            $output .= '<div class="bb-menu-form">';
+            $output .= '<div class="row">';
+            $output .= '<div class="col-md-4">';
+            $output .= '<div class="form-group">';
+            $output .= '<label>Icon</label>';
+            $output .= '<input type="text" data-placement="right" class="form-control input-sm icp">';
+            $output .= '</div>';
+            $output .= '</div>';
+            $output .= '<div class="col-md-8">';
+            $output .= '<div class="form-group">';
+            $output .= '<label>Item Title</label>';
+            $output .= '<input type="text" value="' . $item['title'] . '" class="form-control input-sm menu-item-title">';
+            $output .= '</div>';
+            $output .= '</div>';
+            $output .= '</div>';
+            $output .= '<div class="row">';
+            $output .= '<div class="col-md-6">';
+            $output .= '<div class="form-group">';
+            $output .= '<label>Item URL</label>';
+            $output .= '<input type="text" value="" class="form-control input-sm">';
+            $output .= '</div>';
+            $output .= '</div>';
+            $output .= '<div class="col-md-6">';
+            $output .= '<div class="form-group">';
+            $output .= '<label>Display Roles</label>';
+            $output .= '<select name="display_roles" class="form-control input-sm">';
+            $output .= '<option value="">All Visitors</option>';
+            $output .= '<option value="">Members Only</option>';
+            $output .= '<option value="">Guests Only</option>';
+            $output .= '<option value="specific">Specific Roles</option>';
+            $output .= '</select>';
+            $output .= '</div>';
+            $output .= '</div>';
+            $output .= '</div>';
+            $output .= '<div class="form-group specific hide">';
+            $output .= '<label>Select Roles</label>';
+            $output .= Form::select('roles[]', $roles->pluck('slug', 'name'), null, ['multiple' => true, 'class' => 'form-control input-sm']);
+            $output .= '</div>';
+            $output .= '</div>';
+            $output .= '</div>';
+            $output .= '</div>';
+            $output .= '</li>';
+        }
+
+        if (isset($item['children'])) {
+            $output .= renderSavedPagesInMenu($item['children'], false, $i + 1);
+        }
+
+        if ($parent) {
+            $output .= '</div>';
+            $output .= '</div>';
+            $output .= '</li>';
+        }
+    }
+    // Return data tree
+    return $output;
+}
+
+
+function renderFrontPagesInMenu($data, $parent = true, $i = 0, $children = true)
+{
+    $roles = new \Btybug\User\Repository\RoleRepository();
+    $output = '';
+    // Loop through items
+    foreach ($data as $item) {
+        $output .= '<li data-id="' . $item->id . '" id="menu-item-' . $item->id . '" class="level-' . $i . '">';
+        $output .= '<div class="bb-menu-item">';
+        $output .= '<div class="bb-menu-item-title">';
+        $output .= '<i></i><span>' . $item->title . '</span>';
+        $output .= '<div class="bb-menu-actions pull-right">';
+        $output .= '<a href="javascript:" class="bb-menu-delete"><i class="fa fa-close"></i></a>';
+        $output .= '<a href="javascript:" class="bb-menu-collapse"><i class="fa fa-caret-down"></i></a>';
+        $output .= '</div>';
+        $output .= '</div>';
+        $output .= '<div class="bb-menu-item-body">';
+        $output .= '<div class="bb-menu-form">';
+        $output .= '<div class="row">';
+        $output .= '<div class="col-md-4">';
+        $output .= '<div class="form-group">';
+        $output .= '<label>Icon</label>';
+        $output .= '<input type="text" data-placement="right" class="form-control input-sm icp" readonly>';
+        $output .= '</div>';
+        $output .= '</div>';
+        $output .= '<div class="col-md-8">';
+        $output .= '<div class="form-group">';
+        $output .= '<label>Item Title</label>';
+        $output .= '<input type="text" value="' . $item->title . '" class="form-control input-sm menu-item-title" readonly>';
+        $output .= '</div>';
+        $output .= '</div>';
+        $output .= '</div>';
+        $output .= '<div class="row">';
+        $output .= '<div class="col-md-6">';
+        $output .= '<div class="form-group">';
+        $output .= '<label>Item URL</label>';
+        $output .= '<input type="text" value="' . $item->url . '" class="form-control input-sm item-url" readonly>';
+        $output .= '</div>';
+        $output .= '</div>';
+        $output .= '<div class="col-md-6">';
+        $output .= '<div class="form-group">';
+        $output .= '<label>Display Roles</label>';
+        $output .= '<select name="display_roles" class="form-control input-sm">';
+        $output .= '<option value="">All Visitors</option>';
+        $output .= '<option value="">Members Only</option>';
+        $output .= '<option value="">Guests Only</option>';
+        $output .= '<option value="specific">Specific Roles</option>';
+        $output .= '</select>';
+        $output .= '</div>';
+        $output .= '</div>';
+        $output .= '</div>';
+        $output .= '<div class="form-group specific hide">';
+        $output .= '<label>Select Roles</label>';
+        $output .= Form::select('roles[]', $roles->pluck('slug', 'name'), null, ['multiple' => true, 'class' => 'form-control input-sm']);
+        $output .= '</div>';
+        $output .= '</div>';
+        $output .= '</div>';
+        $output .= '</div>';
+        $output .= '</li>';
+
+        if (count($item->childs)) {
+            $output .= renderFrontPagesInMenu($item->childs, false, $i + 1, $children);
+        }
+
+    }
+    // Return data tree
+    return $output;
+}
+
+function recursive_hook_menus()
+{
 }

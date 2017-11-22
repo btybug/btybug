@@ -660,4 +660,13 @@ class ContentLayouts
         }
     }
 
+    public function scopeGetChildrenPageLayout($page)
+    {
+        $layout = self::findVariation($page->page_layout);
+        if ($layout) {
+            $html = \View::make('btybug::_partials.children_layout', compact('layout','page'));
+            return $html;
+        }
+    }
+
 }
